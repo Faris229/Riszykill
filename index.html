@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RISZY SHOP - ระบบสั่งซื้ออัตโนมัติ</title>
+    <title>RISZY SHOP - ระบบสั่งซื้ออัตโนมัติ V2</title>
     
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -35,19 +37,26 @@
         .status-pending { background-color: #FEF3C7; color: #D97706; }
         .status-success { background-color: #D1FAE5; color: #059669; }
         .status-cancel { background-color: #FEE2E2; color: #DC2626; }
+        
+        /* Animation for form switching */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="text-gray-800 pb-20">
 
+    <!-- Navbar -->
     <nav class="bg-primary text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <img src="https://i.postimg.cc/CdpMCWTh/IMG-9993.png" class="w-10 h-10 rounded-full border-2 border-secondary bg-white">
-                <span class="font-bold text-lg tracking-wide">RISZY SHOP</span>
+                <span class="font-bold text-lg tracking-wide hidden sm:block">RISZY SHOP</span>
+                <span class="font-bold text-lg tracking-wide sm:hidden">RISZY</span>
             </div>
-            <div class="flex gap-3">
-                <button onclick="togglePage('home')" class="hover:text-secondary transition"><i class="fas fa-home"></i> หน้าหลัก</button>
-                <button onclick="togglePage('history')" id="navHistoryBtn" class="hidden hover:text-secondary transition"><i class="fas fa-history"></i> สถานะ</button>
+            <div class="flex gap-3 items-center">
+                <div id="userGreeting" class="hidden text-xs text-secondary font-light mr-2"></div>
+                <button onclick="togglePage('home')" class="hover:text-secondary transition text-sm"><i class="fas fa-home"></i> หน้าหลัก</button>
+                <button onclick="togglePage('history')" id="navHistoryBtn" class="hidden hover:text-secondary transition text-sm"><i class="fas fa-history"></i> ประวัติ</button>
                 <button onclick="logout()" id="navLogoutBtn" class="hidden text-red-300 hover:text-red-100 transition"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
@@ -55,20 +64,30 @@
 
     <div class="container max-w-2xl mx-auto p-4 mt-6">
 
-        <div id="authSection" class="glass-panel p-6 rounded-2xl shadow-md bg-white">
+        <!-- AUTH SECTION -->
+        <div id="authSection" class="glass-panel p-6 rounded-2xl shadow-md bg-white fade-in">
             <div class="text-center mb-6">
                 <h2 class="text-2xl font-bold text-brand-dark" id="authTitle">เข้าสู่ระบบ</h2>
-                <p class="text-gray-500 text-sm">เพื่อทำการสั่งซื้อสินค้า</p>
+                <p class="text-gray-500 text-sm">ยินดีต้อนรับสู่ Riszy Shop</p>
             </div>
             
             <form id="authForm" class="space-y-4">
+                <!-- Username (Always Visible) -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
-                    <input type="email" id="authEmail" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none" placeholder="example@email.com" required>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้ (Username)</label>
+                    <input type="text" id="authUsername" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none bg-gray-50" placeholder="ตั้งชื่อผู้ใช้ภาษาอังกฤษ" required>
                 </div>
+
+                <!-- Email (Visible only in Register Mode) -->
+                <div id="emailFieldContainer" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล (Email)</label>
+                    <input type="email" id="authEmail" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none bg-gray-50" placeholder="example@gmail.com">
+                </div>
+
+                <!-- Password (Always Visible) -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
-                    <input type="password" id="authPassword" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none" placeholder="******" required>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน (Password)</label>
+                    <input type="password" id="authPassword" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none bg-gray-50" placeholder="******" required>
                 </div>
                 
                 <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-brand-green hover:bg-green-700 text-white font-bold rounded-xl shadow transition">เข้าสู่ระบบ</button>
@@ -76,34 +95,43 @@
 
             <div class="mt-4 text-center text-sm">
                 <span id="authSwitchText" class="text-gray-500">ยังไม่มีบัญชี?</span>
-                <button id="authSwitchBtn" class="text-modern-blue font-bold hover:underline text-blue-600">สมัครสมาชิก</button>
+                <button id="authSwitchBtn" class="text-modern-blue font-bold hover:underline text-blue-600 ml-1">สมัครสมาชิก</button>
             </div>
 
             <div class="mt-6 border-t pt-4 text-center">
-                <button onclick="openAdminLogin()" class="text-xs text-gray-400 hover:text-gray-600">Admin Login</button>
+                <button onclick="openAdminLogin()" class="text-xs text-gray-400 hover:text-gray-600 font-mono"><i class="fas fa-lock"></i> Admin Only</button>
             </div>
         </div>
 
-        <div id="appSection" class="hidden space-y-6">
+        <!-- MAIN APP SECTION (Hidden by default) -->
+        <div id="appSection" class="hidden space-y-6 fade-in">
             
+            <!-- HOME: Product Selection -->
             <div id="page-home" class="page-content">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-lg font-bold text-primary mb-4 flex items-center"><i class="fas fa-shopping-bag mr-2"></i> เลือกสินค้า</h3>
                     
+                    <!-- Categories -->
                     <div class="grid grid-cols-3 gap-2 mb-6" id="categoryTabs">
-                        <button onclick="filterCategory('gem')" class="cat-btn p-2 rounded-lg border text-sm font-bold bg-green-50 border-brand-green text-brand-green">💎 เพชรเกม</button>
-                        <button onclick="filterCategory('account')" class="cat-btn p-2 rounded-lg border text-sm text-gray-500 hover:bg-gray-50">🆔 ไอดีเกม</button>
-                        <button onclick="filterCategory('program')" class="cat-btn p-2 rounded-lg border text-sm text-gray-500 hover:bg-gray-50">🎮 โปรแกรม</button>
+                        <button onclick="filterCategory('gem')" class="cat-btn p-2 rounded-lg border text-sm font-bold bg-green-50 border-brand-green text-brand-green transition-all">💎 เพชรเกม</button>
+                        <button onclick="filterCategory('account')" class="cat-btn p-2 rounded-lg border text-sm text-gray-500 hover:bg-gray-50 transition-all">🆔 ไอดีเกม</button>
+                        <button onclick="filterCategory('program')" class="cat-btn p-2 rounded-lg border text-sm text-gray-500 hover:bg-gray-50 transition-all">🎮 โปรแกรม</button>
                     </div>
 
+                    <!-- Products Grid -->
                     <div id="productsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                        <!-- Products will be injected here via JS -->
                         <div class="col-span-full text-center py-10 text-gray-400">
                             <i class="fas fa-spinner fa-spin"></i> กำลังโหลดสินค้า...
                         </div>
                     </div>
 
-                    <div id="orderForm" class="hidden border-t pt-6">
-                        <h4 class="font-bold text-gray-700 mb-3" id="selectedProductName">สินค้า: -</h4>
+                    <!-- Input Form -->
+                    <div id="orderForm" class="hidden border-t pt-6 fade-in">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-gray-700" id="selectedProductName">สินค้า: -</h4>
+                            <button onclick="closeOrderForm()" class="text-red-500 text-sm hover:underline">ยกเลิก</button>
+                        </div>
                         
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1" id="dynamicInputLabel">UID เกม / ข้อมูลติดต่อ</label>
@@ -117,10 +145,15 @@
                 </div>
             </div>
 
-            <div id="page-history" class="page-content hidden">
+            <!-- HISTORY: Order Status -->
+            <div id="page-history" class="page-content hidden fade-in">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="text-lg font-bold text-primary mb-4"><i class="fas fa-list-alt mr-2"></i> ประวัติการสั่งซื้อ</h3>
+                    <h3 class="text-lg font-bold text-primary mb-4 flex items-center justify-between">
+                        <span><i class="fas fa-list-alt mr-2"></i> ประวัติการสั่งซื้อ</span>
+                        <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded">ข้อมูลของคุณเท่านั้น</span>
+                    </h3>
                     <div id="orderHistoryList" class="space-y-3">
+                        <!-- Orders injected here -->
                         <p class="text-center text-gray-400 py-4">ยังไม่มีรายการสั่งซื้อ</p>
                     </div>
                 </div>
@@ -128,35 +161,47 @@
 
         </div>
 
-        <div id="adminPanel" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-[100] overflow-y-auto">
+        <!-- ADMIN PANEL (Overlay) -->
+        <div id="adminPanel" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-[100] overflow-y-auto fade-in">
             <div class="max-w-4xl mx-auto p-4 min-h-screen">
                 <div class="flex justify-between items-center mb-6 text-white">
-                    <h1 class="text-2xl font-bold text-secondary">Admin Dashboard</h1>
+                    <h1 class="text-2xl font-bold text-secondary">Admin System</h1>
                     <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
                 </div>
 
+                <!-- Admin Login -->
                 <div id="adminLoginForm" class="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto mt-20">
-                    <h2 class="text-xl font-bold text-center mb-4">เข้าสู่ระบบหลังบ้าน</h2>
-                    <input type="text" id="adminUser" placeholder="Username" class="w-full p-3 border rounded-lg mb-3">
-                    <input type="password" id="adminPass" placeholder="Password" class="w-full p-3 border rounded-lg mb-4">
-                    <button onclick="checkAdminLogin()" class="w-full py-2 bg-primary text-white rounded-lg font-bold">Login</button>
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-shield text-4xl text-brand-dark"></i>
+                        <h2 class="text-xl font-bold mt-2">ยืนยันตัวตนแอดมิน</h2>
+                    </div>
+                    <input type="text" id="adminUser" placeholder="Username (admin)" class="w-full p-3 border rounded-lg mb-3 outline-none focus:border-brand-green">
+                    <input type="password" id="adminPass" placeholder="Password" class="w-full p-3 border rounded-lg mb-4 outline-none focus:border-brand-green">
+                    <button onclick="checkAdminLogin()" class="w-full py-2 bg-primary text-white rounded-lg font-bold hover:bg-green-800 transition">เข้าสู่ระบบหลังบ้าน</button>
                 </div>
 
+                <!-- Admin Content -->
                 <div id="adminContent" class="hidden space-y-6">
                     
-                    <div class="flex gap-2 bg-gray-800 p-2 rounded-lg">
-                        <button onclick="switchAdminTab('orders')" class="flex-1 py-2 rounded bg-secondary text-brand-dark font-bold text-sm">จัดการออเดอร์</button>
-                        <button onclick="switchAdminTab('stock')" class="flex-1 py-2 rounded text-white hover:bg-gray-700 text-sm">จัดการสต็อก/สินค้า</button>
+                    <!-- Navigation Tabs -->
+                    <div class="flex gap-2 bg-gray-800 p-2 rounded-lg sticky top-0 z-10">
+                        <button onclick="switchAdminTab('orders')" id="btn-tab-orders" class="flex-1 py-2 rounded bg-secondary text-brand-dark font-bold text-sm transition">จัดการออเดอร์</button>
+                        <button onclick="switchAdminTab('stock')" id="btn-tab-stock" class="flex-1 py-2 rounded text-gray-300 hover:bg-gray-700 text-sm transition">จัดการสต็อก/สินค้า</button>
+                        <button onclick="switchAdminTab('users')" id="btn-tab-users" class="flex-1 py-2 rounded text-gray-300 hover:bg-gray-700 text-sm transition">ผู้ใช้งาน</button>
                     </div>
 
-                    <div id="admin-tab-orders" class="bg-white p-4 rounded-xl text-black">
-                        <h3 class="font-bold text-lg mb-4 border-b pb-2">รายการสั่งซื้อล่าสุด</h3>
+                    <!-- TAB: Orders -->
+                    <div id="admin-tab-orders" class="bg-white p-4 rounded-xl text-black shadow-lg">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 class="font-bold text-lg"><i class="fas fa-clipboard-list text-primary"></i> รายการสั่งซื้อ</h3>
+                            <button onclick="initAdminDashboard()" class="text-xs bg-gray-200 px-2 py-1 rounded hover:bg-gray-300"><i class="fas fa-sync"></i> รีเฟรช</button>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-gray-100 text-gray-600 uppercase">
                                     <tr>
                                         <th class="p-3">เวลา</th>
-                                        <th class="p-3">ลูกค้า</th>
+                                        <th class="p-3">ผู้สั่ง</th>
                                         <th class="p-3">สินค้า</th>
                                         <th class="p-3">ข้อมูลลูกค้า</th>
                                         <th class="p-3">สถานะ</th>
@@ -168,41 +213,62 @@
                         </div>
                     </div>
 
+                    <!-- TAB: Stock -->
                     <div id="admin-tab-stock" class="hidden space-y-4">
                         
-                        <div class="bg-white p-4 rounded-xl text-black">
-                            <h3 class="font-bold text-lg mb-4 border-b pb-2">เพิ่มสินค้าใหม่</h3>
+                        <!-- Add Product -->
+                        <div class="bg-white p-4 rounded-xl text-black shadow-lg">
+                            <h3 class="font-bold text-lg mb-4 border-b pb-2"><i class="fas fa-plus-circle text-green-600"></i> เพิ่มสินค้าใหม่</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input id="newProdName" type="text" placeholder="ชื่อสินค้า (เช่น เพชร 100)" class="border p-2 rounded">
-                                <select id="newProdCat" class="border p-2 rounded">
+                                <input id="newProdName" type="text" placeholder="ชื่อสินค้า (เช่น เพชร 100)" class="border p-2 rounded outline-none focus:border-green-500">
+                                <select id="newProdCat" class="border p-2 rounded outline-none">
                                     <option value="gem">หมวด: เพชรเกม</option>
                                     <option value="account">หมวด: ไอดีเกม</option>
                                     <option value="program">หมวด: โปรแกรม</option>
                                 </select>
-                                <input id="newProdPrice" type="number" placeholder="ราคา (บาท)" class="border p-2 rounded">
-                                <button onclick="addNewProduct()" class="bg-green-600 text-white p-2 rounded font-bold hover:bg-green-700">บันทึกสินค้า</button>
+                                <input id="newProdPrice" type="number" placeholder="ราคา (บาท)" class="border p-2 rounded outline-none focus:border-green-500">
+                                <button onclick="addNewProduct()" class="bg-green-600 text-white p-2 rounded font-bold hover:bg-green-700 shadow">บันทึกสินค้า</button>
                             </div>
                         </div>
 
-                        <div class="bg-white p-4 rounded-xl text-black">
-                            <h3 class="font-bold text-lg mb-4 border-b pb-2">เพิ่มโค้ด/สต็อก</h3>
+                        <!-- Add Codes -->
+                        <div class="bg-white p-4 rounded-xl text-black shadow-lg">
+                            <h3 class="font-bold text-lg mb-4 border-b pb-2"><i class="fas fa-barcode text-blue-600"></i> เพิ่มโค้ด/สต็อก</h3>
                             <div class="mb-3">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">เลือกสินค้าที่จะเติมสต็อก</label>
-                                <select id="stockProdSelect" class="w-full border p-2 rounded bg-gray-50"></select>
+                                <select id="stockProdSelect" class="w-full border p-2 rounded bg-gray-50 outline-none"></select>
                             </div>
                             <div class="mb-3">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">รายการโค้ด (1 บรรทัด = 1 โค้ด)</label>
-                                <textarea id="stockCodesArea" rows="5" class="w-full border p-2 rounded" placeholder="CODE1234&#10;CODE5678&#10;CODE9012"></textarea>
+                                <textarea id="stockCodesArea" rows="4" class="w-full border p-2 rounded outline-none focus:border-blue-500" placeholder="CODE1111&#10;CODE2222&#10;CODE3333"></textarea>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="addStockCodes()" class="flex-1 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">บันทึกโค้ด</button>
-                                <button onclick="clearAllCodes()" class="px-4 py-2 bg-red-100 text-red-600 rounded font-bold hover:bg-red-200">ล้างโค้ดทั้งหมด</button>
+                                <button onclick="addStockCodes()" class="flex-1 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 shadow">บันทึกโค้ด</button>
+                                <button onclick="clearAllCodes()" class="px-4 py-2 bg-red-100 text-red-600 rounded font-bold hover:bg-red-200 border border-red-200">ล้างโค้ดทั้งหมด</button>
                             </div>
                         </div>
 
-                        <div class="bg-white p-4 rounded-xl text-black">
-                            <h3 class="font-bold text-lg mb-4">รายการสินค้าในระบบ</h3>
-                            <ul id="adminProductList" class="space-y-2"></ul>
+                        <!-- Product List -->
+                        <div class="bg-white p-4 rounded-xl text-black shadow-lg">
+                            <h3 class="font-bold text-lg mb-4"><i class="fas fa-box text-orange-500"></i> สินค้าในระบบ</h3>
+                            <ul id="adminProductList" class="space-y-2 max-h-60 overflow-y-auto"></ul>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Users -->
+                    <div id="admin-tab-users" class="hidden bg-white p-4 rounded-xl text-black shadow-lg">
+                         <h3 class="font-bold text-lg mb-4 border-b pb-2"><i class="fas fa-users text-purple-600"></i> รายชื่อผู้ใช้งาน</h3>
+                         <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-100 text-gray-600">
+                                    <tr>
+                                        <th class="p-2">ชื่อผู้ใช้</th>
+                                        <th class="p-2">อีเมล</th>
+                                        <th class="p-2">Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUserTable"></tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -216,21 +282,21 @@
         <i class="fab fa-facebook-f text-xl"></i>
     </a>
 
+    <!-- Scripts -->
     <script type="module">
-        // --- 1. FIREBASE CONFIG ---
+        // --- 1. FIREBASE CONFIG (UPDATED) ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, push, set, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, update, remove, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyC-rPvq9fFvhnYQCWxKtLf4Y3UK1uMnP0c",
-            authDomain: "rssave-6169a.firebaseapp.com",
-            databaseURL: "https://rssave-6169a-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "rssave-6169a",
-            storageBucket: "rssave-6169a.firebasestorage.app",
-            messagingSenderId: "619695253658",
-            appId: "1:619695253658:web:4cd77e7fff5c4718491723",
-            measurementId: "G-LMS63E7P3F"
+          apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
+          authDomain: "rsdm-9ca2a.firebaseapp.com",
+          projectId: "rsdm-9ca2a",
+          storageBucket: "rsdm-9ca2a.firebasestorage.app",
+          messagingSenderId: "299212700124",
+          appId: "1:299212700124:web:730160dae6bb1b09cbb719",
+          measurementId: "G-CMX9GKW7FF"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -242,46 +308,111 @@
         let selectedProduct = null;
         let currentCategory = 'gem';
 
-        // --- 3. AUTH LOGIC ---
+        // --- 3. AUTH LOGIC (Updated for Username/Password) ---
         const authForm = document.getElementById('authForm');
         const authSwitchBtn = document.getElementById('authSwitchBtn');
+        const emailFieldContainer = document.getElementById('emailFieldContainer');
+        const authEmailInput = document.getElementById('authEmail');
+        
         let isLoginMode = true;
 
         authSwitchBtn.addEventListener('click', (e) => {
             e.preventDefault();
             isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').innerText = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-            document.getElementById('authSubmitBtn').innerText = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-            document.getElementById('authSwitchText').innerText = isLoginMode ? 'ยังไม่มีบัญชี?' : 'มีบัญชีอยู่แล้ว?';
-            authSwitchBtn.innerText = isLoginMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+            
+            // Toggle UI
+            if (isLoginMode) {
+                document.getElementById('authTitle').innerText = 'เข้าสู่ระบบ';
+                document.getElementById('authSubmitBtn').innerText = 'เข้าสู่ระบบ';
+                document.getElementById('authSwitchText').innerText = 'ยังไม่มีบัญชี?';
+                authSwitchBtn.innerText = 'สมัครสมาชิก';
+                emailFieldContainer.classList.add('hidden');
+                authEmailInput.removeAttribute('required');
+            } else {
+                document.getElementById('authTitle').innerText = 'สมัครสมาชิก';
+                document.getElementById('authSubmitBtn').innerText = 'สมัครสมาชิก';
+                document.getElementById('authSwitchText').innerText = 'มีบัญชีอยู่แล้ว?';
+                authSwitchBtn.innerText = 'เข้าสู่ระบบ';
+                emailFieldContainer.classList.remove('hidden');
+                authEmailInput.setAttribute('required', 'true');
+            }
         });
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('authEmail').value;
+            const username = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value;
+            const email = authEmailInput.value.trim();
+
+            if (!username || !password) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบ', 'warning');
+
+            Swal.fire({ title: 'กำลังประมวลผล...', didOpen: () => Swal.showLoading() });
 
             try {
-                if (isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, password);
-                } else {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    // Create user profile in DB
-                    const user = auth.currentUser;
-                    set(ref(db, 'users/' + user.uid), {
+                if (!isLoginMode) {
+                    // --- REGISTER LOGIC ---
+                    if (!email) throw new Error("กรุณากรอกอีเมลสำหรับการสมัคร");
+
+                    // 1. Check if username exists (Simple check)
+                    const userCheckRef = query(ref(db, 'users'), orderByChild('username'), equalTo(username));
+                    const userCheckSnap = await get(userCheckRef);
+                    if (userCheckSnap.exists()) {
+                         throw new Error("ชื่อผู้ใช้นี้ถูกใช้งานแล้ว");
+                    }
+
+                    // 2. Create Auth User
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // 3. Save User Data to Realtime DB
+                    await set(ref(db, 'users/' + user.uid), {
+                        username: username,
                         email: email,
-                        role: 'user'
+                        role: 'user',
+                        createdAt: Date.now()
                     });
+
+                    Swal.fire({ icon: 'success', title: 'สมัครสมาชิกสำเร็จ', timer: 1500, showConfirmButton: false });
+                } else {
+                    // --- LOGIN LOGIC (Username -> Email -> Auth) ---
+                    
+                    // 1. Find email by username
+                    const usersRef = query(ref(db, 'users'), orderByChild('username'), equalTo(username));
+                    const snapshot = await get(usersRef);
+
+                    if (snapshot.exists()) {
+                        // Get the first match
+                        const userData = Object.values(snapshot.val())[0];
+                        const foundEmail = userData.email;
+                        
+                        // 2. Sign in with found email
+                        await signInWithEmailAndPassword(auth, foundEmail, password);
+                        Swal.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ', timer: 1000, showConfirmButton: false });
+                    } else {
+                        throw new Error("ไม่พบชื่อผู้ใช้นี้ในระบบ");
+                    }
                 }
-                Swal.fire({ icon: 'success', title: 'สำเร็จ', timer: 1000, showConfirmButton: false });
             } catch (error) {
-                Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
+                console.error(error);
+                let msg = error.message;
+                if (msg.includes("auth/email-already-in-use")) msg = "อีเมลนี้ถูกใช้ไปแล้ว";
+                if (msg.includes("auth/wrong-password")) msg = "รหัสผ่านไม่ถูกต้อง";
+                if (msg.includes("auth/user-not-found")) msg = "ไม่พบผู้ใช้";
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: msg });
             }
         });
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                
+                // Fetch extra user data (username)
+                const userSnapshot = await get(ref(db, 'users/' + user.uid));
+                const userData = userSnapshot.val();
+                const displayName = userData ? userData.username : user.email;
+
+                document.getElementById('userGreeting').innerHTML = `<i class="fas fa-user-circle"></i> ${displayName}`;
+                
                 document.getElementById('authSection').classList.add('hidden');
                 document.getElementById('appSection').classList.remove('hidden');
                 document.getElementById('navHistoryBtn').classList.remove('hidden');
@@ -291,6 +422,7 @@
                 listenToMyOrders();
             } else {
                 currentUser = null;
+                document.getElementById('userGreeting').innerText = '';
                 document.getElementById('authSection').classList.remove('hidden');
                 document.getElementById('appSection').classList.add('hidden');
                 document.getElementById('navHistoryBtn').classList.add('hidden');
@@ -302,40 +434,41 @@
 
         // --- 4. CUSTOMER APP LOGIC ---
         
-        // Tab Switching
         window.togglePage = (pageName) => {
             document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`page-${pageName}`).classList.remove('hidden');
         };
 
-        // Category Filter
+        window.closeOrderForm = () => {
+             document.getElementById('orderForm').classList.add('hidden');
+             const allBoxes = document.getElementById('productsGrid').children;
+             for(let box of allBoxes) { box.classList.remove('ring-2', 'ring-brand-green', 'bg-green-50'); }
+             selectedProduct = null;
+        }
+
         window.filterCategory = (cat) => {
             currentCategory = cat;
-            // Update buttons UI
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.remove('bg-green-50', 'border-brand-green', 'text-brand-green');
                 btn.classList.add('text-gray-500', 'border-transparent');
             });
             event.target.classList.remove('text-gray-500', 'border-transparent');
             event.target.classList.add('bg-green-50', 'border-brand-green', 'text-brand-green');
-
+            
+            closeOrderForm();
             loadProducts(cat);
-            // Reset selection
-            selectedProduct = null;
-            document.getElementById('orderForm').classList.add('hidden');
         };
 
-        // Load Products
         function loadProducts(category) {
             const productsRef = ref(db, 'products');
             const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '<div class="col-span-full text-center"><i class="fas fa-spinner fa-spin"></i></div>';
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>';
 
             onValue(productsRef, (snapshot) => {
                 grid.innerHTML = '';
                 const data = snapshot.val();
                 if (!data) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400">ยังไม่มีสินค้าในหมวดนี้</p>';
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400 mt-4">ไม่มีสินค้าในหมวดนี้</p>';
                     return;
                 }
 
@@ -344,33 +477,39 @@
                     if (product.category === category) {
                         hasProduct = true;
                         const div = document.createElement('div');
-                        div.className = `cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center transition hover:shadow-md hover:border-brand-green bg-white h-32 relative`;
-                        div.onclick = () => selectProduct(key, product);
+                        div.className = `cursor-pointer border border-gray-100 rounded-xl p-3 flex flex-col items-center justify-center transition hover:shadow-lg hover:border-brand-green bg-white h-36 relative group`;
+                        div.onclick = (e) => selectProduct(e, key, product);
                         div.innerHTML = `
-                            <div class="text-center font-bold text-primary text-sm mb-1">${product.name}</div>
-                            <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">${product.price} บาท</div>
+                            <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mb-2 text-xl shadow-inner group-hover:scale-110 transition">
+                                ${category === 'gem' ? '💎' : category === 'account' ? '🆔' : '🎮'}
+                            </div>
+                            <div class="text-center font-bold text-primary text-sm mb-1 leading-tight px-1 break-words w-full">${product.name}</div>
+                            <div class="text-xs text-brand-dark font-mono bg-green-100 px-2 py-0.5 rounded-full mt-1">${product.price} ฿</div>
                         `;
                         grid.appendChild(div);
                     }
                 });
 
                 if (!hasProduct) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400">ยังไม่มีสินค้าในหมวดนี้</p>';
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400 mt-4">ไม่มีสินค้าในหมวดนี้</p>';
                 }
             });
         }
 
-        window.selectProduct = (key, product) => {
+        window.selectProduct = (e, key, product) => {
             selectedProduct = { ...product, id: key };
             document.getElementById('selectedProductName').innerHTML = `<span class="text-primary">${product.name}</span> <span class="text-gray-400 text-sm">(${product.price} บ.)</span>`;
             document.getElementById('orderForm').classList.remove('hidden');
             
-            // Highlight selection visually
+            // Highlight selection
             const allBoxes = document.getElementById('productsGrid').children;
             for(let box of allBoxes) { box.classList.remove('ring-2', 'ring-brand-green', 'bg-green-50'); }
-            event.currentTarget.classList.add('ring-2', 'ring-brand-green', 'bg-green-50');
+            e.currentTarget.classList.add('ring-2', 'ring-brand-green', 'bg-green-50');
 
-            // Dynamic Placeholder
+            // Scroll to form
+            document.getElementById('orderForm').scrollIntoView({ behavior: 'smooth' });
+
+            // Dynamic Input Placeholder
             const input = document.getElementById('customerInput');
             const label = document.getElementById('dynamicInputLabel');
             if (product.category === 'gem') {
@@ -387,23 +526,27 @@
             if (!inputVal) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
             if (!selectedProduct) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกสินค้า', 'warning');
 
-            Swal.fire({
-                title: 'กำลังบันทึก...',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
+            // Get current username for the order record
+            let currentUsername = "Unknown";
+            try {
+                const uSnap = await get(ref(db, 'users/' + currentUser.uid));
+                if(uSnap.exists()) currentUsername = uSnap.val().username;
+            } catch(e){}
+
+            Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
                 const newOrderRef = push(ref(db, 'orders'));
                 await set(newOrderRef, {
                     userId: currentUser.uid,
-                    userEmail: currentUser.email,
+                    username: currentUsername, // Add username to order for Admin easier view
+                    email: currentUser.email,
                     productId: selectedProduct.id,
                     productName: selectedProduct.name,
                     price: selectedProduct.price,
-                    customerInfo: inputVal, // UID or Contact
+                    customerInfo: inputVal,
                     category: selectedProduct.category,
-                    status: 'pending', // pending, completed, cancelled
+                    status: 'pending',
                     timestamp: Date.now()
                 });
 
@@ -415,8 +558,8 @@
                 });
 
                 document.getElementById('customerInput').value = '';
-                document.getElementById('orderForm').classList.add('hidden');
-                togglePage('history'); // Go to history page
+                closeOrderForm();
+                togglePage('history'); 
 
             } catch (error) {
                 console.error(error);
@@ -437,7 +580,7 @@
                     return;
                 }
 
-                // Filter client side for simplicity (or use query in Firebase)
+                // Filter: Only show orders belonging to current User UID
                 const myOrders = Object.entries(data)
                     .filter(([key, order]) => order.userId === currentUser.uid)
                     .sort((a, b) => b[1].timestamp - a[1].timestamp);
@@ -455,8 +598,8 @@
                         statusHtml = '<span class="status-badge status-pending"><i class="fas fa-clock"></i> กำลังตรวจสอบ</span>';
                     } else if (order.status === 'completed') {
                         statusHtml = '<span class="status-badge status-success"><i class="fas fa-check"></i> สำเร็จ</span>';
-                        if (order.code) { // If admin attached a code
-                             noteHtml = `<div class="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm font-mono text-green-800 break-all select-all">Code: ${order.code}</div>`;
+                        if (order.code) { 
+                             noteHtml = `<div class="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm font-mono text-green-800 break-all select-all flex items-center gap-2"><i class="fas fa-key"></i> ${order.code}</div>`;
                         }
                     } else {
                         statusHtml = '<span class="status-badge status-cancel"><i class="fas fa-times"></i> ยกเลิก</span>';
@@ -465,16 +608,18 @@
                     const date = new Date(order.timestamp).toLocaleString('th-TH');
 
                     const item = document.createElement('div');
-                    item.className = 'bg-gray-50 p-4 rounded-xl border border-gray-100';
+                    item.className = 'bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition hover:shadow-md';
                     item.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <h4 class="font-bold text-gray-800">${order.productName}</h4>
-                                <p class="text-xs text-gray-500">${date}</p>
+                                <h4 class="font-bold text-gray-800 text-sm md:text-base">${order.productName}</h4>
+                                <p class="text-xs text-gray-400">${date}</p>
                             </div>
                             ${statusHtml}
                         </div>
-                        <p class="text-sm text-gray-600">ข้อมูล: <span class="font-medium">${order.customerInfo}</span></p>
+                        <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                            <i class="fas fa-info-circle text-xs mr-1"></i> <span class="font-medium">${order.customerInfo}</span>
+                        </div>
                         ${noteHtml}
                     `;
                     list.appendChild(item);
@@ -485,16 +630,13 @@
 
         // --- 5. ADMIN LOGIC ---
         
-        window.openAdminLogin = () => {
-            document.getElementById('adminPanel').classList.remove('hidden');
-        };
-        window.closeAdminPanel = () => {
-            document.getElementById('adminPanel').classList.add('hidden');
-        };
+        window.openAdminLogin = () => { document.getElementById('adminPanel').classList.remove('hidden'); };
+        window.closeAdminPanel = () => { document.getElementById('adminPanel').classList.add('hidden'); };
 
         window.checkAdminLogin = () => {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPass').value;
+            // Hardcoded Admin as requested
             if (u === 'admin' && p === '1122') {
                 document.getElementById('adminLoginForm').classList.add('hidden');
                 document.getElementById('adminContent').classList.remove('hidden');
@@ -505,14 +647,25 @@
         };
 
         window.switchAdminTab = (tab) => {
-            document.getElementById('admin-tab-orders').classList.add('hidden');
-            document.getElementById('admin-tab-stock').classList.add('hidden');
+            ['orders', 'stock', 'users'].forEach(t => {
+                document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-tab-${t}`);
+                if(btn) {
+                    btn.classList.remove('bg-secondary', 'text-brand-dark');
+                    btn.classList.add('text-gray-300');
+                }
+            });
             document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-tab-${tab}`);
+            if(activeBtn) {
+                 activeBtn.classList.add('bg-secondary', 'text-brand-dark');
+                 activeBtn.classList.remove('text-gray-300');
+            }
             
-            // Visual feedback for buttons could be added here
+            if (tab === 'users') loadAdminUsers();
         };
 
-        function initAdminDashboard() {
+        window.initAdminDashboard = () => {
             // Listen to all orders
             onValue(ref(db, 'orders'), (snapshot) => {
                 const tbody = document.getElementById('adminOrderTable');
@@ -525,24 +678,27 @@
 
                 orders.forEach(([key, order]) => {
                     const date = new Date(order.timestamp).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+                    const displayUser = order.username ? order.username : order.email;
                     
                     let actionBtn = '';
                     if (order.status === 'pending') {
                         actionBtn = `
-                            <button onclick="updateOrderStatus('${key}', 'completed')" class="bg-green-500 text-white px-2 py-1 rounded text-xs mr-1 hover:bg-green-600">อนุมัติ</button>
-                            <button onclick="updateOrderStatus('${key}', 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">ยกเลิก</button>
+                            <button onclick="updateOrderStatus('${key}', 'completed')" class="bg-green-500 text-white px-2 py-1 rounded text-xs mr-1 hover:bg-green-600 shadow">อนุมัติ</button>
+                            <button onclick="updateOrderStatus('${key}', 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 shadow">ยกเลิก</button>
                         `;
+                    } else if (order.status === 'completed') {
+                         actionBtn = `<button onclick="updateOrderStatus('${key}', 'pending')" class="text-xs text-gray-400 underline">ย้อนสถานะ</button>`;
                     } else {
-                        actionBtn = `<span class="text-xs text-gray-400">ดำเนินการแล้ว</span>`;
+                         actionBtn = `<span class="text-xs text-red-300">ยกเลิกแล้ว</span>`;
                     }
 
                     const tr = document.createElement('tr');
-                    tr.className = "border-b hover:bg-gray-50";
+                    tr.className = "border-b hover:bg-gray-50 transition";
                     tr.innerHTML = `
-                        <td class="p-3 text-gray-500">${date}</td>
-                        <td class="p-3 font-bold text-blue-900">${order.userEmail}</td>
-                        <td class="p-3">${order.productName}</td>
-                        <td class="p-3 font-mono text-primary select-all cursor-copy" title="คลิกเพื่อเลือก">${order.customerInfo}</td>
+                        <td class="p-3 text-gray-500 text-xs">${date}</td>
+                        <td class="p-3 font-bold text-blue-900 text-sm">${displayUser}</td>
+                        <td class="p-3 text-sm">${order.productName}</td>
+                        <td class="p-3 font-mono text-primary select-all cursor-copy text-sm bg-gray-50 rounded" title="คลิกเพื่อเลือก">${order.customerInfo}</td>
                         <td class="p-3">
                             <span class="status-badge ${order.status === 'pending' ? 'status-pending' : order.status === 'completed' ? 'status-success' : 'status-cancel'}">
                                 ${order.status.toUpperCase()}
@@ -554,11 +710,12 @@
                 });
             });
 
-            // Listen to products for the select dropdown & list
+            // Listen to products for stock
             onValue(ref(db, 'products'), (snapshot) => {
                 const select = document.getElementById('stockProdSelect');
                 const list = document.getElementById('adminProductList');
                 
+                const oldVal = select.value; // Keep selection
                 select.innerHTML = '<option value="">-- เลือกสินค้า --</option>';
                 list.innerHTML = '';
                 
@@ -566,7 +723,7 @@
                 if(!data) return;
 
                 Object.entries(data).forEach(([key, prod]) => {
-                    // Option for dropdown
+                    // Option
                     const opt = document.createElement('option');
                     opt.value = key;
                     opt.innerText = `${prod.name} (${prod.category})`;
@@ -574,9 +731,35 @@
 
                     // List Item
                     const li = document.createElement('li');
-                    li.className = 'flex justify-between bg-gray-50 p-2 rounded border';
-                    li.innerHTML = `<span>${prod.name}</span> <span class="text-gray-400 text-sm">${prod.price}บ.</span>`;
+                    li.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100';
+                    li.innerHTML = `
+                        <div>
+                            <span class="font-bold text-gray-700">${prod.name}</span> 
+                            <span class="text-xs text-gray-400 ml-2">${prod.category}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-brand-green font-mono">${prod.price}บ.</span>
+                            <button onclick="removeProduct('${key}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
                     list.appendChild(li);
+                });
+                if(oldVal) select.value = oldVal;
+            });
+        }
+
+        function loadAdminUsers() {
+            onValue(ref(db, 'users'), (snapshot) => {
+                const tbody = document.getElementById('adminUserTable');
+                tbody.innerHTML = '';
+                const data = snapshot.val();
+                if (!data) return;
+                
+                Object.values(data).forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b';
+                    tr.innerHTML = `<td class="p-2 font-bold">${u.username}</td><td class="p-2 text-gray-500">${u.email}</td><td class="p-2 text-xs badge">${u.role}</td>`;
+                    tbody.appendChild(tr);
                 });
             });
         }
@@ -594,9 +777,15 @@
                 name, category: cat, price: Number(price)
             });
 
-            Swal.fire('สำเร็จ', 'เพิ่มสินค้าแล้ว', 'success');
+            Swal.fire({ icon: 'success', title: 'เพิ่มสินค้าแล้ว', toast: true, position: 'top-end', timer: 1500, showConfirmButton: false });
             document.getElementById('newProdName').value = '';
             document.getElementById('newProdPrice').value = '';
+        };
+
+        window.removeProduct = async (key) => {
+            if(confirm('ยืนยันลบสินค้านี้?')) {
+                await remove(ref(db, `products/${key}`));
+            }
         };
 
         window.addStockCodes = async () => {
@@ -608,7 +797,6 @@
 
             const codes = codesText.split('\n').filter(line => line.trim() !== '');
             
-            // Save each code individually
             const updates = {};
             codes.forEach(code => {
                 const newCodeKey = push(ref(db, 'codes/' + prodId)).key;
@@ -640,17 +828,15 @@
         };
 
         window.updateOrderStatus = async (orderId, status) => {
-            // If completed, we might want to fetch a code automatically or let admin manually send via external chat.
-            // For this requirements: just update status. 
-            // Optional: If we wanted to auto-assign a code:
-            /*
-            if(status === 'completed') {
-                // Fetch order details -> find productID -> find available code -> assign -> mark code used
-            }
-            */
+            // Check for available code if completing
+            let updates = { status: status };
             
-            await update(ref(db, `orders/${orderId}`), { status: status });
-            Swal.fire('อัปเดต', `สถานะเป็น ${status} แล้ว`, 'success');
+            // Logic: If status is completed and no code assigned, try to find one?
+            // For now, simple status update.
+            // If you want auto-assign code, we need to query 'codes/{productId}' where status='available' limitToFirst(1)
+            
+            await update(ref(db, `orders/${orderId}`), updates);
+            Swal.fire({ icon: 'success', title: `สถานะ: ${status}`, toast: true, position: 'top-end', timer: 1000, showConfirmButton: false });
         };
 
     </script>
