@@ -3,457 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RISZY SHOP - ระบบแก้ไขปัญหา</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#005500',
-                        'secondary': '#FFC72C',
-                        'brand-green': '#009933',
-                    },
-                    fontFamily: { sans: ['Mitr', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
+    <title>RISZY SHOP - Diagnostic Tool</title>
     <style>
-        body { font-family: 'Mitr', sans-serif; background-color: #f3f4f6; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: monospace; padding: 20px; background: #222; color: #fff; }
+        .box { border: 1px solid #555; padding: 15px; margin-bottom: 20px; border-radius: 8px; background: #333; }
+        h2 { color: #FFC72C; margin-top: 0; }
+        button { padding: 10px 20px; cursor: pointer; background: #009933; color: white; border: none; font-size: 16px; border-radius: 4px; margin-right: 10px; }
+        button:hover { background: #007722; }
+        button.error { background: #cc0000; }
+        input { padding: 8px; width: 60%; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; }
+        .log { background: #000; padding: 10px; height: 150px; overflow-y: scroll; border: 1px solid #444; font-size: 12px; color: #0f0; margin-top: 10px; }
+        .status { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
     </style>
 </head>
-<body class="text-gray-800 pb-20">
+<body>
 
-    <!-- Navbar -->
-    <nav class="bg-primary text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <span class="font-bold text-lg">RISZY SHOP</span>
-            <div id="navMenu" class="hidden flex gap-3 text-sm">
-                <button onclick="togglePage('home')">หน้าหลัก</button>
-                <button onclick="togglePage('history')">ประวัติ</button>
-                <button onclick="logout()" class="text-red-300">ออกระบบ</button>
-            </div>
-        </div>
-    </nav>
+    <h1>🔧 เครื่องมือตรวจสอบปัญหา (Diagnostic)</h1>
+    <p>ใช้โค้ดนี้เช็คว่า Firebase เชื่อมต่อได้จริงหรือไม่</p>
 
-    <div class="container max-w-md mx-auto p-4 mt-6">
-
-        <!-- SYSTEM STATUS CHECK -->
-        <div id="systemCheck" class="mb-4 p-2 text-xs text-center bg-yellow-100 text-yellow-800 rounded hidden">
-            <i class="fas fa-wifi"></i> กำลังทดสอบการเชื่อมต่อ Firebase...
-        </div>
-
-        <!-- AUTH SECTION -->
-        <div id="authSection" class="bg-white p-6 rounded-2xl shadow-lg fade-in">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-brand-green" id="authTitle">เข้าสู่ระบบ</h2>
-                <p class="text-gray-400 text-xs mt-1">Version 3.0 (Debug Mode)</p>
-            </div>
-            
-            <form id="authForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">ชื่อผู้ใช้ (Username)</label>
-                    <input type="text" id="authUsername" class="w-full p-3 border rounded-xl bg-gray-50 focus:border-green-500 outline-none" placeholder="User001" required>
-                </div>
-
-                <div id="emailContainer" class="hidden">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">อีเมล (Email)</label>
-                    <input type="email" id="authEmail" class="w-full p-3 border rounded-xl bg-gray-50 focus:border-green-500 outline-none" placeholder="email@example.com">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">รหัสผ่าน (Password)</label>
-                    <input type="password" id="authPassword" class="w-full p-3 border rounded-xl bg-gray-50 focus:border-green-500 outline-none" placeholder="******" required>
-                </div>
-                
-                <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-brand-green text-white font-bold rounded-xl shadow hover:bg-green-700 transition">เข้าสู่ระบบ</button>
-            </form>
-
-            <div class="mt-4 text-center text-sm">
-                <button id="toggleAuthMode" class="text-blue-600 font-bold hover:underline">สมัครสมาชิกใหม่</button>
-            </div>
-            
-            <div class="mt-6 pt-4 border-t text-center">
-                <button onclick="document.getElementById('adminPanel').classList.remove('hidden')" class="text-xs text-gray-400">Admin Login</button>
-            </div>
-        </div>
-
-        <!-- APP SECTION -->
-        <div id="appSection" class="hidden space-y-4 fade-in">
-            <div id="userWelcome" class="text-center text-primary font-bold mb-4"></div>
-            
-            <!-- Home Page -->
-            <div id="page-home">
-                <div class="bg-white p-4 rounded-xl shadow mb-4">
-                    <h3 class="font-bold mb-3 border-b pb-2">📦 เลือกสินค้า</h3>
-                    <div class="grid grid-cols-3 gap-2 mb-4">
-                        <button onclick="setCategory('gem')" class="p-2 border rounded text-xs font-bold hover:bg-green-50">💎 เพชร</button>
-                        <button onclick="setCategory('account')" class="p-2 border rounded text-xs font-bold hover:bg-green-50">🆔 ไอดี</button>
-                        <button onclick="setCategory('program')" class="p-2 border rounded text-xs font-bold hover:bg-green-50">🎮 โปร</button>
-                    </div>
-                    <div id="productList" class="grid grid-cols-2 gap-2">
-                        <!-- JS Insert Items -->
-                    </div>
-                </div>
-
-                <!-- Order Form -->
-                <div id="orderForm" class="hidden bg-white p-4 rounded-xl shadow border-2 border-brand-green">
-                    <h4 id="selectedItemName" class="font-bold text-brand-green mb-2"></h4>
-                    <input type="text" id="customerInfo" class="w-full p-2 border rounded mb-2 text-sm" placeholder="UID / ลิงก์เฟส / เบอร์">
-                    <button onclick="confirmOrder()" class="w-full py-2 bg-secondary font-bold rounded shadow">ยืนยันการสั่งซื้อ</button>
-                    <button onclick="document.getElementById('orderForm').classList.add('hidden')" class="w-full py-2 mt-2 text-gray-400 text-xs">ยกเลิก</button>
-                </div>
-            </div>
-
-            <!-- History Page -->
-            <div id="page-history" class="hidden bg-white p-4 rounded-xl shadow">
-                <h3 class="font-bold mb-3 border-b pb-2">🕒 ประวัติการสั่งซื้อ</h3>
-                <div id="historyList" class="space-y-2 text-sm">กำลังโหลด...</div>
-            </div>
-        </div>
-
+    <!-- 1. CHECK DATABASE -->
+    <div class="box">
+        <h2>1. ทดสอบฐานข้อมูล (Database Rule)</h2>
+        <p>ถ้ากดปุ่มแล้วขึ้น Error สีแดง แสดงว่าคุณยังไม่ได้แก้ Rules เป็น true</p>
+        <div id="dbStatus" class="status" style="color: yellow;">รอการทดสอบ...</div>
+        <button onclick="testDatabaseWrite()">ทดสอบการเขียนข้อมูล</button>
     </div>
 
-    <!-- ADMIN PANEL -->
-    <div id="adminPanel" class="hidden fixed inset-0 bg-black/90 z-50 p-4 overflow-y-auto text-left">
-        <div class="max-w-md mx-auto bg-white rounded-lg p-4 mt-10">
-            <div class="flex justify-between mb-4">
-                <h2 class="font-bold text-xl">Admin System</h2>
-                <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="text-red-500">ปิด</button>
-            </div>
-
-            <div id="adminLoginBox">
-                <input type="text" id="adminUser" placeholder="User" class="w-full border p-2 mb-2">
-                <input type="password" id="adminPass" placeholder="Pass" class="w-full border p-2 mb-2">
-                <button onclick="adminLogin()" class="w-full bg-black text-white py-2 rounded">Login</button>
-            </div>
-
-            <div id="adminContent" class="hidden space-y-4">
-                <div class="bg-gray-100 p-2 rounded">
-                    <h3 class="font-bold">เพิ่มสินค้า</h3>
-                    <input id="addName" placeholder="ชื่อสินค้า" class="w-full border p-1 mb-1 text-sm">
-                    <input id="addPrice" placeholder="ราคา" type="number" class="w-full border p-1 mb-1 text-sm">
-                    <select id="addCat" class="w-full border p-1 mb-1 text-sm">
-                        <option value="gem">เพชร</option>
-                        <option value="account">ไอดี</option>
-                        <option value="program">โปรแกรม</option>
-                    </select>
-                    <button onclick="addProduct()" class="bg-green-600 text-white px-4 py-1 rounded text-sm w-full">บันทึก</button>
-                </div>
-                
-                <div class="bg-gray-100 p-2 rounded">
-                    <h3 class="font-bold">รายการออเดอร์</h3>
-                    <button onclick="loadAdminOrders()" class="bg-blue-500 text-white px-2 py-1 rounded text-xs mb-2">รีเฟรช</button>
-                    <div id="adminOrderList" class="text-xs space-y-2"></div>
-                </div>
-            </div>
-        </div>
+    <!-- 2. CHECK AUTH REGISTER -->
+    <div class="box">
+        <h2>2. ทดสอบสมัครสมาชิก (Auth)</h2>
+        <p>ลองสมัครดูว่าผ่านไหม (ถ้าไม่ผ่าน แสดงว่าไม่ได้เปิด Email/Pass ใน Console)</p>
+        <input type="email" id="testEmail" placeholder="test@email.com" value="test1@test.com">
+        <input type="password" id="testPass" placeholder="password" value="123456">
+        <br>
+        <button onclick="testRegister()">ทดสอบสมัครสมาชิก</button>
     </div>
 
-    <!-- MAIN SCRIPT -->
+    <!-- 3. CHECK LOGIN -->
+    <div class="box">
+        <h2>3. ทดสอบล็อกอิน (Auth)</h2>
+        <input type="email" id="loginEmail" placeholder="test@email.com" value="test1@test.com">
+        <input type="password" id="loginPass" placeholder="password" value="123456">
+        <br>
+        <button onclick="testLogin()">ทดสอบ Login</button>
+    </div>
+
+    <div class="box">
+        <h2>Log การทำงาน</h2>
+        <div id="consoleLog" class="log"></div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, push, set, onValue, update, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // CONFIG (ตรวจสอบแล้วถูกต้อง)
+        // Config ของคุณ
         const firebaseConfig = {
-  apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
-  authDomain: "rsdm-9ca2a.firebaseapp.com",
-  projectId: "rsdm-9ca2a",
-  storageBucket: "rsdm-9ca2a.firebasestorage.app",
-  messagingSenderId: "299212700124",
-  appId: "1:299212700124:web:730160dae6bb1b09cbb719",
-  measurementId: "G-CMX9GKW7FF"
-};
+            apiKey: "AIzaSyAHAkBhypqyJuuL22tLrFKN7ZqdEsqGDTk",
+            authDomain: "rsdm-9ca2a.firebaseapp.com",
+            projectId: "rsdm-9ca2a",
+            storageBucket: "rsdm-9ca2a.firebasestorage.app",
+            messagingSenderId: "299212700124",
+            appId: "1:299212700124:web:730160dae6bb1b09cbb719",
+            measurementId: "G-CMX9GKW7FF"
+        };
 
         // Initialize
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // Variables
-        let currentUser = null;
-        let isRegisterMode = false;
-        let selectedProduct = null;
-        let currentCat = 'gem';
+        // Helper Log
+        function log(msg, type='info') {
+            const logDiv = document.getElementById('consoleLog');
+            const color = type === 'error' ? 'red' : '#0f0';
+            logDiv.innerHTML += `<div style="color:${color};">> ${msg}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(msg);
+        }
 
-        // --- SYSTEM CHECK ---
-        const sysCheck = document.getElementById('systemCheck');
-        sysCheck.classList.remove('hidden');
-        const connectedRef = ref(db, ".info/connected");
-        onValue(connectedRef, (snap) => {
-            if (snap.val() === true) {
-                sysCheck.innerHTML = '<i class="fas fa-check-circle text-green-600"></i> เชื่อมต่อ Firebase สำเร็จ';
-                sysCheck.className = "mb-4 p-2 text-xs text-center bg-green-100 text-green-800 rounded";
-                setTimeout(() => sysCheck.classList.add('hidden'), 3000);
-            } else {
-                sysCheck.innerHTML = '<i class="fas fa-exclamation-triangle text-red-600"></i> ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (เน็ตหลุด หรือ ตั้งค่า Rules ผิด)';
-                sysCheck.className = "mb-4 p-2 text-xs text-center bg-red-100 text-red-800 rounded";
-            }
-        });
-
-        // --- AUTH LOGIC ---
-        const toggleBtn = document.getElementById('toggleAuthMode');
-        const authTitle = document.getElementById('authTitle');
-        const emailContainer = document.getElementById('emailContainer');
-        const authSubmitBtn = document.getElementById('authSubmitBtn');
-
-        toggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            isRegisterMode = !isRegisterMode;
-            if(isRegisterMode) {
-                authTitle.innerText = "สมัครสมาชิก";
-                emailContainer.classList.remove('hidden');
-                authSubmitBtn.innerText = "ยืนยันการสมัคร";
-                toggleBtn.innerText = "กลับไปหน้าเข้าสู่ระบบ";
-            } else {
-                authTitle.innerText = "เข้าสู่ระบบ";
-                emailContainer.classList.add('hidden');
-                authSubmitBtn.innerText = "เข้าสู่ระบบ";
-                toggleBtn.innerText = "สมัครสมาชิกใหม่";
-            }
-        });
-
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('authUsername').value.trim();
-            const password = document.getElementById('authPassword').value;
-            const email = document.getElementById('authEmail').value.trim();
-
-            if(!username || !password) return alert("กรุณากรอกข้อมูลให้ครบ");
-
-            authSubmitBtn.disabled = true;
-            authSubmitBtn.innerText = "กำลังประมวลผล...";
-
+        // 1. TEST DATABASE
+        window.testDatabaseWrite = async () => {
+            log("กำลังทดสอบเขียนฐานข้อมูล...");
             try {
-                if(isRegisterMode) {
-                    // REGISTER
-                    if(!email) throw new Error("กรุณากรอกอีเมล");
-                    
-                    // Check username duplicate
-                    const userQuery = query(ref(db, 'users'), orderByChild('username'), equalTo(username));
-                    const snap = await get(userQuery);
-                    if(snap.exists()) throw new Error("ชื่อผู้ใช้นี้มีคนใช้แล้ว");
-
-                    // Create Auth
-                    const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                    // Save User Data
-                    await set(ref(db, 'users/' + userCred.user.uid), {
-                        username: username,
-                        email: email,
-                        role: 'user'
-                    });
-                    Swal.fire("สำเร็จ", "สมัครสมาชิกเรียบร้อย", "success");
-
-                } else {
-                    // LOGIN (Username -> Email -> Auth)
-                    // ขั้นตอนนี้ต้องการ Database Rule: .read = true
-                    const userQuery = query(ref(db, 'users'), orderByChild('username'), equalTo(username));
-                    const snap = await get(userQuery);
-
-                    if(!snap.exists()) {
-                        throw new Error("ไม่พบชื่อผู้ใช้นี้ (หรือ Database Rules ปิดอยู่)");
-                    }
-
-                    const userData = Object.values(snap.val())[0];
-                    const userEmail = userData.email;
-
-                    await signInWithEmailAndPassword(auth, userEmail, password);
-                    Swal.fire("ยินดีต้อนรับ", "เข้าสู่ระบบสำเร็จ", "success");
-                }
-            } catch (err) {
-                console.error("Auth Error:", err);
-                let msg = err.message;
-                if(msg.includes("permission_denied")) msg = "สิทธิ์ถูกปฏิเสธ (กรุณาแก้ Rules ใน Firebase Console)";
-                if(msg.includes("auth/wrong-password")) msg = "รหัสผ่านผิด";
-                if(msg.includes("auth/user-not-found")) msg = "ไม่พบผู้ใช้";
-                Swal.fire("เกิดข้อผิดพลาด", msg, "error");
-            } finally {
-                authSubmitBtn.disabled = false;
-                authSubmitBtn.innerText = isRegisterMode ? "ยืนยันการสมัคร" : "เข้าสู่ระบบ";
-            }
-        });
-
-        // --- AUTH STATE ---
-        onAuthStateChanged(auth, async (user) => {
-            if(user) {
-                currentUser = user;
-                document.getElementById('authSection').classList.add('hidden');
-                document.getElementById('appSection').classList.remove('hidden');
-                document.getElementById('navMenu').classList.remove('hidden');
-                
-                // Get Username
-                try {
-                    const snap = await get(ref(db, 'users/' + user.uid));
-                    if(snap.exists()) {
-                        document.getElementById('userWelcome').innerText = `สวัสดี, ${snap.val().username}`;
-                    }
-                } catch(e) { console.log(e); }
-
-                loadProducts(currentCat);
-            } else {
-                currentUser = null;
-                document.getElementById('authSection').classList.remove('hidden');
-                document.getElementById('appSection').classList.add('hidden');
-                document.getElementById('navMenu').classList.add('hidden');
-            }
-        });
-
-        window.logout = () => signOut(auth);
-
-        // --- APP LOGIC ---
-        window.togglePage = (page) => {
-            document.getElementById('page-home').classList.add('hidden');
-            document.getElementById('page-history').classList.add('hidden');
-            document.getElementById(`page-${page}`).classList.remove('hidden');
-            if(page === 'history') loadHistory();
-        }
-
-        window.setCategory = (cat) => {
-            currentCat = cat;
-            loadProducts(cat);
-        }
-
-        function loadProducts(cat) {
-            const list = document.getElementById('productList');
-            list.innerHTML = "Loading...";
-            onValue(ref(db, 'products'), (snap) => {
-                list.innerHTML = "";
-                if(!snap.exists()) {
-                    list.innerHTML = "<p class='col-span-2 text-center text-gray-400'>ไม่มีสินค้า</p>";
-                    return;
-                }
-                const data = snap.val();
-                Object.entries(data).forEach(([key, item]) => {
-                    if(item.category === cat) {
-                        const div = document.createElement('div');
-                        div.className = "border p-2 rounded text-center cursor-pointer hover:border-green-500 bg-white shadow-sm";
-                        div.innerHTML = `
-                            <div class="font-bold text-sm">${item.name}</div>
-                            <div class="text-green-600 text-xs">${item.price} บาท</div>
-                        `;
-                        div.onclick = () => {
-                            selectedProduct = { ...item, id: key };
-                            document.getElementById('selectedItemName').innerText = `สั่งซื้อ: ${item.name} (${item.price}บ.)`;
-                            document.getElementById('orderForm').classList.remove('hidden');
-                        };
-                        list.appendChild(div);
-                    }
-                });
-            });
-        }
-
-        window.confirmOrder = async () => {
-            const info = document.getElementById('customerInfo').value;
-            if(!info) return alert("กรอกข้อมูลก่อนสั่งซื้อ");
-            if(!selectedProduct) return;
-
-            try {
-                await push(ref(db, 'orders'), {
-                    userId: currentUser.uid,
-                    productId: selectedProduct.id,
-                    productName: selectedProduct.name,
-                    price: selectedProduct.price,
-                    customerInfo: info,
-                    status: 'pending',
+                await set(ref(db, 'test_connection'), {
+                    message: "Connected!",
                     timestamp: Date.now()
                 });
-                Swal.fire("สำเร็จ", "ส่งออเดอร์แล้ว", "success");
-                document.getElementById('orderForm').classList.add('hidden');
-                document.getElementById('customerInfo').value = '';
-                togglePage('history');
-            } catch(e) {
-                alert("สั่งซื้อล้มเหลว: " + e.message);
+                document.getElementById('dbStatus').innerText = "✅ เชื่อมต่อฐานข้อมูลสำเร็จ (Rules ถูกต้อง)";
+                document.getElementById('dbStatus').style.color = "#0f0";
+                log("เขียนข้อมูลลง 'test_connection' สำเร็จ!");
+            } catch (error) {
+                document.getElementById('dbStatus').innerText = "❌ เชื่อมต่อล้มเหลว (Permission Denied)";
+                document.getElementById('dbStatus').style.color = "red";
+                log("Error: " + error.message, 'error');
+                log("คำแนะนำ: ไปที่ Firebase Console > Realtime Database > Rules แล้วแก้ .write เป็น true");
             }
-        }
+        };
 
-        function loadHistory() {
-            const list = document.getElementById('historyList');
-            onValue(query(ref(db, 'orders'), orderByChild('userId'), equalTo(currentUser.uid)), (snap) => {
-                list.innerHTML = "";
-                if(!snap.exists()) {
-                    list.innerHTML = "ไม่มีประวัติ";
-                    return;
+        // 2. TEST REGISTER
+        window.testRegister = async () => {
+            const email = document.getElementById('testEmail').value;
+            const pass = document.getElementById('testPass').value;
+            log(`กำลังทดสอบสมัครสมาชิก: ${email}...`);
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                log("✅ สมัครสมาชิกสำเร็จ! UID: " + userCredential.user.uid);
+                alert("สมัครสมาชิกได้ปกติครับ!");
+            } catch (error) {
+                log("❌ สมัครไม่ผ่าน: " + error.code, 'error');
+                if (error.code === 'auth/email-already-in-use') {
+                    log("อีเมลนี้มีคนใช้แล้ว (แสดงว่าระบบเชื่อมต่อได้ปกติ แต่อีเมลซ้ำ)");
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    log("สำคัญ: คุณยังไม่ได้เปิด Email/Password ใน Firebase Console");
+                    alert("ไปที่ Authentication > Sign-in method แล้วเปิด Email/Password ก่อนครับ");
+                } else {
+                    log(error.message, 'error');
                 }
-                const data = snap.val();
-                // Sort client side
-                const arr = Object.values(data).sort((a,b) => b.timestamp - a.timestamp);
-                
-                arr.forEach(order => {
-                    let statusColor = order.status === 'pending' ? 'text-yellow-600' : (order.status==='completed'?'text-green-600':'text-red-600');
-                    let statusText = order.status === 'pending' ? 'รอตรวจสอบ' : (order.status==='completed'?'สำเร็จ':'ยกเลิก');
-                    
-                    list.innerHTML += `
-                        <div class="border p-2 rounded bg-gray-50">
-                            <div class="flex justify-between">
-                                <span class="font-bold">${order.productName}</span>
-                                <span class="${statusColor} font-bold text-xs">${statusText}</span>
-                            </div>
-                            <div class="text-xs text-gray-500">${new Date(order.timestamp).toLocaleString()}</div>
-                        </div>
-                    `;
-                });
-            });
-        }
+            }
+        };
 
-        // --- ADMIN ---
-        window.adminLogin = () => {
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPass').value;
-            if(u === 'admin' && p === '1122') {
-                document.getElementById('adminLoginBox').classList.add('hidden');
-                document.getElementById('adminContent').classList.remove('hidden');
-                loadAdminOrders();
-            } else {
-                alert("รหัสผิด");
+        // 3. TEST LOGIN
+        window.testLogin = async () => {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            log(`กำลังทดสอบล็อกอิน: ${email}...`);
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+                log("✅ ล็อกอินสำเร็จ! ยินดีต้อนรับ: " + userCredential.user.email);
+                alert("ล็อกอินได้ปกติครับ!");
+            } catch (error) {
+                log("❌ ล็อกอินไม่ผ่าน: " + error.code, 'error');
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+                    log("อีเมลหรือรหัสผ่านผิด");
+                } else {
+                    log(error.message, 'error');
+                }
             }
         }
-
-        window.addProduct = async () => {
-            const name = document.getElementById('addName').value;
-            const price = document.getElementById('addPrice').value;
-            const cat = document.getElementById('addCat').value;
-            if(name && price) {
-                await push(ref(db, 'products'), { name, price: Number(price), category: cat });
-                alert("เพิ่มแล้ว");
-            }
-        }
-
-        window.loadAdminOrders = () => {
-            const list = document.getElementById('adminOrderList');
-            onValue(ref(db, 'orders'), (snap) => {
-                list.innerHTML = "";
-                if(!snap.exists()) return;
-                const data = snap.val();
-                Object.entries(data).sort((a,b)=>b[1].timestamp-a[1].timestamp).forEach(([key, order]) => {
-                    list.innerHTML += `
-                        <div class="border p-2 bg-white mb-1">
-                            <div>${order.productName} | ${order.customerInfo}</div>
-                            <div class="flex gap-2 mt-1">
-                                <button onclick="setStatus('${key}', 'completed')" class="bg-green-500 text-white px-1 rounded">อนุมัติ</button>
-                                <button onclick="setStatus('${key}', 'cancelled')" class="bg-red-500 text-white px-1 rounded">ยกเลิก</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        window.setStatus = (key, status) => {
-            update(ref(db, `orders/${key}`), { status });
-        }
-
-        // Expose to window
-        window.toggleAuthMode = () => {}; 
     </script>
 </body>
 </html>
