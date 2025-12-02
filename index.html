@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ติดการบ้าน</title>
+    <title>ติดการบ้าน | Ultimate Edition (Fixed)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,16 +34,6 @@
         .btn-danger { background: #ef4444; color: white; }
         .btn-ghost { background: transparent; color: var(--text-muted); }
         
-        /* Google Button Fix */
-        .btn-google {
-            background: white; color: #1f2937; border: 2px solid #e5e7eb; 
-            margin-top: 15px; width: 100%; justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
-        }
-        .btn-google:hover { background: #f9fafb; border-color: #d1d5db; }
-        .btn-google:active { transform: scale(0.98); }
-        .btn-google i { color: #ea4335; }
-
         .btn-status {
             padding: 8px 16px; border-radius: 50px; font-size: 0.9rem; font-weight: 600;
             background: white; border: 2px solid #e2e8f0; color: var(--text-muted); transition: all 0.2s;
@@ -116,17 +106,9 @@
             <input type="email" id="auth-email" placeholder="อีเมลของคุณ">
             <input type="password" id="auth-pass" placeholder="รหัสผ่าน">
             
-            <div style="text-align: right; width: 100%;">
-                <span class="forgot-pass" onclick="forgotPassword()">ลืมรหัสผ่าน?</span>
-            </div>
-
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="authAction('login')">เข้าสู่ระบบ</button>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 15px;" onclick="authAction('login')">เข้าสู่ระบบ</button>
             
-            <button class="btn btn-google" onclick="signInWithGoogle()">
-                <i class="fa-brands fa-google"></i> เข้าสู่ระบบด้วย Google
-            </button>
-
-            <button class="btn btn-ghost" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="authAction('signup')">สมัครสมาชิกใหม่</button>
+            <button class="btn btn-ghost" style="width: 100%; justify-content: center;" onclick="authAction('signup')">สมัครสมาชิกใหม่</button>
         </div>
     </div>
 
@@ -331,7 +313,7 @@
         let calDate = new Date();
         let chartInstance = null;
 
-        // AUTH SYSTEM (FIXED)
+        // AUTH SYSTEM (FIXED & STRIPPED)
         auth.onAuthStateChanged(user => {
             if(user) {
                 currentUser = user;
@@ -353,19 +335,24 @@
             const e = document.getElementById('auth-email').value;
             const p = document.getElementById('auth-pass').value;
 
+            // 1. Check for missing data (always show pop-up)
             if(!e || !p) {
                 return Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกอีเมลและรหัสผ่าน', confirmButtonColor: '#4338ca' });
             }
 
             try {
+                // 2. Perform action
                 if(type === 'login') {
                     await auth.signInWithEmailAndPassword(e, p);
+                    // 3. Success Pop-up
                     Swal.fire({ icon: 'success', title: 'ยินดีต้อนรับ!', text: 'เข้าสู่ระบบสำเร็จ', timer: 1500, showConfirmButton: false });
                 } else { 
                     await auth.createUserWithEmailAndPassword(e, p); 
+                    // 3. Success Pop-up
                     Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'สมัครสมาชิกเรียบร้อยแล้ว', confirmButtonColor: '#4338ca' });
                 }
             } catch(err) { 
+                // 4. Error Pop-up
                 let msg = 'เกิดข้อผิดพลาด';
                 if(err.code === 'auth/user-not-found') msg = 'ไม่พบอีเมลนี้ในระบบ';
                 if(err.code === 'auth/wrong-password') msg = 'รหัสผ่านไม่ถูกต้อง';
@@ -376,37 +363,8 @@
             }
         }
 
-        async function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.signInWithPopup(provider);
-                Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'เข้าสู่ระบบด้วย Google เรียบร้อย', timer: 1500, showConfirmButton: false });
-            } catch (error) {
-                Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
-            }
-        }
-
-        async function forgotPassword() {
-            const { value: email } = await Swal.fire({
-                title: 'รีเซ็ตรหัสผ่าน',
-                text: 'กรุณากรอกอีเมลที่ใช้สมัคร เพื่อรับลิงก์ตั้งรหัสใหม่',
-                input: 'email',
-                inputPlaceholder: 'อีเมลของคุณ',
-                showCancelButton: true,
-                confirmButtonText: 'ส่งลิงก์',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#4338ca'
-            });
-
-            if (email) {
-                try {
-                    await auth.sendPasswordResetEmail(email);
-                    Swal.fire({ icon: 'success', title: 'ส่งอีเมลแล้ว', text: 'กรุณาตรวจสอบกล่องจดหมายของคุณ', confirmButtonColor: '#4338ca' });
-                } catch (error) {
-                    Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่พบอีเมลนี้ หรือรูปแบบไม่ถูกต้อง', confirmButtonColor: '#ef4444' });
-                }
-            }
-        }
+        // REMOVED: signInWithGoogle function
+        // REMOVED: forgotPassword function
 
         function logout() {
             Swal.fire({
