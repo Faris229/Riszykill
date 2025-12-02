@@ -3,274 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกการบ้าน (Firestore Minimal UI)</title>
+    <title>Homework Tracker Pro</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-borderless/borderless.css" rel="stylesheet">
+
     <style>
         :root {
-            --primary-color: #5d5cff;
-            --secondary-color: #f0f4f8;
-            --pending-color: #ffc107;
-            --completed-color: #28a745;
-            --danger-color: #dc3545;
-            --text-color: #333;
+            --primary: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--secondary-color);
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
-            margin: 20px 0;
-            color: var(--text-color);
+            padding: 20px;
         }
 
-        #auth-container, #homework-app {
-            background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 900px;
-        }
-
-        /* --- Input & Button Styling --- */
-        input:not([type="date"]), input[type="date"], textarea {
+        /* --- Global Styles --- */
+        .hidden { display: none !important; }
+        
+        .container {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
+            max-width: 900px;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        input:focus, textarea:focus {
-            border-color: var(--primary-color);
-            outline: none;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        button {
-            padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            margin-right: 10px;
+        /* --- Auth Screen --- */
+        #auth-container {
+            max-width: 400px;
+            margin: 10vh auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
         }
 
-        button:hover {
-            background-color: #4b4ae3;
-        }
-        button:active {
-            transform: translateY(1px);
+        #auth-container h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
-        /* --- Header & Tabs --- */
-        #header {
+        /* --- Main App Header --- */
+        .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--secondary-color);
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        #view-tabs {
+        .user-info {
             display: flex;
-            margin-bottom: 20px;
-        }
-
-        #view-tabs button {
-            background: none;
-            color: #777;
-            border-bottom: 3px solid transparent;
-            padding: 10px 20px;
-            font-weight: 600;
-            margin-right: 15px;
-        }
-
-        #view-tabs button.active {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-        }
-
-        /* --- Form Layout --- */
-        #homework-form {
-            background-color: var(--secondary-color);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        #homework-form textarea, #homework-form button {
-            grid-column: 1 / span 2;
-        }
-
-        /* --- Homework List (Cards) --- */
-        .homework-list {
-            padding: 0;
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .homework-item {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            border-left: 6px solid var(--pending-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 180px;
-        }
-
-        .homework-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
-        }
-
-        .homework-item.completed {
-            border-left-color: var(--completed-color);
-            opacity: 0.8;
-        }
-
-        .item-info h4 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 1.2rem;
+            align-items: center;
+            gap: 10px;
         }
         
-        .due-date {
-            font-weight: 600;
-            color: var(--danger-color);
-            font-size: 0.95rem;
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
-        
-        .item-content {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #555;
-            flex-grow: 1;
+
+        /* --- Inputs & Forms --- */
+        .input-group {
+            position: relative;
             margin-bottom: 15px;
         }
 
-        .actions button {
-            padding: 8px 12px;
-            font-size: 0.85rem;
-            margin-right: 8px;
-            border-radius: 4px;
-        }
-        .actions .btn-done {
-            background-color: var(--completed-color);
-        }
-        .actions .btn-delete {
-            background-color: var(--danger-color);
-        }
-        .actions .btn-done:hover {
-            background-color: #1e7e34;
-        }
-        .actions .btn-delete:hover {
-            background-color: #bd2130;
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
         }
 
-        .empty-message {
-            text-align: center;
-            color: #aaa;
-            grid-column: 1 / -1; /* ครอบคลุมพื้นที่ทั้งหมดของ grid */
-            padding: 50px 0;
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px 12px 40px; /* Space for icon */
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-family: 'Prompt', sans-serif;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            font-size: 0.95rem;
         }
 
-        /* Responsive adjustments */
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); width: 100%; margin-top: 10px;}
+        .btn-outline:hover { background: #eef2ff; }
+
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; width: auto; margin: 0;}
+        .btn-danger { background: #fee2e2; color: var(--danger); }
+        .btn-danger:hover { background: #fecaca; }
+        
+        .btn-logout { background: #f3f4f6; color: var(--text-muted); }
+        .btn-logout:hover { background: #e5e7eb; color: var(--text-main); }
+
+        /* --- Dashboard Layout --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+        }
+
+        /* --- Left Side: Form --- */
+        .add-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .add-card h3 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px;}
+
+        /* --- Right Side: List --- */
+        .list-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #e0e7ff;
+            padding: 5px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .search-bar input { border: none; padding: 10px; }
+        .search-bar input:focus { box-shadow: none; }
+
+        /* --- Homework Cards --- */
+        .homework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .hw-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            border-top: 4px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hw-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .hw-card.urgent { border-top-color: var(--danger); }
+        .hw-card.soon { border-top-color: var(--warning); }
+        .hw-card.chill { border-top-color: var(--success); }
+        .hw-card.done { border-top-color: #cbd5e1; opacity: 0.7; }
+
+        .hw-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .hw-subject {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .hw-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .badge-urgent { background: #fee2e2; color: var(--danger); }
+        .badge-soon { background: #fef3c7; color: var(--warning); }
+        .badge-chill { background: #d1fae5; color: var(--success); }
+
+        .hw-content {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .hw-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 10px;
+        }
+
+        .hw-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .btn-check { color: var(--success); font-size: 1.2rem; }
+        .btn-check:hover { background: #d1fae5; }
+        
+        .btn-trash { color: var(--danger); font-size: 1rem; }
+        .btn-trash:hover { background: #fee2e2; }
+
+        .btn-undo { color: var(--warning); font-size: 1.1rem; }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            #homework-form textarea, #homework-form button {
-                grid-column: auto;
-            }
-            .homework-list {
-                grid-template-columns: 1fr;
-            }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .add-card { position: relative; top: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div id="auth-container" class="hidden">
-        <h2>ระบบบันทึกการบ้าน</h2>
-        <p id="auth-status"></p>
-        <input type="email" id="email" placeholder="อีเมล">
-        <input type="password" id="password" placeholder="รหัสผ่าน">
-        <button onclick="login()">เข้าสู่ระบบ</button>
-        <button onclick="signup()">ลงทะเบียน</button>
+    <div id="auth-container" class="container">
+        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 10px;">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h2>Homework Tracker</h2>
+        
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="อีเมลของคุณ">
+        </div>
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" placeholder="รหัสผ่าน">
+        </div>
+
+        <button class="btn btn-primary" onclick="login()">
+            <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
+        </button>
+        <button class="btn btn-outline" onclick="signup()">
+            สมัครสมาชิกใหม่
+        </button>
     </div>
 
-    <div id="homework-app" class="hidden">
-        <div id="header">
-            <h1 id="welcome-user">บันทึกการบ้านรายวัน</h1>
-            <button onclick="logout()">ออกจากระบบ</button>
-        </div>
+    <div id="homework-app" class="container hidden">
         
-        <div id="homework-form">
-            <h3>+ เพิ่มการบ้านใหม่</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="subject-input">วิชา:</label>
-                    <input type="text" id="subject-input" placeholder="เช่น คณิตศาสตร์">
-                </div>
-                <div class="form-group">
-                    <label for="due-date-input">กำหนดส่ง:</label>
-                    <input type="date" id="due-date-input">
+        <div class="app-header">
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar-text">U</div>
+                <div>
+                    <div style="font-weight: 600;" id="user-display-email">Loading...</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">จัดการงานค้างของคุณ</div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="assigned-date-input">วันที่สั่ง:</label>
-                <input type="date" id="assigned-date-input">
+            <button class="btn btn-logout" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i> ออกจากระบบ
+            </button>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <div class="add-card">
+                <h3><i class="fa-solid fa-plus-circle"></i> สั่งงานใหม่</h3>
+                
+                <div class="input-group">
+                    <i class="fa-solid fa-book"></i>
+                    <input type="text" id="subject-input" placeholder="วิชา (เช่น คณิตศาสตร์)">
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-align-left"></i>
+                    <textarea id="content-input" rows="3" placeholder="รายละเอียดงาน..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label style="font-size: 0.8rem; margin-left: 5px;">วันที่สั่ง</label>
+                        <div class="input-group" style="margin-bottom: 10px;">
+                            <i class="fa-regular fa-calendar"></i>
+                            <input type="date" id="assigned-date-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; margin-left: 5px; color: var(--danger);">กำหนดส่ง</label>
+                        <div class="input-group" style="margin-bottom: 10px;">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <input type="date" id="due-date-input">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top: 15px;" onclick="saveHomework()">
+                    บันทึกข้อมูล
+                </button>
             </div>
-            <div class="form-group">
-                <label for="content-input">เนื้อหาที่สั่ง:</label>
-                <textarea id="content-input" rows="3" placeholder="รายละเอียดของงานที่ต้องทำ"></textarea>
+
+            <div class="list-section">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="tabs">
+                        <button id="tab-pending" class="tab-btn active" onclick="setView('pending')">งานค้าง</button>
+                        <button id="tab-completed" class="tab-btn" onclick="setView('completed')">เสร็จแล้ว</button>
+                    </div>
+
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search" style="color: #ccc;"></i>
+                        <input type="text" id="search-input" placeholder="ค้นหาวิชา..." onkeyup="filterHomework()">
+                    </div>
+                </div>
+
+                <div id="loading-spinner" style="text-align: center; padding: 40px; display: none;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+                    <p>กำลังโหลดข้อมูล...</p>
+                </div>
+
+                <div id="homework-list-container" class="homework-grid">
+                    </div>
+
             </div>
-            <button onclick="saveHomework()">บันทึกการบ้าน</button>
         </div>
-
-        <div id="search-area">
-            <input type="text" id="search-input" placeholder="ค้นหางาน (วิชา หรือ เนื้อหา)...">
-            <button onclick="filterHomework()">ค้นหา</button>
-        </div>
-
-        <div id="view-tabs">
-            <button id="tab-pending" class="active" onclick="setView('pending')">งานค้าง</button>
-            <button id="tab-completed" onclick="setView('completed')">งานส่งแล้ว</button>
-        </div>
-
-        <ul id="pending-list" class="homework-list">
-            <li class="empty-message">กำลังโหลดข้อมูล...</li>
-        </ul>
-
-        <ul id="completed-list" class="homework-list hidden">
-            <li class="empty-message">กำลังโหลดข้อมูล...</li>
-        </ul>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // โค้ด Configuration ของโปรเจกต์คุณ
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
             authDomain: "chat-27f96.firebaseapp.com",
@@ -281,271 +441,241 @@
             measurementId: "G-GR38B5JHZZ"
         };
 
-        // 1. กำหนดค่าเริ่มต้นของ Firebase (เปลี่ยนไปใช้ Firestore)
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const firestore = firebase.firestore(); 
+        const firestore = firebase.firestore();
+        
         let currentUserId = null;
-        let homeworkCollectionRef = null;
-        let allHomeworkData = {}; 
-        let unsubscribeSnapshot = null; // สำหรับยกเลิกการฟังข้อมูล
+        let unsubscribe = null;
+        let allData = [];
+        let currentView = 'pending';
 
-        // ตั้งค่าวันที่เริ่มต้น
+        // --- Init ---
         window.onload = () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('assigned-date-input').value = today;
             document.getElementById('due-date-input').value = today;
         };
 
-        // --- AUTHENTICATION (ยังใช้ Firebase Auth เหมือนเดิม) ---
-
-        function signup() {
-            // ... (โค้ด signup เหมือนเดิม)
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    alert('✅ ลงทะเบียนสำเร็จ! เข้าสู่ระบบแล้ว');
-                })
-                .catch((error) => {
-                    alert('❌ ลงทะเบียนล้มเหลว: ' + error.message);
-                });
-        }
-
-        function login() {
-            // ... (โค้ด login เหมือนเดิม)
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    alert('✅ เข้าสู่ระบบสำเร็จ!');
-                })
-                .catch((error) => {
-                    alert('❌ เข้าสู่ระบบล้มเหลว: ' + error.message);
-                });
-        }
-
-        function logout() {
-            // ยกเลิกการฟัง Firestore ก่อนออกจากระบบ
-            if (unsubscribeSnapshot) {
-                unsubscribeSnapshot();
-                unsubscribeSnapshot = null;
-            }
-            auth.signOut();
-        }
-
+        // --- Auth Functions ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUserId = user.uid;
-                // กำหนด Collection สำหรับผู้ใช้นี้: 'homeworks/user_id/items'
-                homeworkCollectionRef = firestore.collection('homeworks').doc(currentUserId).collection('items');
-
                 document.getElementById('auth-container').classList.add('hidden');
                 document.getElementById('homework-app').classList.remove('hidden');
-                document.getElementById('welcome-user').innerText = `บันทึกการบ้านรายวัน (${user.email})`;
                 
-                loadHomework(); 
+                // Set Header Info
+                document.getElementById('user-display-email').innerText = user.email.split('@')[0];
+                document.getElementById('user-avatar-text').innerText = user.email.charAt(0).toUpperCase();
+
+                loadData();
             } else {
                 currentUserId = null;
-                homeworkCollectionRef = null;
                 document.getElementById('auth-container').classList.remove('hidden');
                 document.getElementById('homework-app').classList.add('hidden');
-                document.getElementById('pending-list').innerHTML = '<li class="empty-message">โปรดเข้าสู่ระบบ</li>';
-                document.getElementById('completed-list').innerHTML = '<li class="empty-message">โปรดเข้าสู่ระบบ</li>';
-                allHomeworkData = {};
+                if(unsubscribe) unsubscribe();
             }
         });
 
-        // --- HOMEWORK LOGIC (ใช้ CLOUD FIRESTORE) ---
+        function login() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            if(!e || !p) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกอีเมลและรหัสผ่าน', 'warning');
+            
+            auth.signInWithEmailAndPassword(e, p).then(() => {
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                Toast.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ' });
+            }).catch(err => Swal.fire('Error', err.message, 'error'));
+        }
 
+        function signup() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            if(!e || !p) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกอีเมลและรหัสผ่าน', 'warning');
+
+            auth.createUserWithEmailAndPassword(e, p).then(() => {
+                Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย!', 'success');
+            }).catch(err => Swal.fire('Error', err.message, 'error'));
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, ออกเลย'
+            }).then((result) => {
+                if (result.isConfirmed) auth.signOut();
+            });
+        }
+
+        // --- Firestore Logic ---
         async function saveHomework() {
-            if (!currentUserId || !homeworkCollectionRef) {
-                alert('โปรดเข้าสู่ระบบก่อนบันทึกการบ้าน');
-                return;
-            }
-
             const subject = document.getElementById('subject-input').value.trim();
+            const content = document.getElementById('content-input').value.trim();
             const assignedDate = document.getElementById('assigned-date-input').value;
             const dueDate = document.getElementById('due-date-input').value;
-            const content = document.getElementById('content-input').value.trim();
 
-            if (!subject || !dueDate || !content) {
-                alert('กรุณากรอกข้อมูล *วิชา*, *กำหนดส่ง* และ *เนื้อหาที่สั่ง* ให้ครบถ้วน');
-                return;
+            if (!subject || !dueDate) {
+                return Swal.fire('เดี๋ยวก่อน!', 'กรุณากรอกวิชาและวันกำหนดส่ง', 'warning');
             }
 
-            const homeworkData = {
-                subject: subject,
-                assignedDate: assignedDate,
-                dueDate: dueDate,
-                content: content,
-                isCompleted: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
             try {
-                await homeworkCollectionRef.add(homeworkData);
-                alert('✅ บันทึกการบ้านสำเร็จ!');
+                await firestore.collection('homeworks').doc(currentUserId).collection('items').add({
+                    subject, content, assignedDate, dueDate,
+                    isCompleted: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Clear Form
                 document.getElementById('subject-input').value = '';
                 document.getElementById('content-input').value = '';
+                
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                Toast.fire({ icon: 'success', title: 'บันทึกงานใหม่แล้ว' });
+
             } catch (error) {
-                alert('❌ บันทึกการบ้านล้มเหลว: ' + error.message);
+                Swal.fire('Error', error.message, 'error');
             }
         }
 
-        function loadHomework() {
-            if (!homeworkCollectionRef) return;
-            
-            // ยกเลิกการฟังเดิมหากมี
-            if (unsubscribeSnapshot) unsubscribeSnapshot();
+        function loadData() {
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('homework-list-container').innerHTML = '';
 
-            // ฟังการเปลี่ยนแปลงข้อมูลทั้งหมดแบบเรียลไทม์ (Snapshot Listener)
-            unsubscribeSnapshot = homeworkCollectionRef.orderBy('dueDate', 'asc').onSnapshot(snapshot => {
-                const updatedData = {};
+            const ref = firestore.collection('homeworks').doc(currentUserId).collection('items');
+            
+            unsubscribe = ref.orderBy('dueDate', 'asc').onSnapshot(snapshot => {
+                allData = [];
                 snapshot.forEach(doc => {
-                    updatedData[doc.id] = doc.data();
+                    allData.push({ id: doc.id, ...doc.data() });
                 });
-                allHomeworkData = updatedData;
-                renderAllHomework(allHomeworkData);
-            }, error => {
-                console.error("Firestore Read Failed:", error);
-                alert("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: " + error.message);
+                document.getElementById('loading-spinner').style.display = 'none';
+                renderList();
             });
         }
 
-        async function markAsDone(docId, isCompleted) {
-            if (!confirm(`ยืนยันการ${isCompleted ? 'ทำเสร็จ' : 'ย้ายกลับไปงานค้าง'}?`)) return;
-
-            try {
-                // ใช้ update() เพื่ออัปเดตสถานะ isCompleted
-                await homeworkCollectionRef.doc(docId).update({ isCompleted: isCompleted });
-                alert('✅ อัปเดตสถานะการบ้านสำเร็จ');
-            } catch (error) {
-                alert('❌ อัปเดตสถานะล้มเหลว: ' + error.message);
-            }
+        async function updateStatus(id, status) {
+            await firestore.collection('homeworks').doc(currentUserId).collection('items').doc(id).update({
+                isCompleted: status
+            });
+            const msg = status ? 'เยี่ยมมาก! งานเสร็จแล้ว' : 'ย้ายกลับมางานค้าง';
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            Toast.fire({ icon: status ? 'success' : 'info', title: msg });
         }
 
-        async function deleteHomework(docId) {
-            if (!confirm('ยืนยันการลบการบ้านรายการนี้?')) return;
-
-            try {
-                // ใช้ delete() เพื่อลบเอกสาร
-                await homeworkCollectionRef.doc(docId).delete();
-                alert('✅ ลบการบ้านสำเร็จ');
-            } catch (error) {
-                alert('❌ ลบการบ้านล้มเหลว: ' + error.message);
-            }
-        }
-        
-        // --- UI RENDERING & FILTERING ---
-
-        function renderAllHomework(data) {
-            const pendingList = document.getElementById('pending-list');
-            const completedList = document.getElementById('completed-list');
-            const currentSearchTerm = document.getElementById('search-input').value.toLowerCase().trim();
-
-            pendingList.innerHTML = '';
-            completedList.innerHTML = '';
-
-            const keys = Object.keys(data);
-
-            keys.forEach(key => {
-                const item = data[key];
-
-                const isMatch = currentSearchTerm === '' ||
-                                item.subject.toLowerCase().includes(currentSearchTerm) ||
-                                item.content.toLowerCase().includes(currentSearchTerm);
-
-                if (isMatch) {
-                    const itemHTML = createHomeworkItemHTML(key, item);
-                    if (item.isCompleted) {
-                        completedList.appendChild(itemHTML);
-                    } else {
-                        pendingList.appendChild(itemHTML);
-                    }
+        function deleteItem(id) {
+            Swal.fire({
+                title: 'ลบงานนี้?',
+                text: "ลบแล้วกู้คืนไม่ได้นะ!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'ลบเลย',
+                cancelButtonText: 'ยกเลิก'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await firestore.collection('homeworks').doc(currentUserId).collection('items').doc(id).delete();
+                    Swal.fire('ลบแล้ว!', 'งานถูกลบออกจากระบบ', 'success');
                 }
             });
-            
-            // แสดงข้อความเมื่อไม่มีงาน
-            if (pendingList.children.length === 0) {
-                pendingList.innerHTML = `<li class="empty-message">🎉 ไม่มีงานค้าง! เยี่ยมมาก!</li>`;
-            }
-            if (completedList.children.length === 0) {
-                completedList.innerHTML = `<li class="empty-message">🗑️ ไม่มีงานส่งแล้วที่บันทึกไว้</li>`;
-            }
-            
-            // ต้องเรียก setView อีกครั้งเพื่อให้แน่ใจว่าแสดงรายการที่ถูกต้อง
-            const activeTab = document.querySelector('#view-tabs button.active').id.replace('tab-', '');
-            setView(activeTab, false); // false คือไม่ต้องเปลี่ยน active class
         }
 
-        function createHomeworkItemHTML(key, item) {
-            const li = document.createElement('li');
-            li.classList.add('homework-item');
-            if (item.isCompleted) {
-                li.classList.add('completed');
-            }
-
-            li.innerHTML = `
-                <div class="item-info">
-                    <h4>${item.subject}</h4>
-                    <span class="due-date">กำหนดส่ง: ${formatDate(item.dueDate)}</span>
-                </div>
-                <p class="item-content">${item.content}</p>
-                <div class="actions">
-                    ${!item.isCompleted ? 
-                        `<button class="btn-done" onclick="markAsDone('${key}', true)">✅ ทำเสร็จแล้ว</button>` :
-                        `<button class="btn-done" onclick="markAsDone('${key}', false)">↩️ ยังไม่เสร็จ</button>`
-                    }
-                    <button class="btn-delete" onclick="deleteHomework('${key}')">🗑️ ลบ</button>
-                </div>
-            `;
-            return li;
-        }
-
-        function setView(viewType, updateClass = true) {
-            const pendingTab = document.getElementById('tab-pending');
-            const completedTab = document.getElementById('tab-completed');
-            const pendingList = document.getElementById('pending-list');
-            const completedList = document.getElementById('completed-list');
-
-            if (updateClass) {
-                pendingTab.classList.remove('active');
-                completedTab.classList.remove('active');
-            }
-
-            if (viewType === 'pending') {
-                if (updateClass) pendingTab.classList.add('active');
-                pendingList.classList.remove('hidden');
-                completedList.classList.add('hidden');
-            } else if (viewType === 'completed') {
-                if (updateClass) completedTab.classList.add('active');
-                pendingList.classList.add('hidden');
-                completedList.classList.remove('hidden');
-            }
+        // --- UI Rendering ---
+        function setView(view) {
+            currentView = view;
+            document.getElementById('tab-pending').classList.toggle('active', view === 'pending');
+            document.getElementById('tab-completed').classList.toggle('active', view === 'completed');
+            renderList();
         }
 
         function filterHomework() {
-            renderAllHomework(allHomeworkData);
+            renderList();
         }
 
-        // --- Helper Function ---
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            try {
-                // Ensure date parsing works correctly across browsers by adding T00:00:00
-                return new Date(dateString + 'T00:00:00').toLocaleDateString('th-TH', options);
-            } catch (e) {
-                return dateString;
+        function renderList() {
+            const container = document.getElementById('homework-list-container');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            
+            container.innerHTML = '';
+
+            const filtered = allData.filter(item => {
+                const matchSearch = item.subject.toLowerCase().includes(search) || item.content.toLowerCase().includes(search);
+                const matchStatus = currentView === 'pending' ? !item.isCompleted : item.isCompleted;
+                return matchSearch && matchStatus;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; grid-column: 1/-1; color:#9ca3af; padding: 40px;">
+                    <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom:10px;"></i>
+                    <p>ไม่มีข้อมูลงานในหน้านี้</p>
+                </div>`;
+                return;
             }
+
+            filtered.forEach(item => {
+                const daysLeft = getDaysLeft(item.dueDate);
+                let urgencyClass = 'chill';
+                let badgeText = 'เหลือ ' + daysLeft + ' วัน';
+                
+                if (item.isCompleted) {
+                    urgencyClass = 'done';
+                    badgeText = 'เสร็จแล้ว';
+                } else {
+                    if (daysLeft < 0) { urgencyClass = 'urgent'; badgeText = 'เกินกำหนด!'; }
+                    else if (daysLeft === 0) { urgencyClass = 'urgent'; badgeText = 'ส่งวันนี้!'; }
+                    else if (daysLeft <= 2) { urgencyClass = 'soon'; }
+                }
+
+                const card = document.createElement('div');
+                card.className = `hw-card ${urgencyClass}`;
+                card.innerHTML = `
+                    <div class="hw-header">
+                        <div class="hw-subject">${item.subject}</div>
+                        <span class="hw-badge badge-${urgencyClass}">${badgeText}</span>
+                    </div>
+                    <div class="hw-content">
+                        ${item.content || '- ไม่มีรายละเอียด -'}
+                    </div>
+                    <div class="hw-footer">
+                        <div class="hw-date">
+                            <i class="fa-regular fa-clock"></i> 
+                            ${formatDate(item.dueDate)}
+                        </div>
+                        <div class="actions">
+                            ${!item.isCompleted ? 
+                                `<button class="action-btn btn-check" onclick="updateStatus('${item.id}', true)" title="ทำเสร็จแล้ว">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </button>` : 
+                                `<button class="action-btn btn-undo" onclick="updateStatus('${item.id}', false)" title="ยังไม่เสร็จ">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                </button>`
+                            }
+                            <button class="action-btn btn-trash" onclick="deleteItem('${item.id}')" title="ลบ">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
-        
-        // ให้สามารถกด Enter เพื่อค้นหาได้
-        document.getElementById('search-input').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                filterHomework();
-            }
-        });
+
+        // --- Helpers ---
+        function getDaysLeft(dateStr) {
+            const due = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const diffTime = due - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+        }
     </script>
 </body>
 </html>
