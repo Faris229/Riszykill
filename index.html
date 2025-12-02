@@ -1,133 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Simple Chat App - All in One</title>
+    <title>ระบบบันทึกการบ้านรายวัน (Minimal) - All in One</title>
     
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            align-items: flex-start; /* จัดให้อยู่ด้านบนหน่อย */
+            min-height: 100vh;
+            margin: 20px 0;
         }
 
-        #auth-container, #chat-container {
+        #auth-container, #homework-app {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 350px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
         }
 
-        /* Chat Styles */
-        #chat-container {
-            width: 400px;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
+        /* --- สไตล์ของระบบล็อกอิน --- */
+        #auth-container {
+            max-width: 400px;
         }
 
-        #header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-        }
-
-        #messages-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
+        input[type="email"], input[type="password"], input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            background-color: #eef;
-        }
-
-        .message {
-            margin-bottom: 8px;
-            padding: 5px 10px;
-            border-radius: 15px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-
-        .message.mine {
-            background-color: #dcf8c6;
-            margin-left: auto;
-            text-align: right;
-        }
-
-        .message.other {
-            background-color: #fff;
-            margin-right: auto;
-            border: 1px solid #ccc;
-        }
-
-        #input-area {
-            display: flex;
-        }
-
-        #message-input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px 0 0 4px;
+            border-radius: 6px;
+            box-sizing: border-box; /* สำคัญ: รวม padding ในความกว้าง */
         }
 
         button {
             padding: 10px 15px;
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
             border: none;
+            border-radius: 6px;
             cursor: pointer;
-            border-radius: 0 4px 4px 0;
+            transition: background-color 0.3s;
+            margin-right: 10px;
         }
-        /* ปรับปุ่มใน auth-container */
-        #auth-container button {
-            border-radius: 4px;
-            margin-top: 5px;
+
+        button:hover {
+            background-color: #0056b3;
         }
-        #auth-container input {
-            width: 95%;
-            padding: 10px;
+
+        /* --- สไตล์ของหน้าหลัก (Homework App) --- */
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        /* Homework Form */
+        #homework-form h3 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        /* Layout สำหรับ input/label ในฟอร์ม */
+        .form-group {
             margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* --- สไตล์สำหรับรายการการบ้าน --- */
+        #search-area {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        #search-input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        #view-tabs {
+            margin-bottom: 20px;
+            display: flex;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #view-tabs button {
+            background: none;
+            color: #555;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 0;
+            margin-right: 0;
+            border-bottom: 3px solid transparent;
+            font-weight: bold;
+        }
+
+        #view-tabs button.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+        
+        .homework-list {
+            padding: 0;
+            list-style: none;
+        }
+
+        .homework-item {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 5px solid #ffc107; /* Pending: สีเหลือง */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s;
+        }
+
+        .homework-item.completed {
+            border-left: 5px solid #28a745; /* Completed: สีเขียว */
+            opacity: 0.7;
+        }
+
+        .homework-item h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #007bff;
+        }
+
+        .due-date {
+            font-weight: bold;
+            color: #dc3545; /* สีแดงสำหรับกำหนดส่ง */
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .actions button {
+            background-color: #6c757d;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+        .actions .btn-done {
+            background-color: #28a745;
+        }
+        .actions .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
     <div id="auth-container">
-        <h2>เข้าสู่ระบบ / ลงทะเบียน</h2>
+        <h2>ระบบบันทึกการบ้าน</h2>
+        <p id="auth-status"></p>
         <input type="email" id="email" placeholder="อีเมล">
         <input type="password" id="password" placeholder="รหัสผ่าน">
         <button onclick="login()">เข้าสู่ระบบ</button>
         <button onclick="signup()">ลงทะเบียน</button>
-        <p id="auth-status"></p>
     </div>
 
-    <div id="chat-container" style="display: none;">
+    <div id="homework-app" class="hidden">
         <div id="header">
-            <span id="welcome-user"></span>
+            <h1 id="welcome-user">บันทึกการบ้านรายวัน</h1>
             <button onclick="logout()">ออกจากระบบ</button>
         </div>
         
-        <div id="messages-list">
+        <div id="homework-form">
+            <h3>+ เพิ่มการบ้านใหม่</h3>
+            <div class="form-group">
+                <label for="subject-input">วิชา:</label>
+                <input type="text" id="subject-input" placeholder="เช่น คณิตศาสตร์, วิทยาศาสตร์">
             </div>
-
-        <div id="input-area">
-            <input type="text" id="message-input" placeholder="พิมพ์ข้อความ...">
-            <button onclick="sendMessage()">ส่ง</button>
+            <div class="form-group">
+                <label for="assigned-date-input">วันที่สั่ง:</label>
+                <input type="date" id="assigned-date-input" value="">
+            </div>
+            <div class="form-group">
+                <label for="due-date-input">กำหนดส่ง:</label>
+                <input type="date" id="due-date-input" value="">
+            </div>
+            <div class="form-group">
+                <label for="content-input">เนื้อหาที่สั่ง:</label>
+                <textarea id="content-input" rows="3" placeholder="รายละเอียดของงานที่ต้องทำ"></textarea>
+            </div>
+            <button onclick="saveHomework()">บันทึกการบ้าน</button>
+            <hr style="margin-top: 30px;">
         </div>
+
+        <div id="search-area">
+            <input type="text" id="search-input" placeholder="ค้นหางาน (วิชา หรือ เนื้อหา)...">
+            <button onclick="filterHomework()">ค้นหา</button>
+        </div>
+
+        <div id="view-tabs">
+            <button id="tab-pending" class="active" onclick="setView('pending')">งานค้าง</button>
+            <button id="tab-completed" onclick="setView('completed')">งานส่งแล้ว</button>
+        </div>
+
+        <ul id="pending-list" class="homework-list">
+            </ul>
+
+        <ul id="completed-list" class="homework-list hidden">
+            </ul>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -135,7 +235,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <script>
-        // โค้ด Configuration ของโปรเจกต์คุณ
+        // โค้ด Configuration ของโปรเจกต์ของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
             authDomain: "chat-27f96.firebaseapp.com",
@@ -150,9 +250,16 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
-        const messagesRef = database.ref('messages'); 
-
         let currentUserId = null;
+        let homeworkRef = null;
+        let allHomeworkData = {}; // เก็บข้อมูลทั้งหมดเพื่อใช้ในการค้นหา/กรอง
+
+        // ตั้งค่าวันที่ปัจจุบันให้ input[type=date] ตอนโหลด
+        window.onload = () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('assigned-date-input').value = today;
+            document.getElementById('due-date-input').value = today;
+        };
 
         // --- ส่วนของการจัดการ Authentication ---
 
@@ -160,11 +267,11 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    document.getElementById('auth-status').innerText = 'ลงทะเบียนสำเร็จ! เข้าสู่ระบบแล้ว';
+                .then(() => {
+                    alert('✅ ลงทะเบียนสำเร็จ! เข้าสู่ระบบแล้ว');
                 })
                 .catch((error) => {
-                    document.getElementById('auth-status').innerText = 'ลงทะเบียนล้มเหลว: ' + error.message;
+                    alert('❌ ลงทะเบียนล้มเหลว: ' + error.message);
                 });
         }
 
@@ -172,11 +279,11 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    document.getElementById('auth-status').innerText = 'เข้าสู่ระบบสำเร็จ!';
+                .then(() => {
+                    alert('✅ เข้าสู่ระบบสำเร็จ!');
                 })
                 .catch((error) => {
-                    document.getElementById('auth-status').innerText = 'เข้าสู่ระบบล้มเหลว: ' + error.message;
+                    alert('❌ เข้าสู่ระบบล้มเหลว: ' + error.message);
                 });
         }
 
@@ -188,65 +295,215 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUserId = user.uid;
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('chat-container').style.display = 'flex'; 
-                document.getElementById('welcome-user').innerText = `สวัสดี, ${user.email}`;
-                document.getElementById('messages-list').innerHTML = ''; 
-                loadMessages(); 
+                // สร้าง reference ที่เป็นของ user คนนี้เท่านั้น
+                homeworkRef = database.ref('homework/' + currentUserId); 
+
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('homework-app').classList.remove('hidden');
+                document.getElementById('welcome-user').innerText = `บันทึกการบ้านรายวัน (${user.email})`;
+                
+                // เริ่มโหลดข้อมูลการบ้าน
+                loadHomework(); 
             } else {
                 currentUserId = null;
-                document.getElementById('auth-container').style.display = 'block';
-                document.getElementById('chat-container').style.display = 'none';
+                homeworkRef = null;
+                document.getElementById('auth-container').classList.remove('hidden');
+                document.getElementById('homework-app').classList.add('hidden');
+                document.getElementById('pending-list').innerHTML = ''; // เคลียร์ข้อมูลเมื่อออกจากระบบ
+                document.getElementById('completed-list').innerHTML = '';
+                allHomeworkData = {};
             }
         });
 
-        // --- ส่วนของการจัดการแชท ---
+        // --- ส่วนของการจัดการการบ้าน ---
 
-        function sendMessage() {
-            const inputElement = document.getElementById('message-input');
-            const messageText = inputElement.value.trim();
-
-            if (messageText && currentUserId) {
-                const messageData = {
-                    userId: currentUserId,
-                    email: auth.currentUser.email, 
-                    text: messageText,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP 
-                };
-                
-                messagesRef.push(messageData); 
-                
-                inputElement.value = ''; 
+        function saveHomework() {
+            if (!currentUserId) {
+                alert('โปรดเข้าสู่ระบบก่อนบันทึกการบ้าน');
+                return;
             }
+
+            const subject = document.getElementById('subject-input').value.trim();
+            const assignedDate = document.getElementById('assigned-date-input').value;
+            const dueDate = document.getElementById('due-date-input').value;
+            const content = document.getElementById('content-input').value.trim();
+
+            if (!subject || !dueDate || !content) {
+                alert('กรุณากรอกข้อมูล *วิชา*, *กำหนดส่ง* และ *เนื้อหาที่สั่ง* ให้ครบถ้วน');
+                return;
+            }
+
+            const homeworkData = {
+                subject: subject,
+                assignedDate: assignedDate,
+                dueDate: dueDate,
+                content: content,
+                isCompleted: false,
+                timestamp: firebase.database.ServerValue.TIMESTAMP 
+            };
+            
+            homeworkRef.push(homeworkData)
+                .then(() => {
+                    alert('✅ บันทึกการบ้านสำเร็จ!');
+                    // เคลียร์ฟอร์ม
+                    document.getElementById('subject-input').value = '';
+                    document.getElementById('content-input').value = '';
+                    // วันที่ปล่อยให้เป็นค่าเดิมหรือวันที่ปัจจุบัน
+                })
+                .catch((error) => {
+                    alert('❌ บันทึกการบ้านล้มเหลว: ' + error.message);
+                });
         }
 
-        function loadMessages() {
-            // ฟัง 'child_added' เพื่อให้เรียลไทม์
-            messagesRef.limitToLast(50).on('child_added', (snapshot) => {
-                const message = snapshot.val();
-                displayMessage(message);
+        function loadHomework() {
+            if (!homeworkRef) return;
+
+            // ฟังการเปลี่ยนแปลงทั้งหมดในโหนด homework ของผู้ใช้นี้
+            homeworkRef.on('value', (snapshot) => {
+                allHomeworkData = snapshot.val() || {}; // อัปเดตข้อมูลทั้งหมด
+                renderAllHomework(allHomeworkData);
+            }, (error) => {
+                console.error("Firebase Read Failed:", error);
+                alert("❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: " + error.message);
             });
         }
 
-        function displayMessage(message) {
-            const messageList = document.getElementById('messages-list');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
+        function renderAllHomework(data) {
+            const pendingList = document.getElementById('pending-list');
+            const completedList = document.getElementById('completed-list');
+            const currentSearchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+
+            pendingList.innerHTML = '';
+            completedList.innerHTML = '';
+
+            const keys = Object.keys(data).sort((a, b) => {
+                // เรียงตาม Due Date: งานที่ถึงกำหนดก่อนจะอยู่ด้านบน
+                const dateA = new Date(data[a].dueDate);
+                const dateB = new Date(data[b].dueDate);
+                return dateA - dateB;
+            });
+
+            keys.forEach(key => {
+                const item = data[key];
+
+                // ตรวจสอบการค้นหา (กรองตาม Keyword)
+                const isMatch = currentSearchTerm === '' ||
+                                item.subject.toLowerCase().includes(currentSearchTerm) ||
+                                item.content.toLowerCase().includes(currentSearchTerm);
+
+                if (isMatch) {
+                    const itemHTML = createHomeworkItemHTML(key, item);
+                    if (item.isCompleted) {
+                        completedList.appendChild(itemHTML);
+                    } else {
+                        pendingList.appendChild(itemHTML);
+                    }
+                }
+            });
             
-            // จัดรูปแบบข้อความ
-            if (message.userId === currentUserId) {
-                messageElement.classList.add('mine');
-                messageElement.innerHTML = `**คุณ**: ${message.text}`;
-            } else {
-                messageElement.classList.add('other');
-                messageElement.innerHTML = `**${message.email.split('@')[0]}**: ${message.text}`; 
+            // แสดงข้อความเมื่อไม่มีงาน
+            if (pendingList.children.length === 0 && document.getElementById('tab-pending').classList.contains('active')) {
+                pendingList.innerHTML = `<li style="text-align: center; color: #aaa;">🎉 ไม่มีงานค้าง! เยี่ยมมาก!</li>`;
+            }
+            if (completedList.children.length === 0 && document.getElementById('tab-completed').classList.contains('active')) {
+                completedList.innerHTML = `<li style="text-align: center; color: #aaa;">🗑️ ไม่มีงานส่งแล้วที่บันทึกไว้</li>`;
+            }
+        }
+
+        function createHomeworkItemHTML(key, item) {
+            const li = document.createElement('li');
+            li.id = `item-${key}`;
+            li.classList.add('homework-item');
+            if (item.isCompleted) {
+                li.classList.add('completed');
+            }
+
+            li.innerHTML = `
+                <h4>${item.subject}</h4>
+                <span class="due-date">กำหนดส่ง: ${formatDate(item.dueDate)}</span>
+                <p><strong>สั่งเมื่อ:</strong> ${formatDate(item.assignedDate)}</p>
+                <p>${item.content}</p>
+                <div class="actions">
+                    ${!item.isCompleted ? 
+                        `<button class="btn-done" onclick="markAsDone('${key}', true)">✅ ทำเสร็จแล้ว</button>` :
+                        `<button class="btn-done" onclick="markAsDone('${key}', false)">↩️ ยังไม่เสร็จ</button>`
+                    }
+                    <button class="btn-delete" onclick="deleteHomework('${key}')">🗑️ ลบ</button>
+                </div>
+            `;
+            return li;
+        }
+
+        function markAsDone(key, isCompleted) {
+            if (!confirm(`ยืนยันการ${isCompleted ? 'ทำเสร็จ' : 'ย้ายกลับไปงานค้าง'}?`)) return;
+
+            homeworkRef.child(key).update({ isCompleted: isCompleted })
+                .then(() => {
+                    alert('✅ อัปเดตสถานะการบ้านสำเร็จ');
+                })
+                .catch((error) => {
+                    alert('❌ อัปเดตสถานะล้มเหลว: ' + error.message);
+                });
+        }
+
+        function deleteHomework(key) {
+            if (!confirm('ยืนยันการลบการบ้านรายการนี้?')) return;
+
+            homeworkRef.child(key).remove()
+                .then(() => {
+                    alert('✅ ลบการบ้านสำเร็จ');
+                })
+                .catch((error) => {
+                    alert('❌ ลบการบ้านล้มเหลว: ' + error.message);
+                });
+        }
+
+        // --- ส่วนของการจัดการ UI/View ---
+
+        function setView(viewType) {
+            const pendingTab = document.getElementById('tab-pending');
+            const completedTab = document.getElementById('tab-completed');
+            const pendingList = document.getElementById('pending-list');
+            const completedList = document.getElementById('completed-list');
+
+            if (viewType === 'pending') {
+                pendingTab.classList.add('active');
+                completedTab.classList.remove('active');
+                pendingList.classList.remove('hidden');
+                completedList.classList.add('hidden');
+            } else if (viewType === 'completed') {
+                pendingTab.classList.remove('active');
+                completedTab.classList.add('active');
+                pendingList.classList.add('hidden');
+                completedList.classList.remove('hidden');
             }
             
-            messageList.appendChild(messageElement);
-            
-            // เลื่อนไปที่ข้อความล่าสุดอัตโนมัติ
-            messageList.scrollTop = messageList.scrollHeight;
+            // เมื่อเปลี่ยนมุมมอง ให้เรียก renderAllHomework เพื่อแสดงผลใหม่ตามการค้นหาปัจจุบัน
+            renderAllHomework(allHomeworkData);
         }
+
+        function filterHomework() {
+            // การค้นหาถูกรวมอยู่ใน load/render function แล้ว
+            // เพียงแค่เรียก renderAllHomework ใหม่
+            renderAllHomework(allHomeworkData);
+        }
+
+        // --- Helper Function ---
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            try {
+                return new Date(dateString + 'T00:00:00').toLocaleDateString('th-TH', options);
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // ให้สามารถกด Enter เพื่อค้นหาได้
+        document.getElementById('search-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                filterHomework();
+            }
+        });
     </script>
 </body>
 </html>
