@@ -35,6 +35,15 @@
         .btn-danger { background: #ef4444; color: white; }
         .btn-ghost { background: transparent; color: var(--text-muted); }
         
+        /* ปุ่ม Google สวยๆ */
+        .btn-google {
+            background: white; color: #1e293b; border: 2px solid #e2e8f0; 
+            margin-top: 15px; width: 100%; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .btn-google i { color: #ea4335; } /* สีโลโก้ Google */
+
         .btn-status {
             padding: 8px 16px; border-radius: 50px; font-size: 0.9rem; font-weight: 600;
             background: white; border: 2px solid #e2e8f0; color: var(--text-muted); transition: all 0.2s;
@@ -112,7 +121,12 @@
             </div>
 
             <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 15px;" onclick="authAction('login')">เข้าสู่ระบบ</button>
-            <button class="btn btn-ghost" style="width: 100%; justify-content: center;" onclick="authAction('signup')">สมัครสมาชิกใหม่</button>
+            
+            <button class="btn btn-google" onclick="signInWithGoogle()">
+                <i class="fa-brands fa-google"></i> เข้าสู่ระบบด้วย Google
+            </button>
+
+            <button class="btn btn-ghost" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="authAction('signup')">สมัครสมาชิกใหม่</button>
         </div>
     </div>
 
@@ -319,7 +333,7 @@
         let calDate = new Date();
         let chartInstance = null;
 
-        // AUTH SYSTEM (FIXED POPUPS)
+        // AUTH SYSTEM
         auth.onAuthStateChanged(user => {
             if(user) {
                 currentUser = user;
@@ -341,12 +355,12 @@
             const e = document.getElementById('auth-email').value;
             const p = document.getElementById('auth-pass').value;
 
-            // เช็คว่ากรอกครบไหม
+            // FIXED: Alert when inputs are empty
             if(!e || !p) {
                 return Swal.fire({
                     icon: 'warning',
-                    title: 'ข้อมูลไม่ครบถ้วน',
-                    text: 'กรุณากรอกอีเมลและรหัสผ่านให้เรียบร้อยครับ',
+                    title: 'ข้อมูลไม่ครบ',
+                    text: 'กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน',
                     confirmButtonColor: '#4338ca'
                 });
             }
@@ -357,7 +371,7 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'ยินดีต้อนรับ!',
-                        text: 'เข้าสู่ระบบสำเร็จแล้ว',
+                        text: 'เข้าสู่ระบบสำเร็จ',
                         timer: 1500,
                         showConfirmButton: false
                     });
@@ -365,34 +379,41 @@
                     await auth.createUserWithEmailAndPassword(e, p); 
                     Swal.fire({
                         icon: 'success',
-                        title: 'สมัครสมาชิกสำเร็จ',
-                        text: 'ยินดีต้อนรับเข้าสู่ระบบครับ',
+                        title: 'สำเร็จ',
+                        text: 'สมัครสมาชิกเรียบร้อยแล้ว',
                         confirmButtonColor: '#4338ca'
                     });
                 }
             } catch(err) { 
-                // แปลง Error เป็นภาษาไทย
-                let msg = 'เกิดข้อผิดพลาดบางอย่าง';
-                if(err.code === 'auth/user-not-found') msg = 'ไม่พบอีเมลนี้ในระบบครับ';
-                if(err.code === 'auth/wrong-password') msg = 'รหัสผ่านไม่ถูกต้อง ลองใหม่อีกครั้งนะครับ';
-                if(err.code === 'auth/email-already-in-use') msg = 'อีเมลนี้ถูกสมัครไปแล้วครับ';
-                if(err.code === 'auth/invalid-email') msg = 'รูปแบบอีเมลไม่ถูกต้องครับ';
-                if(err.code === 'auth/weak-password') msg = 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษรครับ';
+                // FIXED: Better Error Handling (Popup always shows)
+                let msg = 'เกิดข้อผิดพลาด';
+                if(err.code === 'auth/user-not-found') msg = 'ไม่พบอีเมลนี้ในระบบ';
+                if(err.code === 'auth/wrong-password') msg = 'รหัสผ่านไม่ถูกต้อง';
+                if(err.code === 'auth/email-already-in-use') msg = 'อีเมลนี้ถูกใช้งานแล้ว';
+                if(err.code === 'auth/invalid-email') msg = 'รูปแบบอีเมลไม่ถูกต้อง';
                 
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เข้าสู่ระบบไม่ได้',
-                    text: msg,
-                    confirmButtonColor: '#ef4444'
-                }); 
+                Swal.fire({ icon: 'error', title: 'เข้าสู่ระบบไม่ได้', text: msg, confirmButtonColor: '#ef4444' }); 
             }
         }
 
-        // FORGOT PASSWORD (FIXED)
+        // FIXED: Google Sign-In Function
+        async function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                // Success is handled by onAuthStateChanged
+                Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'เข้าสู่ระบบด้วย Google เรียบร้อย', timer: 1500, showConfirmButton: false });
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
+            }
+        }
+
+        // FIXED: Forgot Password Function
         async function forgotPassword() {
             const { value: email } = await Swal.fire({
                 title: 'รีเซ็ตรหัสผ่าน',
-                text: 'กรุณากรอกอีเมลที่ใช้สมัคร เพื่อรับลิงก์ตั้งรหัสใหม่',
+                text: 'กรุณากรอกอีเมลเพื่อรับลิงก์ตั้งรหัสผ่านใหม่',
                 input: 'email',
                 inputPlaceholder: 'อีเมลของคุณ',
                 showCancelButton: true,
@@ -406,15 +427,15 @@
                     await auth.sendPasswordResetEmail(email);
                     Swal.fire({
                         icon: 'success',
-                        title: 'ส่งอีเมลเรียบร้อย',
-                        text: 'กรุณาตรวจสอบกล่องจดหมายของคุณ (รวมถึง Junk Mail) เพื่อตั้งรหัสผ่านใหม่ครับ',
+                        title: 'ส่งอีเมลแล้ว',
+                        text: 'กรุณาตรวจสอบกล่องจดหมายของคุณ',
                         confirmButtonColor: '#4338ca'
                     });
                 } catch (error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'เกิดข้อผิดพลาด',
-                        text: 'ไม่พบอีเมลนี้ในระบบ หรือรูปแบบอีเมลไม่ถูกต้อง',
+                        text: 'ไม่พบอีเมลนี้ หรือรูปแบบไม่ถูกต้อง',
                         confirmButtonColor: '#ef4444'
                     });
                 }
@@ -423,19 +444,9 @@
 
         function logout() {
             Swal.fire({
-                title: 'ออกจากระบบ?',
-                text: "คุณต้องการออกจากระบบใช่หรือไม่",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'ใช่, ออกเลย',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#ef4444'
-            }).then(r=>{ 
-                if(r.isConfirmed){ 
-                    toggleMenu(); 
-                    auth.signOut(); 
-                } 
-            });
+                title: 'ออกจากระบบ?', icon: 'warning', showCancelButton: true, 
+                confirmButtonText: 'ใช่, ออกเลย', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#ef4444'
+            }).then(r=>{ if(r.isConfirmed){ toggleMenu(); auth.signOut(); } });
         }
 
         // NAVIGATION
@@ -447,7 +458,6 @@
         function router(view) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.add('hidden'));
             document.getElementById('view-' + view).classList.remove('hidden');
-            
             if(document.getElementById('sidebar').classList.contains('active')) toggleMenu();
 
             if(view === 'dashboard') renderDashboard();
@@ -492,7 +502,7 @@
                 await currentUser.updateProfile({displayName:name, photoURL:url});
                 updateProfileUI();
                 document.getElementById('profile-modal').classList.remove('active');
-                Swal.fire({icon:'success', title:'บันทึกแล้ว', text:'อัปเดตข้อมูลส่วนตัวเรียบร้อย', timer: 1500, showConfirmButton: false});
+                Swal.fire({icon:'success', title:'บันทึกแล้ว', timer: 1500, showConfirmButton: false});
             } catch(e) { Swal.fire('Error', e.message, 'error'); }
         }
 
