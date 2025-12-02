@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Stock Pro (Modern UI)</title>
+    <title>Game Stock (Private System)</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,75 +11,17 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
     <style>
-        :root { 
-            --primary-bg: #f3f4f6;
-            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-        }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--primary-bg); color: #1f2937; }
+        :root { --primary-bg: #f8fafc; --primary-color: #4f46e5; }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--primary-bg); color: #334155; padding-bottom: 60px; }
         
-        /* Modern Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        /* Modern Buttons */
-        .btn-modern {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            border: none;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-        }
-        .btn-modern:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-            color: white;
-            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
-        }
-        .btn-danger-soft {
-            background-color: #fee2e2;
-            color: #ef4444;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-        }
-        .btn-danger-soft:hover { background-color: #fecaca; color: #dc2626; }
-
-        /* Navbar Profile */
-        .nav-profile-img {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #e0e7ff;
-        }
-        .dropdown-menu-modern {
-            border: none;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-radius: 1rem;
-            padding: 10px;
-            min-width: 240px;
-        }
-        .dropdown-item { border-radius: 8px; padding: 10px 15px; font-weight: 500; color: #4b5563; }
-        .dropdown-item:hover { background-color: #f3f4f6; color: var(--primary-color); }
-        .dropdown-item.text-danger:hover { background-color: #fef2f2; color: #ef4444; }
-
-        /* Table & Elements */
-        .table-hover tbody tr:hover { background-color: #f9fafb; }
-        .blur-text { filter: blur(5px); transition: 0.3s; cursor: pointer; background: #e5e7eb; padding: 2px 8px; border-radius: 4px; user-select: none; }
+        .glass-card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border: 1px solid #e2e8f0; }
+        .btn-modern { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; padding: 10px 24px; border-radius: 50px; font-weight: 500; transition: 0.3s; }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); color: white; }
+        
+        .nav-profile-img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid #e2e8f0; }
+        .table-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; cursor: zoom-in; }
+        .blur-text { filter: blur(4px); background: #f1f5f9; padding: 2px 8px; border-radius: 4px; transition: 0.2s; cursor: pointer; user-select: none; }
         .blur-text:hover { filter: blur(0); background: transparent; }
-        .table-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: zoom-in; }
-        .table-img:hover { transform: scale(1.1); }
-        
         .hidden { display: none !important; }
     </style>
 </head>
@@ -87,75 +29,45 @@
 
 <nav class="navbar navbar-expand-lg fixed-top glass-card m-3 mt-2 px-3 py-2 hidden" id="mainNavbar">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold text-primary fs-4" href="#" onclick="window.scrollTo(0,0)">
-        <i class="bi bi-joystick me-2"></i><span id="navStoreName">RS SHOP</span>
-    </a>
-    
+    <a class="navbar-brand fw-bold text-primary" href="#" onclick="window.scrollTo(0,0)"><i class="bi bi-controller me-2"></i><span id="navStoreName">MY SHOP</span></a>
     <div class="dropdown ms-auto">
         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
             <div class="text-end me-2 d-none d-sm-block">
-                <div class="fw-bold small text-dark" id="navUserName">Admin</div>
-                <div class="text-muted" style="font-size: 0.75rem;">Manager</div>
+                <div class="fw-bold small text-dark" id="navUserName">User</div>
+                <div class="text-muted" style="font-size: 0.7rem;">Owner</div>
             </div>
-            <img src="https://ui-avatars.com/api/?name=Admin&background=random" id="navProfileImg" class="nav-profile-img shadow-sm">
+            <img src="https://via.placeholder.com/40" id="navProfileImg" class="nav-profile-img">
         </a>
-        <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end mt-3">
-            <li><div class="dropdown-header text-uppercase small fw-bold text-muted">เมนูหลัก</div></li>
-            <li><a class="dropdown-item" href="#" onclick="window.scrollTo(0,0)"><i class="bi bi-speedometer2 me-2"></i> แดชบอร์ด</a></li>
-            <li><a class="dropdown-item" href="#stock-pane" onclick="goToStock()"><i class="bi bi-box-seam me-2"></i> จัดการสินค้า</a></li>
-            <li><hr class="dropdown-divider my-2"></li>
-            <li><div class="dropdown-header text-uppercase small fw-bold text-muted">บัญชีผู้ใช้</div></li>
-            <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editProfileModal"><i class="bi bi-person-gear me-2"></i> แก้ไขข้อมูล / รหัสผ่าน</button></li>
-            <li><button class="dropdown-item text-danger mt-1" onclick="confirmLogout()"><i class="bi bi-box-arrow-right me-2"></i> ออกจากระบบ</button></li>
+        <ul class="dropdown-menu dropdown-menu-end mt-3 border-0 shadow-lg rounded-4 overflow-hidden">
+            <li><button class="dropdown-item py-2" onclick="openEditProfile()"><i class="bi bi-person-gear me-2"></i> แก้ไขข้อมูลส่วนตัว</button></li>
+            <li><hr class="dropdown-divider my-0"></li>
+            <li><button class="dropdown-item py-2 text-danger" onclick="confirmLogout()"><i class="bi bi-box-arrow-right me-2"></i> ออกจากระบบ</button></li>
         </ul>
     </div>
   </div>
 </nav>
 
-<div class="container" id="auth-section" style="padding-top: 10vh;">
+<div class="container" id="auth-section" style="padding-top: 15vh;">
     <div class="row justify-content-center">
         <div class="col-md-5 col-lg-4">
-            <div class="glass-card p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-shield-lock-fill fs-2"></i>
-                    </div>
-                    <h3 class="fw-bold">เข้าสู่ระบบ</h3>
-                    <p class="text-muted small">ระบบจัดการสต็อกหลังบ้าน</p>
-                </div>
-
-                <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-pill" role="tablist">
-                    <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#login-tab">Login</button></li>
-                    <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#signup-tab">Register</button></li>
+            <div class="glass-card p-4 p-md-5 text-center">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3"><i class="bi bi-shop fs-1"></i></div>
+                <h3 class="fw-bold mb-4">ระบบจัดการร้าน</h3>
+                <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-pill">
+                    <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#login-tab">เข้าสู่ระบบ</button></li>
+                    <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#signup-tab">สมัครใหม่</button></li>
                 </ul>
-
-                <div class="tab-content">
+                <div class="tab-content text-start">
                     <div class="tab-pane fade show active" id="login-tab">
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control rounded-3 border-0 bg-light" id="loginEmail" placeholder="name@example.com">
-                            <label>อีเมล</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" class="form-control rounded-3 border-0 bg-light" id="loginPassword" placeholder="Password">
-                            <label>รหัสผ่าน</label>
-                        </div>
-                        <button class="btn btn-modern w-100 py-3" onclick="login()">เข้าสู่ระบบ</button>
+                        <input type="email" class="form-control rounded-pill mb-3" id="loginEmail" placeholder="อีเมล">
+                        <input type="password" class="form-control rounded-pill mb-4" id="loginPassword" placeholder="รหัสผ่าน">
+                        <button class="btn btn-modern w-100" onclick="login()">Login</button>
                     </div>
-                    
                     <div class="tab-pane fade" id="signup-tab">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control rounded-3 border-0 bg-light" id="signupStore" placeholder="Store Name">
-                            <label>ชื่อร้าน (Display Name)</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control rounded-3 border-0 bg-light" id="signupEmail" placeholder="Email">
-                            <label>อีเมล</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" class="form-control rounded-3 border-0 bg-light" id="signupPassword" placeholder="Password">
-                            <label>รหัสผ่าน</label>
-                        </div>
-                        <button class="btn btn-success w-100 py-3 rounded-pill fw-bold border-0" onclick="signup()">สมัครสมาชิก</button>
+                        <input type="text" class="form-control rounded-pill mb-3" id="signupStore" placeholder="ชื่อร้านค้า">
+                        <input type="email" class="form-control rounded-pill mb-3" id="signupEmail" placeholder="อีเมล">
+                        <input type="password" class="form-control rounded-pill mb-4" id="signupPassword" placeholder="รหัสผ่าน">
+                        <button class="btn btn-success w-100 rounded-pill fw-bold" onclick="signup()">Register</button>
                     </div>
                 </div>
             </div>
@@ -163,59 +75,35 @@
     </div>
 </div>
 
-<div class="container hidden" id="dashboard-section" style="padding-top: 100px; padding-bottom: 50px;">
-    
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
-        <div>
-            <h2 class="fw-bold m-0 text-dark">ภาพรวมแดชบอร์ด</h2>
-            <p class="text-muted m-0">ยินดีต้อนรับกลับ, จัดการสินค้าของคุณได้เลย</p>
-        </div>
-        <button class="btn btn-modern shadow" data-bs-toggle="modal" data-bs-target="#addItemModal">
-            <i class="bi bi-plus-lg me-1"></i> เพิ่มสินค้าใหม่
-        </button>
+<div class="container hidden" id="dashboard-section" style="padding-top: 100px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold m-0"><i class="bi bi-grid-fill text-primary me-2"></i>แดชบอร์ด</h3>
+        <button class="btn btn-modern shadow-sm" data-bs-toggle="modal" data-bs-target="#addItemModal"><i class="bi bi-plus-lg me-1"></i> เพิ่มสินค้า</button>
     </div>
 
-    <div class="glass-card p-2 mb-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 p-2">
-            <ul class="nav nav-pills bg-light p-1 rounded-pill" id="dashTab">
-                <li class="nav-item"><button class="nav-link active rounded-pill px-4 fw-bold" data-bs-toggle="tab" data-bs-target="#stock-pane">📦 สต็อกสินค้า</button></li>
-                <li class="nav-item"><button class="nav-link rounded-pill px-4 fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#history-pane">📜 ประวัติการขาย</button></li>
+    <div class="glass-card p-3 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+            <ul class="nav nav-pills bg-light p-1 rounded-pill">
+                <li class="nav-item"><button class="nav-link active rounded-pill px-4 fw-bold" data-bs-toggle="tab" data-bs-target="#stock-pane">📦 สต็อก</button></li>
+                <li class="nav-item"><button class="nav-link rounded-pill px-4 fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#history-pane">📜 ประวัติ</button></li>
             </ul>
-            <div class="input-group w-auto">
-                <span class="input-group-text bg-white border-0 ps-3 rounded-start-pill"><i class="bi bi-search text-muted"></i></span>
-                <input type="text" id="searchInput" class="form-control border-0 bg-white rounded-end-pill" placeholder="ค้นหารหัส..." onkeyup="searchTable('stockTable')">
-            </div>
+            <input type="text" id="searchInput" class="form-control rounded-pill bg-light border-0" placeholder="🔍 ค้นหา..." style="max-width: 250px;" onkeyup="searchTable('stockTable')">
         </div>
 
-        <div class="tab-content mt-2">
+        <div class="tab-content">
             <div class="tab-pane fade show active" id="stock-pane">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="stockTable">
-                        <thead class="bg-light text-muted small text-uppercase">
-                            <tr>
-                                <th class="ps-4 py-3">สินค้า</th>
-                                <th>ราคาขาย</th>
-                                <th>ข้อมูลล็อกอิน</th>
-                                <th class="text-end pe-4">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white border-top-0"></tbody>
+                        <thead class="bg-light text-secondary small text-uppercase"><tr><th class="ps-3">สินค้า</th><th>ราคา</th><th>ข้อมูล</th><th class="text-end pe-3">จัดการ</th></tr></thead>
+                        <tbody class="bg-white"></tbody>
                     </table>
                 </div>
             </div>
-
             <div class="tab-pane fade" id="history-pane">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="historyTable">
-                        <thead class="bg-light text-muted small text-uppercase">
-                            <tr>
-                                <th class="ps-4 py-3">รหัสสินค้า</th>
-                                <th>ราคาขาย</th>
-                                <th>ผลกำไร</th>
-                                <th>วันที่ขาย</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white border-top-0"></tbody>
+                        <thead class="bg-light text-secondary small text-uppercase"><tr><th class="ps-3">รหัส</th><th>ราคาขาย</th><th>กำไร</th><th>วันที่</th></tr></thead>
+                        <tbody class="bg-white"></tbody>
                     </table>
                 </div>
             </div>
@@ -224,55 +112,25 @@
 </div>
 
 <div class="modal fade" id="addItemModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-light">
-                <h5 class="modal-title fw-bold"><i class="bi bi-database-add me-2 text-primary"></i>เพิ่มสินค้าใหม่</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0"><h5 class="modal-title fw-bold">เพิ่มสินค้า</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body p-4">
-                <div class="row g-4">
-                    <div class="col-lg-5 text-center">
-                        <label for="inpFile" class="w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-light rounded-4 border-2 border-dashed p-4" style="cursor: pointer; min-height: 250px;" id="dropZone">
-                            <img id="previewImg" class="img-fluid rounded-3 shadow-sm mb-2" style="display:none; max-height: 200px;">
-                            <div id="uploadText">
-                                <i class="bi bi-cloud-arrow-up text-primary fs-1"></i>
-                                <p class="mb-0 mt-2 fw-bold text-muted">คลิกอัปโหลดรูป</p>
-                            </div>
-                        </label>
-                        <input type="file" id="inpFile" accept="image/*" class="d-none" onchange="previewImage()">
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="small fw-bold text-muted">ทุน (บาท)</label>
-                                <input type="number" id="inpBuy" class="form-control bg-light border-0 fw-bold" placeholder="0">
-                            </div>
-                            <div class="col-6">
-                                <label class="small fw-bold text-success">ราคาขาย (บาท)</label>
-                                <input type="number" id="inpSell" class="form-control border-success text-success fw-bold" placeholder="0">
-                            </div>
-                            <div class="col-12"><hr class="my-2 opacity-25"></div>
-                            <div class="col-12">
-                                <label class="small fw-bold">อีเมล (Game Email)</label>
-                                <input type="text" id="inpGameEmail" class="form-control" placeholder="example@gmail.com">
-                            </div>
-                            <div class="col-6">
-                                <label class="small fw-bold">ID / Username</label>
-                                <input type="text" id="inpUser" class="form-control" placeholder="Optional">
-                            </div>
-                            <div class="col-6">
-                                <label class="small fw-bold text-danger">รหัสผ่าน (Password)</label>
-                                <input type="text" id="inpGamePass" class="form-control border-danger-subtle text-danger" placeholder="Password">
-                            </div>
-                        </div>
-                    </div>
+                <div class="text-center mb-3">
+                    <label for="inpFile" class="d-block bg-light rounded-3 p-4 border-2 border-dashed cursor-pointer position-relative overflow-hidden" style="cursor: pointer;">
+                         <img id="previewImg" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style="display:none;">
+                         <div id="uploadTxt" class="text-muted"><i class="bi bi-image fs-1"></i><br>เลือกรูปภาพ</div>
+                    </label>
+                    <input type="file" id="inpFile" accept="image/*" class="d-none" onchange="handleImage(this)">
+                </div>
+                <div class="row g-2">
+                    <div class="col-6"><input type="number" id="inpBuy" class="form-control" placeholder="ทุน"></div>
+                    <div class="col-6"><input type="number" id="inpSell" class="form-control border-success" placeholder="ราคาขาย"></div>
+                    <div class="col-12"><input type="text" id="inpGameEmail" class="form-control" placeholder="Email / ID"></div>
+                    <div class="col-12"><input type="text" id="inpGamePass" class="form-control text-danger" placeholder="Password"></div>
                 </div>
             </div>
-            <div class="modal-footer border-0 bg-light">
-                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">ยกเลิก</button>
-                <button type="button" class="btn btn-modern rounded-pill px-4" onclick="saveItem()">บันทึกข้อมูล</button>
-            </div>
+            <div class="modal-footer border-0 pt-0"><button class="btn btn-modern w-100 rounded-pill" onclick="saveItem()">บันทึก</button></div>
         </div>
     </div>
 </div>
@@ -280,31 +138,26 @@
 <div class="modal fade" id="editProfileModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold"><i class="bi bi-person-gear me-2"></i>แก้ไขข้อมูลส่วนตัว</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="mb-3">
-                    <label class="form-label fw-bold small text-muted">ชื่อร้าน (Display Name)</label>
-                    <input type="text" id="editStoreName" class="form-control rounded-3">
+            <div class="modal-header border-0"><h5 class="modal-title fw-bold">แก้ไขข้อมูลส่วนตัว</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body p-4 text-center">
+                 <div class="position-relative d-inline-block mb-3" style="width:100px; height:100px;">
+                    <img id="editProfilePreview" src="https://via.placeholder.com/100" class="w-100 h-100 rounded-circle object-fit-cover border shadow-sm">
+                    <label for="profileUpload" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow-sm" style="cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center;"><i class="bi bi-camera-fill small"></i></label>
+                    <input type="file" id="profileUpload" class="d-none" accept="image/*" onchange="handleProfileImage(this)">
                 </div>
-                <hr class="my-4">
-                <h6 class="fw-bold text-danger mb-3"><i class="bi bi-key me-2"></i>เปลี่ยนรหัสผ่านเข้าสู่ระบบ</h6>
-                <div class="mb-3">
-                    <input type="password" id="editNewPass" class="form-control rounded-3" placeholder="รหัสผ่านใหม่ (ทิ้งว่างถ้าไม่เปลี่ยน)">
-                </div>
+                <input type="text" id="editStoreName" class="form-control mb-3" placeholder="ชื่อร้าน">
+                <hr>
+                <input type="password" id="editNewPass" class="form-control" placeholder="รหัสผ่านใหม่ (ไม่เปลี่ยนให้เว้นว่าง)">
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">ปิด</button>
-                <button type="button" class="btn btn-primary rounded-pill px-4" onclick="updateUserProfile()">บันทึกการเปลี่ยนแปลง</button>
-            </div>
+            <div class="modal-footer border-0 pt-0"><button class="btn btn-primary w-100 rounded-pill" onclick="saveProfile()">บันทึก</button></div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <script type="module">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
@@ -323,319 +176,220 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  let currentStorePrefix = 'RS';
-  let currentImageBase64 = "";
+  let tempImg = "", tempProfileImg = "";
 
-  // --- Auth & Profile ---
+  // Auth Functions
+  window.login = async () => {
+    try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }
+    catch(e) { Swal.fire('Error', 'Email หรือ Password ผิดพลาด', 'error'); }
+  }
   window.signup = async () => {
-      const email = document.getElementById('signupEmail').value;
-      const pass = document.getElementById('signupPassword').value;
-      const store = document.getElementById('signupStore').value;
-      if(!email || !pass || !store) return Swal.fire('Error', 'กรุณากรอกข้อมูลให้ครบ', 'error');
+    const name = document.getElementById('signupStore').value;
+    if(!name) return Swal.fire('แจ้งเตือน', 'กรุณาใส่ชื่อร้าน', 'warning');
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, document.getElementById('signupEmail').value, document.getElementById('signupPassword').value);
+        await updateProfile(cred.user, { displayName: name, photoURL: `https://ui-avatars.com/api/?name=${name}&background=random` });
+        Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย', 'success');
+    } catch(e) { Swal.fire('Error', e.message, 'error'); }
+  }
+  window.confirmLogout = () => Swal.fire({ title: 'ออกจากระบบ?', showCancelButton: true, confirmButtonText: 'Yes' }).then((r) => { if(r.isConfirmed) signOut(auth); });
 
+  // Profile Edit
+  window.openEditProfile = () => {
+      const u = auth.currentUser;
+      document.getElementById('editStoreName').value = u.displayName;
+      document.getElementById('editProfilePreview').src = u.photoURL;
+      new bootstrap.Modal(document.getElementById('editProfileModal')).show();
+  }
+  window.saveProfile = async () => {
+      const u = auth.currentUser;
       try {
-          const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-          await updateProfile(userCredential.user, { displayName: store }); // บันทึกชื่อร้านใน Profile
-          Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย', 'success');
+          let updates = { displayName: document.getElementById('editStoreName').value };
+          if(tempProfileImg) updates.photoURL = tempProfileImg; // Use Base64
+          await updateProfile(u, updates);
+          
+          const newPass = document.getElementById('editNewPass').value;
+          if(newPass) await updatePassword(u, newPass);
+          
+          Swal.fire('Updated!', 'บันทึกข้อมูลแล้ว', 'success').then(()=>location.reload());
       } catch(e) { Swal.fire('Error', e.message, 'error'); }
   }
 
-  window.login = async () => {
-      const email = document.getElementById('loginEmail').value;
-      const pass = document.getElementById('loginPassword').value;
-      try {
-          await signInWithEmailAndPassword(auth, email, pass);
-      } catch(e) { Swal.fire('เข้าสู่ระบบไม่สำเร็จ', 'อีเมลหรือรหัสผ่านผิด', 'error'); }
-  }
-
-  // Popup Logout
-  window.confirmLogout = () => {
-      Swal.fire({
-          title: 'ออกจากระบบ?',
-          text: "คุณต้องการออกจากระบบใช่หรือไม่",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'ใช่, ออกจากระบบ',
-          cancelButtonText: 'ยกเลิก'
-      }).then((result) => {
-          if (result.isConfirmed) signOut(auth);
-      });
-  }
-
-  // Update Profile Logic
-  window.updateUserProfile = async () => {
-      const newName = document.getElementById('editStoreName').value;
-      const newPass = document.getElementById('editNewPass').value;
-      const user = auth.currentUser;
-
-      if(!user) return;
-
-      try {
-          // Update Display Name
-          if(newName && newName !== user.displayName) {
-              await updateProfile(user, { displayName: newName });
-          }
-          // Update Password (Optional)
-          if(newPass) {
-              await updatePassword(user, newPass);
-          }
-          
-          Swal.fire('บันทึกสำเร็จ', 'ข้อมูลของคุณถูกอัปเดตแล้ว', 'success').then(() => {
-              window.location.reload(); // Reload เพื่ออัปเดต UI
-          });
-      } catch(e) {
-          Swal.fire('เกิดข้อผิดพลาด', e.message + ' (หากเปลี่ยนรหัสผ่านไม่ได้ ให้ลองล็อกเอาต์แล้วเข้าใหม่)', 'error');
-      }
-  }
-
+  // State Listener
   onAuthStateChanged(auth, (user) => {
-      const authSec = document.getElementById('auth-section');
-      const dashSec = document.getElementById('dashboard-section');
-      const nav = document.getElementById('mainNavbar');
-
       if(user) {
-          authSec.classList.add('hidden');
-          dashSec.classList.remove('hidden');
-          nav.classList.remove('hidden');
-
-          // Setup Profile UI
-          const displayName = user.displayName || "Shop Admin";
-          document.getElementById('navStoreName').innerText = displayName;
-          document.getElementById('navUserName').innerText = displayName;
-          document.getElementById('editStoreName').value = displayName;
+          document.getElementById('auth-section').classList.add('hidden');
+          document.getElementById('dashboard-section').classList.remove('hidden');
+          document.getElementById('mainNavbar').classList.remove('hidden');
           
-          // Generate Avatar UI
-          document.getElementById('navProfileImg').src = `https://ui-avatars.com/api/?name=${displayName}&background=4f46e5&color=fff`;
-
-          // Setup Prefix
-          currentStorePrefix = displayName.substring(0, 2).toUpperCase() || "RS";
-
-          loadInventory();
-          loadHistory();
+          document.getElementById('navStoreName').innerText = user.displayName || 'My Shop';
+          document.getElementById('navUserName').innerText = user.displayName;
+          document.getElementById('navProfileImg').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`;
+          
+          loadData(); // Load private data
       } else {
-          authSec.classList.remove('hidden');
-          dashSec.classList.add('hidden');
-          nav.classList.add('hidden');
+          document.getElementById('auth-section').classList.remove('hidden');
+          document.getElementById('dashboard-section').classList.add('hidden');
+          document.getElementById('mainNavbar').classList.add('hidden');
       }
   });
 
-  // --- Image Helper ---
-  window.previewImage = () => {
-      const file = document.getElementById('inpFile').files[0];
-      if(file){
-          const reader = new FileReader();
-          reader.onloadend = () => {
-              const img = new Image();
-              img.src = reader.result;
-              img.onload = () => {
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  const maxWidth = 500;
-                  const scaleSize = maxWidth / img.width;
-                  canvas.width = maxWidth;
-                  canvas.height = img.height * scaleSize;
-                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                  currentImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                  
-                  document.getElementById('uploadText').classList.add('d-none');
-                  const pv = document.getElementById('previewImg');
-                  pv.src = currentImageBase64;
-                  pv.style.display = 'block';
-              }
-          }
-          reader.readAsDataURL(file);
-      }
-  }
+  // --- CRUD Logic (Private Data) ---
   
-  // Menu Navigation Helper
-  window.goToStock = () => {
-      const tabEl = document.querySelector('button[data-bs-target="#stock-pane"]');
-      const tab = new bootstrap.Tab(tabEl);
-      tab.show();
-  }
-
-  // --- Logic Functions ---
-  async function generateAutoID() {
-      // ใช้ JS คำนวณรหัสชั่วคราวเพื่อเลี่ยงปัญหา Index
-      const q = query(collection(db, "products"), where("status", "==", "available")); // ดูเฉพาะที่มีอยู่
+  // 1. Generate Auto ID (Scoped to User)
+  async function generateAutoID(prefix) {
+      // ดึงสินค้าทั้งหมดของ User นี้เพื่อหาตัวเลขล่าสุด
+      const q = query(collection(db, "products"), where("ownerId", "==", auth.currentUser.uid)); 
       const snap = await getDocs(q);
-      
       let maxNum = 0;
-      snap.forEach(doc => {
-         const code = doc.data().code;
-         if(code.startsWith(currentStorePrefix)) {
-             const num = parseInt(code.replace(currentStorePrefix, ""));
-             if(num > maxNum) maxNum = num;
-         }
+      snap.forEach(d => {
+          const code = d.data().code; // ex: RD005
+          if(code.startsWith(prefix)) {
+              const num = parseInt(code.replace(prefix, ""));
+              if(!isNaN(num) && num > maxNum) maxNum = num;
+          }
       });
-      // เผื่อใน History ด้วย (ถ้าอยากให้รหัสไม่ซ้ำตลอดไปต้อง Query History ด้วย แต่เอาแค่นี้ก่อนเพื่อความเร็ว)
-      return currentStorePrefix + String(maxNum + 1).padStart(3, '0');
+      return prefix + String(maxNum + 1).padStart(3, '0');
   }
 
+  // 2. Add Item
   window.saveItem = async () => {
       const buy = document.getElementById('inpBuy').value;
       const sell = document.getElementById('inpSell').value;
-      const user = document.getElementById('inpUser').value;
-      const email = document.getElementById('inpGameEmail').value;
-      const pass = document.getElementById('inpGamePass').value;
-
-      if(!buy || !sell) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกราคา', 'warning');
+      const user = auth.currentUser;
       
-      // Loading State
-      const btn = document.querySelector('#addItemModal .btn-modern');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = 'Thinking...'; btn.disabled = true;
+      if(!buy || !sell) return Swal.fire('แจ้งเตือน', 'กรุณากรอกราคา', 'warning');
+      
+      const prefix = user.displayName ? user.displayName.substring(0,2).toUpperCase() : "RS";
+      const newCode = await generateAutoID(prefix);
 
       try {
-          const newCode = await generateAutoID();
           await addDoc(collection(db, "products"), {
+              ownerId: user.uid, // 🔥 สำคัญ: ระบุเจ้าของ
               code: newCode,
               buyPrice: Number(buy),
               sellPrice: Number(sell),
-              gameUser: user || "-",
-              gameEmail: email || "-",
-              gamePass: pass || "-",
-              imageUrl: currentImageBase64 || "https://via.placeholder.com/150?text=No+Img",
+              gameEmail: document.getElementById('inpGameEmail').value || "-",
+              gamePass: document.getElementById('inpGamePass').value || "-",
+              imageUrl: tempImg || "https://via.placeholder.com/150",
               status: "available",
               createdAt: Timestamp.now(),
               soldAt: null
           });
           
           bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
-          Swal.fire({
-              icon: 'success',
-              title: 'บันทึกสำเร็จ!',
-              text: `รหัสสินค้า: ${newCode}`,
-              timer: 1500,
-              showConfirmButton: false
-          });
+          Swal.fire('สำเร็จ', `เพิ่มรหัส ${newCode} แล้ว`, 'success');
+          loadData();
           
-          // Reset
+          // Clear form
           document.getElementById('inpBuy').value = '';
           document.getElementById('inpSell').value = '';
-          document.getElementById('inpUser').value = '';
           document.getElementById('inpGameEmail').value = '';
           document.getElementById('inpGamePass').value = '';
-          document.getElementById('inpFile').value = '';
           document.getElementById('previewImg').style.display = 'none';
-          document.getElementById('uploadText').classList.remove('d-none');
-          currentImageBase64 = "";
-
-          loadInventory();
+          document.getElementById('uploadTxt').style.display = 'block';
+          tempImg = "";
 
       } catch(e) { Swal.fire('Error', e.message, 'error'); }
-      finally { btn.innerHTML = originalText; btn.disabled = false; }
   }
 
-  async function loadInventory() {
-      const q = query(collection(db, "products"), where("status", "==", "available"));
-      const snap = await getDocs(q);
-      const tbody = document.querySelector('#stockTable tbody');
-      tbody.innerHTML = "";
+  // 3. Load Data (Private)
+  async function loadData() {
+      const user = auth.currentUser;
+      if(!user) return;
 
-      let docs = [];
-      snap.forEach(d => docs.push({id: d.id, ...d.data()}));
-      docs.sort((a,b) => b.createdAt - a.createdAt);
+      // Load Stock
+      const qStock = query(collection(db, "products"), where("ownerId", "==", user.uid), where("status", "==", "available"));
+      const snapStock = await getDocs(qStock);
+      renderTable('stockTable', snapStock.docs, true);
 
-      if(docs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted">ยังไม่มีสินค้าในสต็อก</td></tr>`;
-          return;
-      }
-
-      docs.forEach(d => {
-          const tr = `
-              <tr>
-                  <td class="ps-4 py-3">
-                    <div class="d-flex align-items-center">
-                        <img src="${d.imageUrl}" class="table-img me-3" onclick="window.open('${d.imageUrl}')">
-                        <div>
-                            <div class="fw-bold text-dark">${d.code}</div>
-                            <div class="small text-muted">${d.gameEmail.split('@')[0]}...</div>
-                        </div>
-                    </div>
-                  </td>
-                  <td><span class="fw-bold text-primary">${d.sellPrice.toLocaleString()} ฿</span></td>
-                  <td>
-                      <div class="small text-muted mb-1"><i class="bi bi-envelope"></i> ${d.gameEmail}</div>
-                      <div class="d-flex align-items-center"><i class="bi bi-key me-2 text-danger"></i> <span class="blur-text text-dark">${d.gamePass}</span></div>
-                  </td>
-                  <td class="text-end pe-4">
-                      <button class="btn btn-warning shadow-sm btn-sm rounded-pill px-3 fw-bold text-dark" onclick="markSold('${d.id}')">
-                          <i class="bi bi-cart-check"></i> ขาย
-                      </button>
-                  </td>
-              </tr>
-          `;
-          tbody.innerHTML += tr;
-      });
+      // Load History
+      const qHist = query(collection(db, "products"), where("ownerId", "==", user.uid), where("status", "==", "sold"));
+      const snapHist = await getDocs(qHist);
+      renderTable('historyTable', snapHist.docs, false);
   }
 
-  async function loadHistory() {
-      const q = query(collection(db, "products"), where("status", "==", "sold"));
-      const snap = await getDocs(q);
-      const tbody = document.querySelector('#historyTable tbody');
+  function renderTable(id, docs, isStock) {
+      const tbody = document.querySelector(`#${id} tbody`);
       tbody.innerHTML = "";
       
-      let docs = [];
-      snap.forEach(d => docs.push(d.data()));
-      docs.sort((a,b) => b.soldAt - a.soldAt);
+      // Sort in JS
+      let data = docs.map(d => ({id: d.id, ...d.data()}));
+      data.sort((a,b) => isStock ? b.createdAt - a.createdAt : b.soldAt - a.soldAt);
 
-      if(docs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted">ยังไม่มีประวัติการขาย</td></tr>`;
-          return;
-      }
+      if(data.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">ไม่มีข้อมูล</td></tr>`; return; }
 
-      docs.forEach(d => {
-          const profit = d.sellPrice - d.buyPrice;
-          const isProfit = profit >= 0;
-          const dateTxt = d.soldAt ? d.soldAt.toDate().toLocaleDateString('th-TH', {day:'numeric', month:'short', year:'2-digit'}) : '-';
-
-          const tr = `
-              <tr>
-                  <td class="ps-4 py-3 fw-bold text-secondary">${d.code}</td>
-                  <td>${d.sellPrice.toLocaleString()} ฿</td>
-                  <td><span class="badge ${isProfit ? 'bg-success' : 'bg-danger'} rounded-pill fw-normal">${isProfit ? '+' : ''}${profit.toLocaleString()}</span></td>
-                  <td class="text-muted small">${dateTxt}</td>
-              </tr>
-          `;
-          tbody.innerHTML += tr;
+      data.forEach(d => {
+          let row = "";
+          if(isStock) {
+              row = `<tr>
+                  <td class="ps-3 py-3"><div class="d-flex align-items-center"><img src="${d.imageUrl}" class="table-img me-3" onclick="window.open('${d.imageUrl}')"><div><div class="fw-bold">${d.code}</div><small class="text-muted">${d.gameEmail}</small></div></div></td>
+                  <td class="fw-bold text-success">${d.sellPrice.toLocaleString()}</td>
+                  <td><span class="blur-text">${d.gamePass}</span></td>
+                  <td class="text-end pe-3"><button class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm" onclick="markSold('${d.id}')">ขาย</button></td>
+              </tr>`;
+          } else {
+              const profit = d.sellPrice - d.buyPrice;
+              const date = d.soldAt ? d.soldAt.toDate().toLocaleDateString('th-TH') : '-';
+              row = `<tr>
+                  <td class="ps-3 py-3 fw-bold text-secondary">${d.code}</td>
+                  <td>${d.sellPrice.toLocaleString()}</td>
+                  <td class="${profit >= 0 ? 'text-success':'text-danger'} fw-bold">${profit >= 0 ? '+':''}${profit.toLocaleString()}</td>
+                  <td class="text-muted small">${date}</td>
+              </tr>`;
+          }
+          tbody.innerHTML += row;
       });
   }
 
   window.markSold = async (id) => {
-      Swal.fire({
-          title: 'ยืนยันการขาย?',
-          text: "รายการนี้จะถูกย้ายไปที่ประวัติการขาย",
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'ขายทันที',
-          confirmButtonColor: '#198754'
-      }).then(async (result) => {
-          if (result.isConfirmed) {
-              try {
-                  await updateDoc(doc(db, "products", id), {
-                      status: "sold",
-                      soldAt: Timestamp.now()
-                  });
-                  Swal.fire('ขายเรียบร้อย!', '', 'success');
-                  loadInventory();
-                  loadHistory();
-              } catch(e) { Swal.fire('Error', e.message, 'error'); }
+      Swal.fire({ title: 'ขายสินค้า?', showCancelButton: true, confirmButtonText: 'ขายทันที', confirmButtonColor: '#198754' }).then(async(r) => {
+          if(r.isConfirmed) {
+              await updateDoc(doc(db, "products", id), { status: "sold", soldAt: Timestamp.now() });
+              loadData();
+              Swal.fire('ขายแล้ว!', '', 'success');
           }
-      })
+      });
+  }
+
+  // --- Image Handling Helpers ---
+  window.handleImage = (input) => processImage(input, (res) => { 
+      tempImg = res; 
+      document.getElementById('previewImg').src = res; 
+      document.getElementById('previewImg').style.display = 'block'; 
+      document.getElementById('uploadTxt').style.display = 'none'; 
+  });
+  
+  window.handleProfileImage = (input) => processImage(input, (res) => {
+      tempProfileImg = res;
+      document.getElementById('editProfilePreview').src = res;
+  });
+
+  function processImage(input, callback) {
+      if(input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              const img = new Image();
+              img.src = e.target.result;
+              img.onload = () => {
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const scale = 500 / img.width;
+                  canvas.width = 500; canvas.height = img.height * scale;
+                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                  callback(canvas.toDataURL('image/jpeg', 0.8));
+              }
+          };
+          reader.readAsDataURL(input.files[0]);
+      }
   }
   
-  window.searchTable = (tId) => {
+  window.searchTable = (id) => {
       const val = document.getElementById('searchInput').value.toLowerCase();
-      const rows = document.querySelectorAll(`#${tId} tbody tr`);
-      rows.forEach(r => r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none');
+      document.querySelectorAll(`#${id} tbody tr`).forEach(r => r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none');
   }
 
   document.querySelector('.hidden').style.display = 'none';
 </script>
-
-<style> .hidden { display: none !important; } </style>
 </body>
 </html>
