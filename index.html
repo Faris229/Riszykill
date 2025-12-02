@@ -3,480 +3,656 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Stock (Private Edition)</title>
+    <title>RISZY SHOP - ระบบสั่งซื้ออัตโนมัติ</title>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#005500',
+                        'secondary': '#FFC72C',
+                        'light-bg': '#f3f4f6',
+                        'brand-green': '#009933',
+                        'brand-dark': '#004d00',
+                    },
+                    fontFamily: {
+                        sans: ['Mitr', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root { 
-            --primary-bg: #f3f4f6;
-            --primary-color: #4f46e5;
-        }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--primary-bg); color: #1f2937; padding-bottom: 50px; }
-        
-        /* Modern UI Style */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-modern {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            border: none; color: white; padding: 10px 24px; border-radius: 50px; font-weight: 500; transition: 0.3s;
-        }
-        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); color: white; }
-
-        /* Profile & Navbar */
-        .nav-profile-img {
-            width: 42px; height: 42px; object-fit: cover; border-radius: 50%;
-            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            background-color: #e0e7ff;
-        }
-        .dropdown-menu-modern { border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 1rem; padding: 10px; }
-        .dropdown-item { border-radius: 8px; padding: 8px 15px; }
-        .dropdown-item:hover { background-color: #f3f4f6; color: var(--primary-color); }
-
-        /* Table Elements */
-        .table-img { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; cursor: zoom-in; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .blur-text { filter: blur(5px); background: #e5e7eb; padding: 2px 8px; border-radius: 4px; transition: 0.2s; cursor: pointer; user-select: none; }
-        .blur-text:hover { filter: blur(0); background: transparent; }
-        
-        /* Edit Profile Upload */
-        .profile-upload-box {
-            width: 100px; height: 100px; border-radius: 50%; border: 3px solid #eee;
-            margin: 0 auto; overflow: hidden; position: relative; cursor: pointer;
-        }
-        .profile-upload-box img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-upload-overlay {
-            position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5);
-            color: white; font-size: 10px; text-align: center; padding: 3px; display: none;
-        }
-        .profile-upload-box:hover .profile-upload-overlay { display: block; }
-        
-        .hidden { display: none !important; }
+        body { font-family: 'Mitr', sans-serif; background-color: #f3f4f6; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+        .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .status-pending { background-color: #FEF3C7; color: #D97706; }
+        .status-success { background-color: #D1FAE5; color: #059669; }
+        .status-cancel { background-color: #FEE2E2; color: #DC2626; }
     </style>
 </head>
-<body>
+<body class="text-gray-800 pb-20">
 
-<nav class="navbar navbar-expand-lg fixed-top glass-card m-3 mt-2 px-3 py-2 hidden" id="mainNavbar">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold text-primary fs-4" href="#" onclick="window.scrollTo(0,0)">
-        <i class="bi bi-joystick me-2"></i><span id="navStoreName">MY SHOP</span>
-    </a>
-    
-    <div class="dropdown ms-auto">
-        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-            <div class="text-end me-2 d-none d-sm-block">
-                <div class="fw-bold small text-dark" id="navUserName">Admin</div>
-                <div class="text-muted" style="font-size: 0.7rem;">Owner</div>
+    <nav class="bg-primary text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="https://i.postimg.cc/CdpMCWTh/IMG-9993.png" class="w-10 h-10 rounded-full border-2 border-secondary bg-white">
+                <span class="font-bold text-lg tracking-wide">RISZY SHOP</span>
             </div>
-            <img src="https://via.placeholder.com/40" id="navProfileImg" class="nav-profile-img">
-        </a>
-        <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end mt-3">
-            <li><h6 class="dropdown-header small text-uppercase fw-bold text-muted">เมนูหลัก</h6></li>
-            <li><button class="dropdown-item" onclick="openEditProfile()"><i class="bi bi-person-circle me-2"></i> แก้ไขข้อมูล / รูปโปรไฟล์</button></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item text-danger" onclick="confirmLogout()"><i class="bi bi-power me-2"></i> ออกจากระบบ</button></li>
-        </ul>
-    </div>
-  </div>
-</nav>
-
-<div class="container" id="auth-section" style="padding-top: 15vh;">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="glass-card p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3 shadow-sm">
-                        <i class="bi bi-shield-check fs-1"></i>
-                    </div>
-                    <h3 class="fw-bold">เข้าสู่ระบบ</h3>
-                    <p class="text-muted small">ระบบจัดการสต็อก (ส่วนตัว)</p>
-                </div>
-
-                <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-pill">
-                    <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#login-tab">Login</button></li>
-                    <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#signup-tab">Register</button></li>
-                </ul>
-
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="login-tab">
-                        <input type="email" class="form-control rounded-pill mb-3 py-2 px-3" id="loginEmail" placeholder="📧 อีเมล">
-                        <input type="password" class="form-control rounded-pill mb-4 py-2 px-3" id="loginPassword" placeholder="🔑 รหัสผ่าน">
-                        <button class="btn btn-modern w-100 py-2" onclick="login()">เข้าสู่ระบบ</button>
-                    </div>
-                    <div class="tab-pane fade" id="signup-tab">
-                        <input type="text" class="form-control rounded-pill mb-3 py-2 px-3" id="signupStore" placeholder="🏪 ชื่อร้านของคุณ">
-                        <input type="email" class="form-control rounded-pill mb-3 py-2 px-3" id="signupEmail" placeholder="📧 อีเมล">
-                        <input type="password" class="form-control rounded-pill mb-4 py-2 px-3" id="signupPassword" placeholder="🔑 รหัสผ่าน">
-                        <button class="btn btn-success w-100 py-2 rounded-pill fw-bold" onclick="signup()">สมัครสมาชิก</button>
-                    </div>
-                </div>
+            <div class="flex gap-3">
+                <button onclick="togglePage('home')" class="hover:text-secondary transition"><i class="fas fa-home"></i> หน้าหลัก</button>
+                <button onclick="togglePage('history')" id="navHistoryBtn" class="hidden hover:text-secondary transition"><i class="fas fa-history"></i> สถานะ</button>
+                <button onclick="logout()" id="navLogoutBtn" class="hidden text-red-300 hover:text-red-100 transition"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
-    </div>
-</div>
+    </nav>
 
-<div class="container hidden" id="dashboard-section" style="padding-top: 100px;">
-    
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-        <div>
-            <h2 class="fw-bold m-0"><i class="bi bi-grid-fill text-primary me-2"></i>แดชบอร์ด</h2>
-            <p class="text-muted m-0 small">จัดการรายการสินค้าของคุณ</p>
-        </div>
-        <button class="btn btn-modern shadow-sm" data-bs-toggle="modal" data-bs-target="#addItemModal">
-            <i class="bi bi-plus-lg me-1"></i> เพิ่มสินค้าใหม่
-        </button>
-    </div>
+    <div class="container max-w-2xl mx-auto p-4 mt-6">
 
-    <div class="glass-card p-3 mb-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
-            <ul class="nav nav-pills bg-light p-1 rounded-pill" id="dashTab">
-                <li class="nav-item"><button class="nav-link active rounded-pill px-4 fw-bold" data-bs-toggle="tab" data-bs-target="#stock-pane">📦 สต็อก</button></li>
-                <li class="nav-item"><button class="nav-link rounded-pill px-4 fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#history-pane">📜 ประวัติ</button></li>
-            </ul>
-            <input type="text" id="searchInput" class="form-control rounded-pill border-0 bg-light" placeholder="🔍 ค้นหารหัส..." style="max-width: 250px;" onkeyup="searchTable('stockTable')">
-        </div>
-
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="stock-pane">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" id="stockTable">
-                        <thead class="bg-light text-secondary small text-uppercase">
-                            <tr><th class="ps-3">สินค้า</th><th>ราคา</th><th>ข้อมูล</th><th class="text-end pe-3">จัดการ</th></tr>
-                        </thead>
-                        <tbody class="bg-white"></tbody>
-                    </table>
+        <div id="authSection" class="glass-panel p-6 rounded-2xl shadow-md bg-white">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-brand-dark" id="authTitle">เข้าสู่ระบบ</h2>
+                <p class="text-gray-500 text-sm">เพื่อทำการสั่งซื้อสินค้า</p>
+            </div>
+            
+            <form id="authForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
+                    <input type="email" id="authEmail" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none" placeholder="example@email.com" required>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="history-pane">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" id="historyTable">
-                        <thead class="bg-light text-secondary small text-uppercase">
-                            <tr><th class="ps-3">รหัส</th><th>ราคาขาย</th><th>กำไร</th><th>วันที่</th></tr>
-                        </thead>
-                        <tbody class="bg-white"></tbody>
-                    </table>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="authPassword" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none" placeholder="******" required>
                 </div>
+                
+                <button type="submit" id="authSubmitBtn" class="w-full py-3 bg-brand-green hover:bg-green-700 text-white font-bold rounded-xl shadow transition">เข้าสู่ระบบ</button>
+            </form>
+
+            <div class="mt-4 text-center text-sm">
+                <span id="authSwitchText" class="text-gray-500">ยังไม่มีบัญชี?</span>
+                <button id="authSwitchBtn" class="text-modern-blue font-bold hover:underline text-blue-600">สมัครสมาชิก</button>
+            </div>
+
+            <div class="mt-6 border-t pt-4 text-center">
+                <button onclick="openAdminLogin()" class="text-xs text-gray-400 hover:text-gray-600">Admin Login</button>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="modal fade" id="addItemModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">เพิ่มสินค้าใหม่</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row g-4">
-                    <div class="col-lg-5 text-center">
-                        <label for="inpFile" class="w-100 h-100 d-flex flex-column justify-content-center align-items-center bg-light rounded-4 border-2 border-dashed p-4" style="cursor: pointer; min-height: 200px;" id="dropZone">
-                            <img id="previewImg" class="img-fluid rounded-3 mb-2" style="display:none; max-height: 180px;">
-                            <div id="uploadText" class="text-muted"><i class="bi bi-cloud-upload fs-1"></i><br>คลิกเลือกรูป</div>
-                        </label>
-                        <input type="file" id="inpFile" accept="image/*" class="d-none" onchange="previewProductImage()">
+        <div id="appSection" class="hidden space-y-6">
+            
+            <div id="page-home" class="page-content">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-primary mb-4 flex items-center"><i class="fas fa-shopping-bag mr-2"></i> เลือกสินค้า</h3>
+                    
+                    <div class="grid grid-cols-3 gap-2 mb-6" id="categoryTabs">
+                        <button onclick="filterCategory('gem')" class="cat-btn p-2 rounded-lg border text-sm font-bold bg-green-50 border-brand-green text-brand-green">💎 เพชรเกม</button>
+                        <button onclick="filterCategory('account')" class="cat-btn p-2 rounded-lg border text-sm text-gray-500 hover:bg-gray-50">🆔 ไอดีเกม</button>
+                        <button onclick="filterCategory('program')" class="cat-btn p-2 rounded-lg border text-sm text-gray-500 hover:bg-gray-50">🎮 โปรแกรม</button>
                     </div>
-                    <div class="col-lg-7">
-                        <div class="row g-3">
-                            <div class="col-6"><label class="small fw-bold">ทุน</label><input type="number" id="inpBuy" class="form-control bg-light" placeholder="0"></div>
-                            <div class="col-6"><label class="small fw-bold text-success">ราคาขาย</label><input type="number" id="inpSell" class="form-control border-success" placeholder="0"></div>
-                            <div class="col-12"><label class="small fw-bold">Email เกม</label><input type="text" id="inpGameEmail" class="form-control" placeholder="user@game.com"></div>
-                            <div class="col-6"><label class="small fw-bold">ID / User</label><input type="text" id="inpUser" class="form-control" placeholder="Login ID"></div>
-                            <div class="col-6"><label class="small fw-bold text-danger">รหัสผ่าน</label><input type="text" id="inpGamePass" class="form-control text-danger" placeholder="Password"></div>
+
+                    <div id="productsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                        <div class="col-span-full text-center py-10 text-gray-400">
+                            <i class="fas fa-spinner fa-spin"></i> กำลังโหลดสินค้า...
                         </div>
                     </div>
+
+                    <div id="orderForm" class="hidden border-t pt-6">
+                        <h4 class="font-bold text-gray-700 mb-3" id="selectedProductName">สินค้า: -</h4>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1" id="dynamicInputLabel">UID เกม / ข้อมูลติดต่อ</label>
+                            <input type="text" id="customerInput" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-brand-green outline-none bg-gray-50" placeholder="กรอกข้อมูล...">
+                        </div>
+
+                        <button onclick="submitOrder()" class="w-full py-3 bg-secondary hover:bg-yellow-400 text-brand-dark font-bold rounded-xl shadow-lg transform active:scale-95 transition">
+                            <i class="fas fa-check-circle mr-2"></i> ยืนยันการสั่งซื้อ
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button class="btn btn-modern w-100 rounded-pill" onclick="saveItem()">บันทึกข้อมูล</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="modal fade" id="editProfileModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0"><h5 class="modal-title fw-bold">แก้ไขข้อมูลส่วนตัว</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body p-4 text-center">
-                 <div class="profile-upload-box mb-3">
-                    <img id="editProfilePreview" src="https://via.placeholder.com/100">
-                    <div class="profile-upload-overlay">เปลี่ยนรูป</div>
-                    <input type="file" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" accept="image/*" onchange="previewProfileImage(this)">
+            <div id="page-history" class="page-content hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-primary mb-4"><i class="fas fa-list-alt mr-2"></i> ประวัติการสั่งซื้อ</h3>
+                    <div id="orderHistoryList" class="space-y-3">
+                        <p class="text-center text-gray-400 py-4">ยังไม่มีรายการสั่งซื้อ</p>
+                    </div>
                 </div>
-                <input type="text" id="editStoreName" class="form-control rounded-pill mb-3 text-center" placeholder="ชื่อร้านค้า">
-                <input type="password" id="editNewPass" class="form-control rounded-pill text-center" placeholder="เปลี่ยนรหัสผ่าน (เว้นว่างถ้าไม่เปลี่ยน)">
             </div>
-            <div class="modal-footer border-0 pt-0"><button class="btn btn-primary w-100 rounded-pill" onclick="saveProfile()">บันทึกการเปลี่ยนแปลง</button></div>
+
         </div>
+
+        <div id="adminPanel" class="hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-[100] overflow-y-auto">
+            <div class="max-w-4xl mx-auto p-4 min-h-screen">
+                <div class="flex justify-between items-center mb-6 text-white">
+                    <h1 class="text-2xl font-bold text-secondary">Admin Dashboard</h1>
+                    <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
+                </div>
+
+                <div id="adminLoginForm" class="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto mt-20">
+                    <h2 class="text-xl font-bold text-center mb-4">เข้าสู่ระบบหลังบ้าน</h2>
+                    <input type="text" id="adminUser" placeholder="Username" class="w-full p-3 border rounded-lg mb-3">
+                    <input type="password" id="adminPass" placeholder="Password" class="w-full p-3 border rounded-lg mb-4">
+                    <button onclick="checkAdminLogin()" class="w-full py-2 bg-primary text-white rounded-lg font-bold">Login</button>
+                </div>
+
+                <div id="adminContent" class="hidden space-y-6">
+                    
+                    <div class="flex gap-2 bg-gray-800 p-2 rounded-lg">
+                        <button onclick="switchAdminTab('orders')" class="flex-1 py-2 rounded bg-secondary text-brand-dark font-bold text-sm">จัดการออเดอร์</button>
+                        <button onclick="switchAdminTab('stock')" class="flex-1 py-2 rounded text-white hover:bg-gray-700 text-sm">จัดการสต็อก/สินค้า</button>
+                    </div>
+
+                    <div id="admin-tab-orders" class="bg-white p-4 rounded-xl text-black">
+                        <h3 class="font-bold text-lg mb-4 border-b pb-2">รายการสั่งซื้อล่าสุด</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-100 text-gray-600 uppercase">
+                                    <tr>
+                                        <th class="p-3">เวลา</th>
+                                        <th class="p-3">ลูกค้า</th>
+                                        <th class="p-3">สินค้า</th>
+                                        <th class="p-3">ข้อมูลลูกค้า</th>
+                                        <th class="p-3">สถานะ</th>
+                                        <th class="p-3">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminOrderTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="admin-tab-stock" class="hidden space-y-4">
+                        
+                        <div class="bg-white p-4 rounded-xl text-black">
+                            <h3 class="font-bold text-lg mb-4 border-b pb-2">เพิ่มสินค้าใหม่</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input id="newProdName" type="text" placeholder="ชื่อสินค้า (เช่น เพชร 100)" class="border p-2 rounded">
+                                <select id="newProdCat" class="border p-2 rounded">
+                                    <option value="gem">หมวด: เพชรเกม</option>
+                                    <option value="account">หมวด: ไอดีเกม</option>
+                                    <option value="program">หมวด: โปรแกรม</option>
+                                </select>
+                                <input id="newProdPrice" type="number" placeholder="ราคา (บาท)" class="border p-2 rounded">
+                                <button onclick="addNewProduct()" class="bg-green-600 text-white p-2 rounded font-bold hover:bg-green-700">บันทึกสินค้า</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl text-black">
+                            <h3 class="font-bold text-lg mb-4 border-b pb-2">เพิ่มโค้ด/สต็อก</h3>
+                            <div class="mb-3">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">เลือกสินค้าที่จะเติมสต็อก</label>
+                                <select id="stockProdSelect" class="w-full border p-2 rounded bg-gray-50"></select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">รายการโค้ด (1 บรรทัด = 1 โค้ด)</label>
+                                <textarea id="stockCodesArea" rows="5" class="w-full border p-2 rounded" placeholder="CODE1234&#10;CODE5678&#10;CODE9012"></textarea>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="addStockCodes()" class="flex-1 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">บันทึกโค้ด</button>
+                                <button onclick="clearAllCodes()" class="px-4 py-2 bg-red-100 text-red-600 rounded font-bold hover:bg-red-200">ล้างโค้ดทั้งหมด</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-xl text-black">
+                            <h3 class="font-bold text-lg mb-4">รายการสินค้าในระบบ</h3>
+                            <ul id="adminProductList" class="space-y-2"></ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <a href="https://www.facebook.com/p/Riszy-shop-61570552356915/" target="_blank" class="fixed bottom-5 right-5 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition z-40">
+        <i class="fab fa-facebook-f text-xl"></i>
+    </a>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+    <script type="module">
+        // --- 1. FIREBASE CONFIG ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, push, set, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC-rPvq9fFvhnYQCWxKtLf4Y3UK1uMnP0c",
-    authDomain: "rssave-6169a.firebaseapp.com",
-    projectId: "rssave-6169a",
-    storageBucket: "rssave-6169a.firebasestorage.app",
-    messagingSenderId: "619695253658",
-    appId: "1:619695253658:web:2d1e3ccb1d5a3c08491723",
-    measurementId: "G-1KHNKSTELW"
-  };
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-rPvq9fFvhnYQCWxKtLf4Y3UK1uMnP0c",
+            authDomain: "rssave-6169a.firebaseapp.com",
+            databaseURL: "https://rssave-6169a-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rssave-6169a",
+            storageBucket: "rssave-6169a.firebasestorage.app",
+            messagingSenderId: "619695253658",
+            appId: "1:619695253658:web:4cd77e7fff5c4718491723",
+            measurementId: "G-LMS63E7P3F"
+        };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
 
-  let currentProductImg = "";
-  let currentProfileImg = "";
+        // --- 2. GLOBAL VARIABLES ---
+        let currentUser = null;
+        let selectedProduct = null;
+        let currentCategory = 'gem';
 
-  // --- Auth System ---
-  window.login = async () => {
-      try {
-          await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-      } catch(e) { Swal.fire('Error', 'อีเมลหรือรหัสผ่านผิด', 'error'); }
-  }
+        // --- 3. AUTH LOGIC ---
+        const authForm = document.getElementById('authForm');
+        const authSwitchBtn = document.getElementById('authSwitchBtn');
+        let isLoginMode = true;
 
-  window.signup = async () => {
-      const name = document.getElementById('signupStore').value;
-      if(!name) return Swal.fire('Error', 'กรุณาใส่ชื่อร้าน', 'warning');
-      try {
-          const cred = await createUserWithEmailAndPassword(auth, document.getElementById('signupEmail').value, document.getElementById('signupPassword').value);
-          // ตั้งชื่อร้านและรูปเริ่มต้น
-          await updateProfile(cred.user, { 
-              displayName: name, 
-              photoURL: `https://ui-avatars.com/api/?name=${name}&background=4f46e5&color=fff` 
-          });
-          Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย', 'success');
-      } catch(e) { Swal.fire('Error', e.message, 'error'); }
-  }
+        authSwitchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+            document.getElementById('authSubmitBtn').innerText = isLoginMode ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+            document.getElementById('authSwitchText').innerText = isLoginMode ? 'ยังไม่มีบัญชี?' : 'มีบัญชีอยู่แล้ว?';
+            authSwitchBtn.innerText = isLoginMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+        });
 
-  window.confirmLogout = () => Swal.fire({title:'ออกจากระบบ?', showCancelButton:true, confirmButtonText:'Yes'}).then((r)=>{ if(r.isConfirmed) signOut(auth); });
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
 
-  // --- Profile Logic ---
-  window.openEditProfile = () => {
-      const u = auth.currentUser;
-      document.getElementById('editStoreName').value = u.displayName;
-      document.getElementById('editProfilePreview').src = u.photoURL;
-      new bootstrap.Modal(document.getElementById('editProfileModal')).show();
-  }
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    // Create user profile in DB
+                    const user = auth.currentUser;
+                    set(ref(db, 'users/' + user.uid), {
+                        email: email,
+                        role: 'user'
+                    });
+                }
+                Swal.fire({ icon: 'success', title: 'สำเร็จ', timer: 1000, showConfirmButton: false });
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: error.message });
+            }
+        });
 
-  window.saveProfile = async () => {
-      const u = auth.currentUser;
-      try {
-          let updates = { displayName: document.getElementById('editStoreName').value };
-          if(currentProfileImg) updates.photoURL = currentProfileImg; // Base64
-          await updateProfile(u, updates);
-          
-          const pass = document.getElementById('editNewPass').value;
-          if(pass) await updatePassword(u, pass);
-          
-          Swal.fire('Updated', 'บันทึกแล้ว', 'success').then(()=>location.reload());
-      } catch(e) { Swal.fire('Error', e.message, 'error'); }
-  }
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('appSection').classList.remove('hidden');
+                document.getElementById('navHistoryBtn').classList.remove('hidden');
+                document.getElementById('navLogoutBtn').classList.remove('hidden');
+                
+                loadProducts(currentCategory);
+                listenToMyOrders();
+            } else {
+                currentUser = null;
+                document.getElementById('authSection').classList.remove('hidden');
+                document.getElementById('appSection').classList.add('hidden');
+                document.getElementById('navHistoryBtn').classList.add('hidden');
+                document.getElementById('navLogoutBtn').classList.add('hidden');
+            }
+        });
 
-  // --- State Monitor ---
-  onAuthStateChanged(auth, (user) => {
-      if(user) {
-          document.getElementById('auth-section').classList.add('hidden');
-          document.getElementById('dashboard-section').classList.remove('hidden');
-          document.getElementById('mainNavbar').classList.remove('hidden');
-          
-          // Setup Navbar UI
-          document.getElementById('navStoreName').innerText = user.displayName;
-          document.getElementById('navUserName').innerText = user.displayName;
-          document.getElementById('navProfileImg').src = user.photoURL;
+        window.logout = () => signOut(auth);
 
-          loadInventory(); // Load ข้อมูลส่วนตัว
-      } else {
-          document.getElementById('auth-section').classList.remove('hidden');
-          document.getElementById('dashboard-section').classList.add('hidden');
-          document.getElementById('mainNavbar').classList.add('hidden');
-      }
-  });
+        // --- 4. CUSTOMER APP LOGIC ---
+        
+        // Tab Switching
+        window.togglePage = (pageName) => {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`page-${pageName}`).classList.remove('hidden');
+        };
 
-  // --- CRUD (Private Data Logic) ---
-  
-  // 1. Generate ID (เฉพาะของ User นี้)
-  async function generateAutoID(prefix) {
-      const u = auth.currentUser;
-      // ดึงของ User นี้เท่านั้น
-      const q = query(collection(db, "products"), where("ownerId", "==", u.uid));
-      const snap = await getDocs(q);
-      
-      let max = 0;
-      snap.forEach(d => {
-          const code = d.data().code;
-          if(code.startsWith(prefix)) {
-              const num = parseInt(code.replace(prefix, ""));
-              if(!isNaN(num) && num > max) max = num;
-          }
-      });
-      return prefix + String(max + 1).padStart(3, '0');
-  }
+        // Category Filter
+        window.filterCategory = (cat) => {
+            currentCategory = cat;
+            // Update buttons UI
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-green-50', 'border-brand-green', 'text-brand-green');
+                btn.classList.add('text-gray-500', 'border-transparent');
+            });
+            event.target.classList.remove('text-gray-500', 'border-transparent');
+            event.target.classList.add('bg-green-50', 'border-brand-green', 'text-brand-green');
 
-  // 2. Save Item (Private)
-  window.saveItem = async () => {
-      const buy = document.getElementById('inpBuy').value;
-      const sell = document.getElementById('inpSell').value;
-      const u = auth.currentUser;
+            loadProducts(cat);
+            // Reset selection
+            selectedProduct = null;
+            document.getElementById('orderForm').classList.add('hidden');
+        };
 
-      if(!buy || !sell) return Swal.fire('!', 'กรุณากรอกราคา', 'warning');
-      
-      const prefix = u.displayName ? u.displayName.substring(0,2).toUpperCase() : "RS";
-      const newCode = await generateAutoID(prefix);
+        // Load Products
+        function loadProducts(category) {
+            const productsRef = ref(db, 'products');
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '<div class="col-span-full text-center"><i class="fas fa-spinner fa-spin"></i></div>';
 
-      try {
-          await addDoc(collection(db, "products"), {
-              ownerId: u.uid, // 🔒 ระบุเจ้าของที่นี่
-              code: newCode,
-              buyPrice: Number(buy),
-              sellPrice: Number(sell),
-              gameUser: document.getElementById('inpUser').value || "-",
-              gameEmail: document.getElementById('inpGameEmail').value || "-",
-              gamePass: document.getElementById('inpGamePass').value || "-",
-              imageUrl: currentProductImg || "https://via.placeholder.com/150?text=No+Img",
-              status: "available",
-              createdAt: Timestamp.now(),
-              soldAt: null
-          });
-          
-          bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
-          Swal.fire('Saved!', `รหัส: ${newCode}`, 'success');
-          loadInventory();
-          
-          // Clear
-          document.getElementById('inpBuy').value = '';
-          document.getElementById('inpSell').value = '';
-          document.getElementById('inpGameEmail').value = '';
-          document.getElementById('inpGamePass').value = '';
-          document.getElementById('previewImg').style.display='none';
-          document.getElementById('uploadText').style.display='block';
-          currentProductImg = "";
+            onValue(productsRef, (snapshot) => {
+                grid.innerHTML = '';
+                const data = snapshot.val();
+                if (!data) {
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400">ยังไม่มีสินค้าในหมวดนี้</p>';
+                    return;
+                }
 
-      } catch(e) { Swal.fire('Error', e.message, 'error'); }
-  }
+                let hasProduct = false;
+                Object.entries(data).forEach(([key, product]) => {
+                    if (product.category === category) {
+                        hasProduct = true;
+                        const div = document.createElement('div');
+                        div.className = `cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center transition hover:shadow-md hover:border-brand-green bg-white h-32 relative`;
+                        div.onclick = () => selectProduct(key, product);
+                        div.innerHTML = `
+                            <div class="text-center font-bold text-primary text-sm mb-1">${product.name}</div>
+                            <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">${product.price} บาท</div>
+                        `;
+                        grid.appendChild(div);
+                    }
+                });
 
-  // 3. Load Data (Private)
-  async function loadInventory() {
-      const u = auth.currentUser;
-      if(!u) return;
+                if (!hasProduct) {
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400">ยังไม่มีสินค้าในหมวดนี้</p>';
+                }
+            });
+        }
 
-      // Query เฉพาะ ownerId == u.uid
-      const q = query(collection(db, "products"), where("ownerId", "==", u.uid));
-      const snap = await getDocs(q);
-      
-      let docs = [];
-      snap.forEach(d => docs.push({id:d.id, ...d.data()}));
+        window.selectProduct = (key, product) => {
+            selectedProduct = { ...product, id: key };
+            document.getElementById('selectedProductName').innerHTML = `<span class="text-primary">${product.name}</span> <span class="text-gray-400 text-sm">(${product.price} บ.)</span>`;
+            document.getElementById('orderForm').classList.remove('hidden');
+            
+            // Highlight selection visually
+            const allBoxes = document.getElementById('productsGrid').children;
+            for(let box of allBoxes) { box.classList.remove('ring-2', 'ring-brand-green', 'bg-green-50'); }
+            event.currentTarget.classList.add('ring-2', 'ring-brand-green', 'bg-green-50');
 
-      // แยก Stock / History และเรียงลำดับใน JS (เพื่อเลี่ยง Index Error)
-      const stock = docs.filter(d => d.status === "available").sort((a,b) => b.createdAt - a.createdAt);
-      const history = docs.filter(d => d.status === "sold").sort((a,b) => b.soldAt - a.soldAt);
+            // Dynamic Placeholder
+            const input = document.getElementById('customerInput');
+            const label = document.getElementById('dynamicInputLabel');
+            if (product.category === 'gem') {
+                label.innerText = 'UID เกม (เพื่อเติม)';
+                input.placeholder = 'กรอก UID เกมของคุณ';
+            } else {
+                label.innerText = 'ชื่อ Facebook / ช่องทางติดต่อ';
+                input.placeholder = 'กรอกชื่อเฟส หรือ ลิงก์เฟส';
+            }
+        };
 
-      renderStock(stock);
-      renderHistory(history);
-  }
+        window.submitOrder = async () => {
+            const inputVal = document.getElementById('customerInput').value.trim();
+            if (!inputVal) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+            if (!selectedProduct) return Swal.fire('แจ้งเตือน', 'กรุณาเลือกสินค้า', 'warning');
 
-  function renderStock(data) {
-      const tbody = document.querySelector('#stockTable tbody');
-      tbody.innerHTML = "";
-      if(data.length===0) { tbody.innerHTML=`<tr><td colspan="4" class="text-center py-5 text-muted">ไม่มีสินค้า</td></tr>`; return;}
+            Swal.fire({
+                title: 'กำลังบันทึก...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
 
-      data.forEach(d => {
-          tbody.innerHTML += `
-              <tr>
-                  <td class="ps-3 py-3"><div class="d-flex align-items-center"><img src="${d.imageUrl}" class="table-img me-3" onclick="window.open('${d.imageUrl}')"><div><div class="fw-bold text-dark">${d.code}</div><small class="text-muted">${d.gameEmail}</small></div></div></td>
-                  <td class="fw-bold text-primary">${d.sellPrice.toLocaleString()} ฿</td>
-                  <td><span class="blur-text">${d.gamePass}</span></td>
-                  <td class="text-end pe-3"><button class="btn btn-warning btn-sm rounded-pill px-3 shadow-sm" onclick="markSold('${d.id}')">ขาย</button></td>
-              </tr>
-          `;
-      });
-  }
+            try {
+                const newOrderRef = push(ref(db, 'orders'));
+                await set(newOrderRef, {
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    productId: selectedProduct.id,
+                    productName: selectedProduct.name,
+                    price: selectedProduct.price,
+                    customerInfo: inputVal, // UID or Contact
+                    category: selectedProduct.category,
+                    status: 'pending', // pending, completed, cancelled
+                    timestamp: Date.now()
+                });
 
-  function renderHistory(data) {
-      const tbody = document.querySelector('#historyTable tbody');
-      tbody.innerHTML = "";
-      if(data.length===0) { tbody.innerHTML=`<tr><td colspan="4" class="text-center py-5 text-muted">ไม่มีประวัติ</td></tr>`; return;}
+                Swal.fire({
+                    icon: 'success',
+                    title: 'สั่งซื้อสำเร็จ!',
+                    text: 'กรุณารอแอดมินตรวจสอบที่หน้าประวัติ',
+                    confirmButtonColor: '#009933'
+                });
 
-      data.forEach(d => {
-          const profit = d.sellPrice - d.buyPrice;
-          const date = d.soldAt ? d.soldAt.toDate().toLocaleDateString('th-TH') : '-';
-          tbody.innerHTML += `
-              <tr>
-                  <td class="ps-3 py-3 fw-bold text-secondary">${d.code}</td>
-                  <td>${d.sellPrice.toLocaleString()}</td>
-                  <td class="${profit>=0?'text-success':'text-danger'} fw-bold">${profit>=0?'+':''}${profit.toLocaleString()}</td>
-                  <td class="text-muted small">${date}</td>
-              </tr>
-          `;
-      });
-  }
+                document.getElementById('customerInput').value = '';
+                document.getElementById('orderForm').classList.add('hidden');
+                togglePage('history'); // Go to history page
 
-  window.markSold = (id) => {
-      Swal.fire({title:'ยืนยันขาย?', showCancelButton:true, confirmButtonText:'ขายเลย', confirmButtonColor:'#198754'}).then(async(r)=>{
-          if(r.isConfirmed) {
-              await updateDoc(doc(db, "products", id), { status: "sold", soldAt: Timestamp.now() });
-              loadInventory();
-              Swal.fire('เรียบร้อย', '', 'success');
-          }
-      });
-  }
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'เกิดข้อผิดพลาดในการสั่งซื้อ', 'error');
+            }
+        };
 
-  // --- Image Utilities ---
-  window.previewProductImage = () => processImg(document.getElementById('inpFile'), (res) => {
-      currentProductImg = res;
-      document.getElementById('previewImg').src = res;
-      document.getElementById('previewImg').style.display='block';
-      document.getElementById('uploadText').style.display='none';
-  });
+        function listenToMyOrders() {
+            if (!currentUser) return;
+            const ordersRef = ref(db, 'orders');
+            onValue(ordersRef, (snapshot) => {
+                const list = document.getElementById('orderHistoryList');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                
+                if (!data) {
+                    list.innerHTML = '<p class="text-center text-gray-400 py-4">ยังไม่มีรายการ</p>';
+                    return;
+                }
 
-  window.previewProfileImage = (el) => processImg(el, (res) => {
-      currentProfileImg = res;
-      document.getElementById('editProfilePreview').src = res;
-  });
+                // Filter client side for simplicity (or use query in Firebase)
+                const myOrders = Object.entries(data)
+                    .filter(([key, order]) => order.userId === currentUser.uid)
+                    .sort((a, b) => b[1].timestamp - a[1].timestamp);
 
-  function processImg(input, cb) {
-      if(input.files && input.files[0]) {
-          const r = new FileReader();
-          r.onload = (e) => {
-              const img = new Image();
-              img.src = e.target.result;
-              img.onload = () => {
-                  const c = document.createElement('canvas');
-                  const ctx = c.getContext('2d');
-                  const scale = 500/img.width;
-                  c.width = 500; c.height = img.height*scale;
-                  ctx.drawImage(img,0,0,c.width,c.height);
-                  cb(c.toDataURL('image/jpeg', 0.8));
-              }
-          };
-          r.readAsDataURL(input.files[0]);
-      }
-  }
+                if (myOrders.length === 0) {
+                    list.innerHTML = '<p class="text-center text-gray-400 py-4">ยังไม่มีรายการ</p>';
+                    return;
+                }
 
-  window.searchTable = (id) => {
-      const v = document.getElementById('searchInput').value.toLowerCase();
-      document.querySelectorAll(`#${id} tbody tr`).forEach(r => r.style.display = r.innerText.toLowerCase().includes(v)?'':'none');
-  }
+                myOrders.forEach(([key, order]) => {
+                    let statusHtml = '';
+                    let noteHtml = '';
+                    
+                    if (order.status === 'pending') {
+                        statusHtml = '<span class="status-badge status-pending"><i class="fas fa-clock"></i> กำลังตรวจสอบ</span>';
+                    } else if (order.status === 'completed') {
+                        statusHtml = '<span class="status-badge status-success"><i class="fas fa-check"></i> สำเร็จ</span>';
+                        if (order.code) { // If admin attached a code
+                             noteHtml = `<div class="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm font-mono text-green-800 break-all select-all">Code: ${order.code}</div>`;
+                        }
+                    } else {
+                        statusHtml = '<span class="status-badge status-cancel"><i class="fas fa-times"></i> ยกเลิก</span>';
+                    }
 
-  document.querySelector('.hidden').style.display = 'none';
-</script>
+                    const date = new Date(order.timestamp).toLocaleString('th-TH');
+
+                    const item = document.createElement('div');
+                    item.className = 'bg-gray-50 p-4 rounded-xl border border-gray-100';
+                    item.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-gray-800">${order.productName}</h4>
+                                <p class="text-xs text-gray-500">${date}</p>
+                            </div>
+                            ${statusHtml}
+                        </div>
+                        <p class="text-sm text-gray-600">ข้อมูล: <span class="font-medium">${order.customerInfo}</span></p>
+                        ${noteHtml}
+                    `;
+                    list.appendChild(item);
+                });
+            });
+        }
+
+
+        // --- 5. ADMIN LOGIC ---
+        
+        window.openAdminLogin = () => {
+            document.getElementById('adminPanel').classList.remove('hidden');
+        };
+        window.closeAdminPanel = () => {
+            document.getElementById('adminPanel').classList.add('hidden');
+        };
+
+        window.checkAdminLogin = () => {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+            if (u === 'admin' && p === '1122') {
+                document.getElementById('adminLoginForm').classList.add('hidden');
+                document.getElementById('adminContent').classList.remove('hidden');
+                initAdminDashboard();
+            } else {
+                Swal.fire('Error', 'รหัสผ่านไม่ถูกต้อง', 'error');
+            }
+        };
+
+        window.switchAdminTab = (tab) => {
+            document.getElementById('admin-tab-orders').classList.add('hidden');
+            document.getElementById('admin-tab-stock').classList.add('hidden');
+            document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
+            
+            // Visual feedback for buttons could be added here
+        };
+
+        function initAdminDashboard() {
+            // Listen to all orders
+            onValue(ref(db, 'orders'), (snapshot) => {
+                const tbody = document.getElementById('adminOrderTable');
+                tbody.innerHTML = '';
+                const data = snapshot.val();
+                if (!data) return;
+
+                // Sort newest first
+                const orders = Object.entries(data).sort((a, b) => b[1].timestamp - a[1].timestamp);
+
+                orders.forEach(([key, order]) => {
+                    const date = new Date(order.timestamp).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
+                    
+                    let actionBtn = '';
+                    if (order.status === 'pending') {
+                        actionBtn = `
+                            <button onclick="updateOrderStatus('${key}', 'completed')" class="bg-green-500 text-white px-2 py-1 rounded text-xs mr-1 hover:bg-green-600">อนุมัติ</button>
+                            <button onclick="updateOrderStatus('${key}', 'cancelled')" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">ยกเลิก</button>
+                        `;
+                    } else {
+                        actionBtn = `<span class="text-xs text-gray-400">ดำเนินการแล้ว</span>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b hover:bg-gray-50";
+                    tr.innerHTML = `
+                        <td class="p-3 text-gray-500">${date}</td>
+                        <td class="p-3 font-bold text-blue-900">${order.userEmail}</td>
+                        <td class="p-3">${order.productName}</td>
+                        <td class="p-3 font-mono text-primary select-all cursor-copy" title="คลิกเพื่อเลือก">${order.customerInfo}</td>
+                        <td class="p-3">
+                            <span class="status-badge ${order.status === 'pending' ? 'status-pending' : order.status === 'completed' ? 'status-success' : 'status-cancel'}">
+                                ${order.status.toUpperCase()}
+                            </span>
+                        </td>
+                        <td class="p-3">${actionBtn}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+
+            // Listen to products for the select dropdown & list
+            onValue(ref(db, 'products'), (snapshot) => {
+                const select = document.getElementById('stockProdSelect');
+                const list = document.getElementById('adminProductList');
+                
+                select.innerHTML = '<option value="">-- เลือกสินค้า --</option>';
+                list.innerHTML = '';
+                
+                const data = snapshot.val();
+                if(!data) return;
+
+                Object.entries(data).forEach(([key, prod]) => {
+                    // Option for dropdown
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.innerText = `${prod.name} (${prod.category})`;
+                    select.appendChild(opt);
+
+                    // List Item
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between bg-gray-50 p-2 rounded border';
+                    li.innerHTML = `<span>${prod.name}</span> <span class="text-gray-400 text-sm">${prod.price}บ.</span>`;
+                    list.appendChild(li);
+                });
+            });
+        }
+
+        // --- Admin Actions ---
+        
+        window.addNewProduct = async () => {
+            const name = document.getElementById('newProdName').value;
+            const cat = document.getElementById('newProdCat').value;
+            const price = document.getElementById('newProdPrice').value;
+
+            if(!name || !price) return Swal.fire('แจ้งเตือน', 'กรอกข้อมูลให้ครบ', 'warning');
+
+            await push(ref(db, 'products'), {
+                name, category: cat, price: Number(price)
+            });
+
+            Swal.fire('สำเร็จ', 'เพิ่มสินค้าแล้ว', 'success');
+            document.getElementById('newProdName').value = '';
+            document.getElementById('newProdPrice').value = '';
+        };
+
+        window.addStockCodes = async () => {
+            const prodId = document.getElementById('stockProdSelect').value;
+            const codesText = document.getElementById('stockCodesArea').value;
+
+            if(!prodId) return Swal.fire('แจ้งเตือน', 'เลือกสินค้าก่อน', 'warning');
+            if(!codesText.trim()) return Swal.fire('แจ้งเตือน', 'กรอกโค้ด', 'warning');
+
+            const codes = codesText.split('\n').filter(line => line.trim() !== '');
+            
+            // Save each code individually
+            const updates = {};
+            codes.forEach(code => {
+                const newCodeKey = push(ref(db, 'codes/' + prodId)).key;
+                updates[`codes/${prodId}/${newCodeKey}`] = { 
+                    code: code.trim(),
+                    status: 'available'
+                };
+            });
+
+            await update(ref(db), updates);
+            Swal.fire('สำเร็จ', `เพิ่ม ${codes.length} โค้ดเรียบร้อย`, 'success');
+            document.getElementById('stockCodesArea').value = '';
+        };
+
+        window.clearAllCodes = async () => {
+             const result = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: "โค้ดทั้งหมดในระบบจะหายไป!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'ใช่, ลบทั้งหมด'
+            });
+
+            if (result.isConfirmed) {
+                await set(ref(db, 'codes'), null);
+                Swal.fire('ลบแล้ว', 'ล้างสต็อกทั้งหมดแล้ว', 'success');
+            }
+        };
+
+        window.updateOrderStatus = async (orderId, status) => {
+            // If completed, we might want to fetch a code automatically or let admin manually send via external chat.
+            // For this requirements: just update status. 
+            // Optional: If we wanted to auto-assign a code:
+            /*
+            if(status === 'completed') {
+                // Fetch order details -> find productID -> find available code -> assign -> mark code used
+            }
+            */
+            
+            await update(ref(db, `orders/${orderId}`), { status: status });
+            Swal.fire('อัปเดต', `สถานะเป็น ${status} แล้ว`, 'success');
+        };
+
+    </script>
 </body>
 </html>
