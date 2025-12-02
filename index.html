@@ -3,124 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสต็อกไอดีเกม (RS SAVE Pro)</title>
+    <title>ระบบสต็อกไอดีเกม (Modern UI Deluxe)</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f4f6f9; }
-        .main-card { border: none; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .auth-box { max-width: 450px; margin: 60px auto; }
-        .img-preview { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; border: 2px dashed #ddd; display: none; margin-top: 10px; }
-        .table-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
-        .table-img:hover { transform: scale(1.5); }
-        .blur-text { filter: blur(5px); cursor: pointer; transition: 0.3s; user-select: none; }
-        .blur-text:hover { filter: blur(0px); }
-        .status-badge { font-size: 0.8em; padding: 5px 10px; border-radius: 20px; }
+        :root { --primary-color: #4361ee; --secondary-color: #3f37c9; }
+        body { font-family: 'Prompt', sans-serif; background-color: #f8f9fa; color: #333; }
+        
+        /* UI Modern Elements */
+        .main-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; overflow: hidden; }
+        .auth-box { max-width: 420px; margin: 80px auto; }
+        .btn-gradient-primary { background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); border: none; color: white; }
+        .btn-gradient-primary:hover { background: linear-gradient(45deg, var(--secondary-color), var(--primary-color)); color: white; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); }
+        .form-control:focus { box-shadow: none; border-color: var(--primary-color); }
+        
+        /* Image & Table */
+        .img-preview-box { width: 100%; height: 220px; border-radius: 12px; border: 2px dashed #dee2e6; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; background: #f8f9fa; transition: 0.3s; }
+        .img-preview-box:hover { border-color: var(--primary-color); background: #eef2ff; }
+        .img-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
+        
+        .table-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: zoom-in; }
+        .table-img:hover { transform: scale(1.1); }
+        .blur-text { filter: blur(6px); transition: 0.4s; cursor: pointer; user-select: none; background: #eee; padding: 2px 8px; border-radius: 4px; }
+        .blur-text:hover { filter: blur(0px); background: transparent; }
+
+        /* Navbar */
+        .navbar { background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.05) !important; padding-top: 1rem; padding-bottom: 1rem; }
+        .navbar-brand { font-weight: 800; color: var(--primary-color) !important; letter-spacing: -1px; }
+        .nav-pills .nav-link.active { background-color: var(--primary-color); }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-gradient bg-primary shadow-sm hidden" id="mainNavbar">
+<nav class="navbar navbar-expand-lg fixed-top hidden" id="mainNavbar">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#"><i class="bi bi-controller"></i> <span id="navStoreName">RS SHOP</span></a>
-    <div class="d-flex align-items-center">
-        <span class="text-white me-3 d-none d-md-block" id="userEmailDisplay"></span>
-        <button class="btn btn-sm btn-light text-primary fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right"></i> ออกจากระบบ</button>
+    <a class="navbar-brand" href="#"><i class="bi bi-joystick me-2"></i><span id="navStoreName">RS SHOP</span></a>
+    
+    <div class="dropdown ms-auto">
+        <button class="btn btn-light dropdown-toggle shadow-sm d-flex align-items-center gap-2 rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle fs-5 text-primary"></i>
+            <span id="userEmailDisplay" class="d-none d-md-block fw-medium small">User</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 mt-2">
+            <li><h6 class="dropdown-header">ตั้งค่าบัญชี</h6></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button class="dropdown-item text-danger rounded-3 fw-bold" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>ออกจากระบบ</button></li>
+        </ul>
     </div>
   </div>
 </nav>
 
-<div class="container" id="auth-section">
+<div class="container" id="auth-section" style="padding-top: 60px;">
     <div class="card auth-box p-4 main-card">
         <div class="text-center mb-4">
-            <h3 class="fw-bold text-primary">ระบบจัดการร้านเกม</h3>
-            <p class="text-muted">เข้าสู่ระบบเพื่อจัดการสต็อก</p>
+            <h2 class="fw-bold" style="color: var(--primary-color);"><i class="bi bi-shield-lock-fill"></i> Admin Panel</h2>
+            <p class="text-muted mb-0">ระบบจัดการสต็อกไอดีเกมหลังบ้าน</p>
         </div>
 
-        <ul class="nav nav-pills nav-fill mb-3 bg-light rounded p-1" id="authTab" role="tablist">
-            <li class="nav-item"><button class="nav-link active rounded-pill" data-bs-toggle="pill" data-bs-target="#login-tab">เข้าสู่ระบบ</button></li>
-            <li class="nav-item"><button class="nav-link rounded-pill" data-bs-toggle="pill" data-bs-target="#signup-tab">สมัครร้านใหม่</button></li>
+        <ul class="nav nav-pills nav-fill mb-4 bg-light rounded-pill p-1" id="authTab" role="tablist">
+            <li class="nav-item"><button class="nav-link active rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#login-tab">เข้าสู่ระบบ</button></li>
+            <li class="nav-item"><button class="nav-link rounded-pill fw-bold" data-bs-toggle="pill" data-bs-target="#signup-tab">สมัครร้านใหม่</button></li>
         </ul>
 
         <div class="tab-content">
             <div class="tab-pane fade show active" id="login-tab">
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="loginEmail" placeholder="Email">
+                    <input type="email" class="form-control rounded-4" id="loginEmail" placeholder="Email">
                     <label>อีเมล</label>
                 </div>
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="loginPassword" placeholder="Password">
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control rounded-4" id="loginPassword" placeholder="Password">
                     <label>รหัสผ่าน</label>
                 </div>
-                <button class="btn btn-primary w-100 py-2 fw-bold" onclick="login()">เข้าสู่ระบบ</button>
+                <button class="btn btn-gradient-primary w-100 py-3 rounded-4 fw-bold fs-5" onclick="login()">เข้าสู่ระบบ <i class="bi bi-arrow-right"></i></button>
             </div>
             
             <div class="tab-pane fade" id="signup-tab">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="signupStore" placeholder="ชื่อร้าน">
+                    <input type="text" class="form-control rounded-4" id="signupStore" placeholder="ชื่อร้าน">
                     <label>ชื่อร้าน (เช่น RS Store)</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="signupEmail" placeholder="Email">
+                    <input type="email" class="form-control rounded-4" id="signupEmail" placeholder="Email">
                     <label>อีเมล</label>
                 </div>
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="signupPassword" placeholder="Password">
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control rounded-4" id="signupPassword" placeholder="Password">
                     <label>รหัสผ่าน</label>
                 </div>
-                <button class="btn btn-success w-100 py-2 fw-bold" onclick="signup()">สมัครสมาชิก</button>
+                <button class="btn btn-success w-100 py-3 rounded-4 fw-bold fs-5" onclick="signup()"><i class="bi bi-check-circle-fill me-2"></i> สมัครสมาชิก</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container mt-4 hidden" id="dashboard-section">
+<div class="container hidden" id="dashboard-section" style="padding-top: 100px; padding-bottom: 40px;">
     
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold m-0"><i class="bi bi-grid-fill text-primary"></i> แดชบอร์ด</h4>
-        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addItemModal">
-            <i class="bi bi-plus-lg"></i> เพิ่มไอดีใหม่
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <div>
+             <h3 class="fw-bold m-0 text-dark"><i class="bi bi-grid-fill text-primary me-2"></i>แดชบอร์ดภาพรวม</h3>
+             <p class="text-muted m-0 small">จัดการรายการสินค้าเข้า-ออก ทั้งหมดของคุณ</p>
+        </div>
+       
+        <button class="btn btn-gradient-primary px-4 py-2 rounded-pill shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addItemModal">
+            <i class="bi bi-plus-lg me-1"></i> เพิ่มไอดีใหม่
         </button>
     </div>
 
-    <ul class="nav nav-tabs nav-justified mb-3 border-0" id="dashTab">
-        <li class="nav-item">
-            <button class="nav-link active fw-bold border-0 border-bottom border-3 border-primary bg-white" data-bs-toggle="tab" data-bs-target="#stock-pane">
-                📦 สต็อกพร้อมขาย
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link fw-bold border-0 bg-white text-secondary" data-bs-toggle="tab" data-bs-target="#history-pane">
-                📜 ประวัติการขาย
-            </button>
-        </li>
-    </ul>
+    <div class="card main-card p-2 mb-4 bg-white d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <ul class="nav nav-pills p-1 rounded-pill bg-light" id="dashTab">
+            <li class="nav-item">
+                <button class="nav-link active rounded-pill fw-bold px-4" data-bs-toggle="tab" data-bs-target="#stock-pane">
+                    📦 สต็อกพร้อมขาย
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link rounded-pill fw-bold px-4 text-secondary" data-bs-toggle="tab" data-bs-target="#history-pane">
+                    📜 ประวัติการขาย
+                </button>
+            </li>
+        </ul>
+        <div class="input-group w-auto" style="min-width: 300px;">
+            <span class="input-group-text bg-light border-0 ps-3 rounded-start-pill"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" id="searchInput" class="form-control border-0 bg-light rounded-end-pill" placeholder="ค้นหารหัส, ชื่อเกม..." onkeyup="searchTable('stockTable')">
+        </div>
+    </div>
 
     <div class="tab-content">
         <div class="tab-pane fade show active" id="stock-pane">
-            <div class="card main-card p-3 mb-3">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                    <input type="text" id="searchInput" class="form-control border-start-0" placeholder="ค้นหารหัส, ชื่อเกม..." onkeyup="searchTable('stockTable')">
-                </div>
-            </div>
-            
             <div class="card main-card overflow-hidden">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="stockTable">
-                        <thead class="table-light">
+                        <thead style="background: #f1f5f9;">
                             <tr>
-                                <th>รูปภาพ</th>
-                                <th>รหัสสินค้า</th>
-                                <th>ราคาขาย</th>
-                                <th>ข้อมูลไอดี (อีเมล/รหัส)</th>
-                                <th>จัดการ</th>
+                                <th class="py-3 ps-4">สินค้า</th>
+                                <th>รหัส & ราคา</th>
+                                <th>ข้อมูลล็อกอิน (แตะเพื่อดู)</th>
+                                <th class="text-end pe-4">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody class="bg-white"></tbody>
                     </table>
                 </div>
             </div>
@@ -130,15 +155,15 @@
             <div class="card main-card overflow-hidden">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="historyTable">
-                        <thead class="table-light">
+                        <thead style="background: #f1f5f9;">
                             <tr>
-                                <th>รหัส</th>
+                                <th class="py-3 ps-4">รหัส</th>
                                 <th>ราคาขาย</th>
-                                <th>กำไร</th>
+                                <th>กำไร/ขาดทุน</th>
                                 <th>วันที่ขาย</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody class="bg-white"></tbody>
                     </table>
                 </div>
             </div>
@@ -146,60 +171,81 @@
     </div>
 </div>
 
-<div class="modal fade" id="addItemModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold">📝 เพิ่มข้อมูลไอดีเกม</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="addItemModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0 ps-4 pt-4">
+                <h5 class="modal-title fw-bold fs-4"><i class="bi bi-folder-plus me-2 text-primary"></i>เพิ่มข้อมูลไอดีเกม</h5>
+                <button type="button" class="btn-close bg-light rounded-circle p-2" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <div class="row g-3">
-                    <div class="col-12 text-center">
-                        <label for="inpFile" class="btn btn-outline-secondary w-100 p-4 border-dashed">
-                            <i class="bi bi-cloud-upload fs-2"></i><br>คลิกเพื่อเลือกรูปภาพสินค้า
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <label class="form-label fw-bold">รูปภาพหน้าปก</label>
+                        <label for="inpFile" class="img-preview-box" id="dropZone">
+                            <div class="text-center text-muted p-3" id="uploadPlaceholder">
+                                <i class="bi bi-cloud-arrow-up-fill fs-1 text-primary opacity-50"></i>
+                                <p class="mb-0 mt-2 fw-medium">คลิกเพื่อเลือกรูปภาพ</p>
+                                <small>รองรับ JPG, PNG (ระบบจะย่อให้อัตโนมัติ)</small>
+                            </div>
+                             <img id="previewImg" class="img-preview">
                         </label>
                         <input type="file" id="inpFile" accept="image/*" class="d-none" onchange="previewImage()">
-                        <img id="previewImg" class="img-preview mx-auto shadow-sm">
                     </div>
                     
-                    <div class="col-md-6">
-                        <label class="form-label text-muted">ราคารับซื้อ</label>
-                        <input type="number" id="inpBuy" class="form-control" placeholder="0.00">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-success fw-bold">ราคาขาย</label>
-                        <input type="number" id="inpSell" class="form-control border-success" placeholder="0.00">
-                    </div>
-                    
-                    <div class="col-12"><hr></div>
-                    
-                    <div class="col-md-6">
-                        <label class="form-label">เบอร์โทร / Username</label>
-                        <input type="text" id="inpUser" class="form-control" placeholder="Login ID">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">อีเมลเกม (Email)</label>
-                        <input type="text" id="inpGameEmail" class="form-control" placeholder="example@gmail.com">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label text-danger">รหัสผ่านเกม (Password)</label>
-                        <input type="text" id="inpGamePass" class="form-control" placeholder="Password ของไอดีเกม">
+                    <div class="col-lg-7">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">ราคารับซื้อ (ทุน)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">฿</span>
+                                    <input type="number" id="inpBuy" class="form-control bg-light border-start-0 fw-medium" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-success">ราคาขาย (ตั้งราคา)</label>
+                                <div class="input-group">
+                                     <span class="input-group-text bg-success text-white border-end-0">฿</span>
+                                    <input type="number" id="inpSell" class="form-control border-success text-success fw-bold" placeholder="0">
+                                </div>
+                            </div>
+                            
+                            <div class="col-12"><hr class="my-2 text-muted opacity-25"></div>
+                            
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small">อีเมลเกม (Email)</label>
+                                <input type="text" id="inpGameEmail" class="form-control" placeholder="example@gmail.com">
+                            </div>
+                             <div class="col-md-6">
+                                <label class="form-label fw-bold small">เบอร์โทร / Username</label>
+                                <input type="text" id="inpUser" class="form-control" placeholder="Optional">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-danger">รหัสผ่านเกม (Password)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-danger-subtle text-danger border-end-0"><i class="bi bi-key-fill"></i></span>
+                                     <input type="text" id="inpGamePass" class="form-control border-danger-subtle" placeholder="รหัสผ่าน">
+                                </div>
+                               
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
-                <button type="button" class="btn btn-primary px-4" onclick="saveItem()">บันทึกข้อมูล</button>
+            <div class="modal-footer border-0 pt-0 ps-4 pe-4 pb-4">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-gradient-primary rounded-pill px-5 py-2 fw-bold shadow-sm" onclick="saveItem()">
+                    <i class="bi bi-save2-fill me-2"></i> บันทึกข้อมูล
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="msgToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastBody">Success!</div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1070;">
+  <div id="msgToast" class="toast align-items-center text-white bg-success border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex p-2">
+      <div class="toast-body fs-6 fw-medium" id="toastBody">Let's go!</div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
@@ -207,12 +253,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module">
-  // Import Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, orderBy, limit, Timestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-  // --- ⚙️ CONFIG ของคุณ ---
+  // --- ⚙️ CONFIG ของคุณ (เหมือนเดิม) ---
   const firebaseConfig = {
     apiKey: "AIzaSyC-rPvq9fFvhnYQCWxKtLf4Y3UK1uMnP0c",
     authDomain: "rssave-6169a.firebaseapp.com",
@@ -228,38 +273,35 @@
   const db = getFirestore(app);
 
   let currentUserData = { storePrefix: 'RS', storeName: 'My Shop' };
-  let currentImageBase64 = ""; // ตัวแปรเก็บรูปชั่วคราว
+  let currentImageBase64 = "";
 
   // --- Helper Functions ---
   const showToast = (msg, type='success') => {
       const el = document.getElementById('msgToast');
-      document.getElementById('toastBody').innerText = msg;
-      el.className = `toast align-items-center text-white bg-${type} border-0`;
+      const icon = type === 'success' ? '<i class="bi bi-check-circle-fill me-2"></i>' : '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+      document.getElementById('toastBody').innerHTML = icon + msg;
+      el.className = `toast align-items-center text-white bg-${type} border-0 shadow-lg rounded-4`;
       new bootstrap.Toast(el).show();
   }
 
-  // ฟังก์ชันแปลงรูปภาพเป็น Base64 พร้อมย่อขนาด (เพื่อไม่ให้หนัก Database)
   window.previewImage = () => {
       const file = document.getElementById('inpFile').files[0];
       if(file){
           const reader = new FileReader();
           reader.onloadend = () => {
-              // ย่อรูปก่อนเก็บ
               const img = new Image();
               img.src = reader.result;
               img.onload = () => {
                   const canvas = document.createElement('canvas');
                   const ctx = canvas.getContext('2d');
-                  // กำหนดขนาดสูงสุด 500px
-                  const maxWidth = 500;
+                  const maxWidth = 600; // เพิ่มขนาดรูปนิดหน่อย
                   const scaleSize = maxWidth / img.width;
                   canvas.width = maxWidth;
                   canvas.height = img.height * scaleSize;
                   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                  currentImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
                   
-                  currentImageBase64 = canvas.toDataURL('image/jpeg', 0.7); // Quality 0.7
-                  
-                  // แสดงผล
+                  document.getElementById('uploadPlaceholder').style.display = 'none';
                   const preview = document.getElementById('previewImg');
                   preview.src = currentImageBase64;
                   preview.style.display = 'block';
@@ -268,6 +310,20 @@
           reader.readAsDataURL(file);
       }
   }
+  
+  // Reset Modal form when closed
+  document.getElementById('addItemModal').addEventListener('hidden.bs.modal', () => {
+      document.getElementById('inpBuy').value = '';
+      document.getElementById('inpSell').value = '';
+      document.getElementById('inpUser').value = '';
+      document.getElementById('inpGameEmail').value = '';
+      document.getElementById('inpGamePass').value = '';
+      document.getElementById('inpFile').value = '';
+      document.getElementById('uploadPlaceholder').style.display = 'block';
+      document.getElementById('previewImg').style.display = 'none';
+      currentImageBase64 = "";
+  });
+
 
   // --- AUTH SYSTEM ---
   window.signup = async () => {
@@ -280,7 +336,7 @@
           await createUserWithEmailAndPassword(auth, email, pass);
           localStorage.setItem('storePrefix', store.substring(0, 2).toUpperCase());
           localStorage.setItem('storeName', store);
-          showToast("สมัครสมาชิกเรียบร้อย!");
+          showToast("สมัครสมาชิกเรียบร้อย! กำลังเข้าสู่ระบบ...");
       } catch(e) { showToast(e.message, "danger"); }
   }
 
@@ -289,7 +345,7 @@
       const pass = document.getElementById('loginPassword').value;
       try {
           await signInWithEmailAndPassword(auth, email, pass);
-      } catch(e) { showToast("Login failed: " + e.message, "danger"); }
+      } catch(e) { showToast("อีเมลหรือรหัสผ่านไม่ถูกต้อง", "danger"); }
   }
 
   window.logout = () => signOut(auth);
@@ -308,7 +364,8 @@
           currentUserData.storePrefix = localStorage.getItem('storePrefix') || 'RS';
           
           document.getElementById('navStoreName').innerText = currentUserData.storeName;
-          document.getElementById('userEmailDisplay').innerText = user.email;
+          // อัปเดตชื่อใน Dropdown
+          document.getElementById('userEmailDisplay').innerText = user.email.split('@')[0];
           
           loadInventory();
           loadHistory();
@@ -321,13 +378,12 @@
 
   // --- LOGIC: CREATE ---
   async function generateAutoID() {
+      // ตรงนี้ต้องใช้ orderBy เพื่อหารหัสล่าสุด
       const q = query(collection(db, "products"), orderBy("createdAt", "desc"), limit(1));
       const snap = await getDocs(q);
       let newNum = 1;
-      
       if(!snap.empty) {
           const lastCode = snap.docs[0].data().code;
-          // เช็คว่า Prefix ตรงกันไหม
           if(lastCode.startsWith(currentUserData.storePrefix)) {
               const numPart = parseInt(lastCode.replace(currentUserData.storePrefix, ""));
               if(!isNaN(numPart)) newNum = numPart + 1;
@@ -343,9 +399,9 @@
       const email = document.getElementById('inpGameEmail').value;
       const pass = document.getElementById('inpGamePass').value;
 
-      if(!buy || !sell) return showToast("กรุณากรอกราคา", "warning");
+      if(!buy || !sell) return showToast("กรุณากรอกราคาให้ครบ", "warning");
+      if(!email || !pass) return showToast("กรุณากรอกอีเมลและรหัสผ่านเกม", "warning");
 
-      // ปิด Modal
       const modal = bootstrap.Modal.getInstance(document.getElementById('addItemModal'));
       modal.hide();
       showToast("กำลังบันทึกข้อมูล...", "info");
@@ -357,54 +413,59 @@
               buyPrice: Number(buy),
               sellPrice: Number(sell),
               gameUser: user || "-",
-              gameEmail: email || "-",
-              gamePass: pass || "-",
-              imageUrl: currentImageBase64 || "https://via.placeholder.com/100?text=No+Img", // รูปจาก Base64
+              gameEmail: email,
+              gamePass: pass,
+              imageUrl: currentImageBase64 || "https://via.placeholder.com/150?text=No+Image",
               status: "available",
               createdAt: Timestamp.now(),
               soldAt: null
           });
           
-          showToast(`✅ เพิ่มสินค้า ${newCode} แล้ว!`);
-          
-          // Reset Form
-          document.getElementById('inpBuy').value = '';
-          document.getElementById('inpSell').value = '';
-          document.getElementById('inpUser').value = '';
-          document.getElementById('inpGameEmail').value = '';
-          document.getElementById('inpGamePass').value = '';
-          document.getElementById('inpFile').value = '';
-          document.getElementById('previewImg').style.display = 'none';
-          currentImageBase64 = "";
-          
-          loadInventory();
+          showToast(`✅ บันทึกรหัส ${newCode} เรียบร้อย!`);
+          loadInventory(); // โหลดข้อมูลใหม่ทันที
 
-      } catch(e) { showToast("Error: " + e.message, "danger"); }
+      } catch(e) { showToast("เกิดข้อผิดพลาด: " + e.message, "danger"); }
   }
 
-  // --- LOGIC: READ & DISPLAY ---
+  // --- LOGIC: READ & DISPLAY (แก้บั๊กตรงนี้!) ---
   async function loadInventory() {
-      const q = query(collection(db, "products"), where("status", "==", "available"), orderBy("createdAt", "desc"));
+      // 🔥 แก้บั๊ก: ลบ orderBy("createdAt", "desc") ออกชั่วคราว เพื่อให้ข้อมูลขึ้นโดยไม่ต้องทำ Index
+      const q = query(collection(db, "products"), where("status", "==", "available"));
+      
       const snap = await getDocs(q);
       const tbody = document.querySelector('#stockTable tbody');
       tbody.innerHTML = "";
 
-      if(snap.empty) { tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">ไม่มีสินค้าในสต็อก</td></tr>`; return; }
+      if(snap.empty) { tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted fs-5">ยังไม่มีสินค้าในสต็อก</td></tr>`; return; }
 
-      snap.forEach(doc => {
-          const d = doc.data();
+      // เรียงข้อมูลใน JS แทน (ชั่วคราว)
+      let docs = [];
+      snap.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
+      docs.sort((a,b) => b.createdAt - a.createdAt); // เรียงใหม่ไปเก่า
+
+      docs.forEach(d => {
           const tr = `
               <tr>
-                  <td><img src="${d.imageUrl}" class="table-img shadow-sm" onclick="viewImage('${d.imageUrl}')"></td>
-                  <td><span class="badge bg-dark text-white p-2" style="font-size:1em">${d.code}</span></td>
-                  <td class="fw-bold text-success">${d.sellPrice.toLocaleString()} ฿</td>
-                  <td>
-                      <small class="text-muted"><i class="bi bi-envelope"></i> ${d.gameEmail}</small><br>
-                      <small class="text-muted"><i class="bi bi-key"></i> Pass:</small> <span class="blur-text badge bg-light text-dark border">${d.gamePass}</span>
+                  <td class="ps-4 py-3">
+                    <div class="d-flex align-items-center">
+                        <img src="${d.imageUrl}" class="table-img shadow-sm me-3" onclick="viewImage('${d.imageUrl}')">
+                    </div>
                   </td>
                   <td>
-                      <button class="btn btn-warning btn-sm fw-bold shadow-sm" onclick="markSold('${doc.id}')">
-                          <i class="bi bi-currency-dollar"></i> แจ้งขาย
+                    <div class="d-flex flex-column">
+                        <span class="badge bg-primary bg-opacity-10 text-primary mb-1" style="width:fit-content">${d.code}</span>
+                        <span class="fw-bold text-success fs-5">${d.sellPrice.toLocaleString()} ฿</span>
+                    </div>
+                  </td>
+                  <td>
+                      <div class="d-flex flex-column gap-1" style="max-width: 200px;">
+                        <small class="text-muted d-flex align-items-center"><i class="bi bi-envelope-fill me-2 opacity-50"></i> <span class="text-truncate">${d.gameEmail}</span></small>
+                        <small class="text-muted d-flex align-items-center"><i class="bi bi-key-fill me-2 opacity-50"></i> <span class="blur-text fw-medium text-dark bg-white border">${d.gamePass}</span></small>
+                      </div>
+                  </td>
+                  <td class="text-end pe-4">
+                      <button class="btn btn-warning btn-sm fw-bold shadow-sm rounded-pill px-3 py-2 text-dark" onclick="markSold('${d.id}')">
+                          <i class="bi bi-bag-check-fill me-1"></i> แจ้งขาย
                       </button>
                   </td>
               </tr>
@@ -414,32 +475,36 @@
   }
 
   async function loadHistory() {
-      const q = query(collection(db, "products"), where("status", "==", "sold"), orderBy("soldAt", "desc"));
+      // 🔥 แก้บั๊ก: ทำเหมือนกันกับประวัติ
+      const q = query(collection(db, "products"), where("status", "==", "sold"));
       const snap = await getDocs(q);
       const tbody = document.querySelector('#historyTable tbody');
       tbody.innerHTML = "";
 
-      if(snap.empty) { tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">ยังไม่มีประวัติการขาย</td></tr>`; return; }
+      if(snap.empty) { tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-muted fs-5">ยังไม่มีประวัติการขาย</td></tr>`; return; }
 
-      snap.forEach(doc => {
-          const d = doc.data();
+      // เรียงข้อมูลใน JS แทน
+      let docs = [];
+      snap.forEach(doc => docs.push(doc.data()));
+      docs.sort((a,b) => b.soldAt - a.soldAt);
+
+      docs.forEach(d => {
           const profit = d.sellPrice - d.buyPrice;
           const profitColor = profit >= 0 ? 'text-success' : 'text-danger';
           const profitSign = profit >= 0 ? '+' : '';
           
-          // แปลงวันที่
           let dateTxt = "-";
           if(d.soldAt) {
              const dt = d.soldAt.toDate();
-             dateTxt = `${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()}`;
+             dateTxt = dt.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute:'2-digit'});
           }
 
           const tr = `
               <tr>
-                  <td><span class="fw-bold text-secondary">${d.code}</span></td>
-                  <td>${d.sellPrice.toLocaleString()}</td>
-                  <td class="${profitColor} fw-bold">${profitSign}${profit.toLocaleString()}</td>
-                  <td><small class="text-muted">${dateTxt}</small></td>
+                  <td class="ps-4 py-3"><span class="fw-bold text-secondary">${d.code}</span></td>
+                  <td>${d.sellPrice.toLocaleString()} ฿</td>
+                  <td><span class="${profitColor} fw-bold badge bg-${profit >= 0 ? 'success' : 'danger'}-subtle px-3 py-2 rounded-pill" style="font-size:0.9em">${profitSign}${profit.toLocaleString()} ฿</span></td>
+                  <td><small class="text-muted fw-medium">${dateTxt}</small></td>
               </tr>
           `;
           tbody.innerHTML += tr;
@@ -469,13 +534,9 @@
       });
   }
   
-  window.viewImage = (url) => {
-      // เปิดดูรูปใหญ่ใน Tab ใหม่
-      window.open(url, '_blank');
-  }
+  window.viewImage = (url) => { window.open(url, '_blank'); }
 
-  // Utility styles helper
-  document.querySelector('.hidden').style.display = 'none'; // Initial hide
+  document.querySelector('.hidden').style.display = 'none';
 </script>
 
 <style>
