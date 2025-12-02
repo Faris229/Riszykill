@@ -3,381 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduTask Ultimate | ระบบจัดการการเรียนครบวงจร</title>
+    <title>EduTask Stable | ระบบจัดการงานที่สมบูรณ์</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            /* Light Theme Variables */
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #64748b;
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
-            --bg-sidebar: #1e293b;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --text-light: #f8fafc;
-            --border: #e2e8f0;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-            --info: #3b82f6;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        [data-theme="dark"] {
-            /* Dark Theme Overrides */
-            --bg-body: #0f172a;
-            --bg-card: #1e293b;
-            --bg-sidebar: #020617;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg-body: #f3f4f6;
+            --bg-sidebar: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --success: #16a34a;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; outline: none; }
-        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; height: 100vh; overflow: hidden; transition: var(--transition); }
+        body { font-family: 'Prompt', sans-serif; background-color: var(--bg-body); margin: 0; height: 100vh; overflow: hidden; display: flex; color: var(--text-main); }
 
-        /* --- Utility Classes --- */
+        /* --- Utility --- */
         .hidden { display: none !important; }
         .flex { display: flex; }
-        .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
         .gap-2 { gap: 0.5rem; }
-        .gap-4 { gap: 1rem; }
         .w-full { width: 100%; }
-        .text-sm { font-size: 0.875rem; }
-        .font-bold { font-weight: 600; }
         .cursor-pointer { cursor: pointer; }
 
         /* --- Components --- */
-        .btn {
-            padding: 0.6rem 1.2rem; border-radius: 8px; border: none; font-family: inherit; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; justify-content: center;
-        }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-weight: 500; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-danger { background: #fee2e2; color: var(--danger); }
+        .btn-danger:hover { background: #fecaca; }
         .btn-ghost { background: transparent; color: var(--text-muted); }
-        .btn-ghost:hover { background: rgba(0,0,0,0.05); color: var(--primary); }
-        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .btn-ghost:hover { background: #f3f4f6; }
 
-        input, select, textarea {
-            width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); font-family: inherit; transition: var(--transition);
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--primary); }
 
-        .card { background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
+        /* --- Layout --- */
+        /* Login Screen */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg-body); z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .auth-card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow); width: 100%; max-width: 400px; text-align: center; }
 
-        /* --- Layout System --- */
-        #app-layout { display: flex; height: 100vh; }
-        
         /* Sidebar */
-        .sidebar {
-            width: 260px; background: var(--bg-sidebar); color: var(--text-light); padding: 1.5rem; display: flex; flex-direction: column; transition: var(--transition); z-index: 10;
-        }
-        .logo-area { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; color: var(--primary); }
-        .logo-area i { font-size: 1.5rem; }
+        .sidebar { width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 1.5rem; }
+        .app-logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; }
         
-        .nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
-        .nav-item { margin-bottom: 0.5rem; }
-        .nav-link {
-            display: flex; align-items: center; gap: 12px; padding: 0.8rem 1rem; border-radius: 10px; color: #94a3b8; text-decoration: none; transition: var(--transition); cursor: pointer;
-        }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.05); color: white; }
-        .nav-link.active { background: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-        .nav-link i { width: 20px; text-align: center; }
+        .nav-menu { list-style: none; padding: 0; margin: 0; flex: 1; }
+        .nav-item { margin-bottom: 5px; }
+        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border-radius: 8px; color: var(--text-muted); text-decoration: none; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .nav-link:hover { background: #eff6ff; color: var(--primary); }
+        .nav-link.active { background: var(--primary); color: white; }
 
-        .user-profile {
-            display: flex; align-items: center; gap: 10px; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;
-        }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-profile { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #e5e7eb; }
 
         /* Main Content */
-        .main-content { flex: 1; overflow-y: auto; padding: 2rem; position: relative; }
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .page-title { font-size: 1.5rem; font-weight: 700; }
+        .page-title { font-size: 1.8rem; font-weight: 600; margin: 0; }
 
-        /* --- Views --- */
-        /* Dashboard */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { display: flex; align-items: center; gap: 1rem; }
-        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .charts-area { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
-        @media (max-width: 900px) { .charts-area { grid-template-columns: 1fr; } }
-
-        /* Task Board */
-        .task-filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 1rem; }
-        .filter-chip { 
-            padding: 0.5rem 1rem; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; white-space: nowrap; font-size: 0.9rem; transition: var(--transition);
-        }
-        .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+        /* Task Cards */
+        .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .task-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); border-left: 5px solid transparent; transition: transform 0.2s; position: relative; }
+        .task-card:hover { transform: translateY(-3px); }
         
-        .task-list-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-        .task-card { 
-            border-left: 4px solid transparent; position: relative; transition: transform 0.2s; 
-        }
-        .task-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .priority-high { border-left-color: var(--danger); }
-        .priority-medium { border-left-color: var(--warning); }
-        .priority-low { border-left-color: var(--success); }
-        
-        .progress-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s ease; }
+        .p-high { border-left-color: var(--danger); }
+        .p-medium { border-left-color: var(--warning); }
+        .p-low { border-left-color: var(--success); }
 
-        /* Calendar */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .calendar-day-header { text-align: center; font-weight: bold; padding: 10px; color: var(--text-muted); }
-        .calendar-day { 
-            background: var(--bg-card); min-height: 100px; padding: 5px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.8rem;
-        }
-        .calendar-day.today { border: 2px solid var(--primary); }
-        .day-number { font-weight: bold; margin-bottom: 5px; display: block; }
-        .cal-event { padding: 2px 4px; border-radius: 4px; margin-bottom: 2px; color: white; font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .task-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .task-subject { font-weight: bold; font-size: 1.1rem; }
+        .task-status { font-size: 0.8rem; padding: 2px 8px; border-radius: 10px; background: #f3f4f6; color: var(--text-muted); }
+        .status-late { background: #fee2e2; color: var(--danger); }
+        .status-done { background: #dcfce7; color: var(--success); }
+
+        .subtask-list { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+        .subtask-item { display: flex; gap: 8px; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-muted); }
+        .subtask-item i { margin-top: 4px; font-size: 0.8rem; }
 
         /* Modals */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: var(--transition);
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content {
-            background: var(--bg-card); width: 90%; max-width: 600px; border-radius: 16px; padding: 2rem; transform: scale(0.9); transition: var(--transition); max-height: 90vh; overflow-y: auto;
-        }
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .subtask-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--border); }
-        .subtask-item.done span { text-decoration: line-through; color: var(--text-muted); }
+        .modal-box { background: white; width: 90%; max-width: 500px; padding: 2rem; border-radius: 1rem; max-height: 90vh; overflow-y: auto; }
 
-        /* Auth Screen */
-        #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 200; display: flex; justify-content: center; align-items: center;
-        }
-        .auth-box { width: 400px; text-align: center; }
-
-        /* Responsive Sidebar */
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; left: -260px; height: 100%; }
-            .sidebar.mobile-active { left: 0; }
-            .main-content { margin-left: 0; width: 100%; }
-        }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <div class="card auth-box">
-            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">
-                <i class="fa-solid fa-graduation-cap"></i>
-            </div>
-            <h2 style="margin-bottom: 0.5rem;">EduTask Ultimate</h2>
-            <p class="text-muted" style="margin-bottom: 2rem;">เข้าสู่ระบบเพื่อจัดการชีวิตการเรียน</p>
-            
-            <form id="login-form">
-                <div style="margin-bottom: 1rem;">
-                    <input type="email" id="auth-email" placeholder="อีเมล" required>
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <input type="password" id="auth-pass" placeholder="รหัสผ่าน" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-full" style="margin-bottom: 10px;">เข้าสู่ระบบ</button>
-                <button type="button" class="btn btn-ghost w-full" onclick="handleAuthAction('signup')">ยังไม่มีบัญชี? สมัครสมาชิก</button>
-            </form>
+        <div class="auth-card">
+            <i class="fa-solid fa-layer-group" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+            <h2>ยินดีต้อนรับ</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">เข้าสู่ระบบเพื่อจัดการงานของคุณ</p>
+            <input type="email" id="auth-email" placeholder="อีเมล">
+            <input type="password" id="auth-pass" placeholder="รหัสผ่าน">
+            <button class="btn btn-primary w-full" style="justify-content: center; margin-top: 10px;" onclick="handleLogin()">เข้าสู่ระบบ</button>
+            <button class="btn btn-ghost w-full" style="justify-content: center; margin-top: 5px;" onclick="handleSignup()">สมัครสมาชิก</button>
         </div>
     </div>
 
-    <div id="app-layout" class="hidden">
+    <div id="app-layout" class="hidden" style="width: 100%;">
         
-        <aside class="sidebar" id="main-sidebar">
-            <div class="logo-area">
-                <i class="fa-solid fa-shapes"></i> EduTask
+        <aside class="sidebar">
+            <div class="app-logo">
+                <i class="fa-solid fa-check-double"></i> EduTask
             </div>
-            
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a class="nav-link active" onclick="router('dashboard')"><i class="fa-solid fa-chart-pie"></i> แดชบอร์ด</a>
+                    <a class="nav-link active" onclick="switchView('all', this)">
+                        <i class="fa-solid fa-list"></i> งานทั้งหมด
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="router('tasks')"><i class="fa-solid fa-list-check"></i> งานและการบ้าน</a>
+                    <a class="nav-link" onclick="switchView('pending', this)" style="color: var(--danger);">
+                        <i class="fa-solid fa-fire"></i> งานค้างส่ง
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="router('calendar')"><i class="fa-solid fa-calendar-days"></i> ปฏิทิน</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" onclick="router('settings')"><i class="fa-solid fa-gear"></i> ตั้งค่า</a>
+                    <a class="nav-link" onclick="switchView('completed', this)" style="color: var(--success);">
+                        <i class="fa-solid fa-check-circle"></i> ทำเสร็จแล้ว
+                    </a>
                 </li>
             </ul>
-
-            <div class="user-profile">
-                <div class="avatar" id="sidebar-avatar">U</div>
+            
+            <div class="user-profile cursor-pointer" onclick="openProfileModal()">
+                <img src="" id="user-avatar" class="avatar" alt="Profile">
                 <div style="flex: 1; overflow: hidden;">
-                    <div class="font-bold text-sm" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="sidebar-name">User</div>
-                    <div class="text-sm text-muted">Online</div>
+                    <div id="user-name" style="font-weight: 600; white-space: nowrap;">Loading...</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">แตะเพื่อตั้งค่า</div>
                 </div>
-                <i class="fa-solid fa-right-from-bracket cursor-pointer text-muted" onclick="logout()" title="ออกจากระบบ"></i>
+                <i class="fa-solid fa-right-from-bracket" style="color: var(--text-muted);" onclick="event.stopPropagation(); logout()"></i>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="header">
-                <div class="flex items-center gap-4">
-                    <button class="btn btn-ghost" id="mobile-menu-btn" style="display: none;"><i class="fa-solid fa-bars"></i></button>
-                    <h1 class="page-title" id="page-header-title">ภาพรวมวันนี้</h1>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button class="btn btn-primary" onclick="openTaskModal()"><i class="fa-solid fa-plus"></i> เพิ่มงาน</button>
-                </div>
+                <h1 class="page-title" id="page-title">งานทั้งหมด</h1>
+                <button class="btn btn-primary" onclick="openModal()">
+                    <i class="fa-solid fa-plus"></i> เพิ่มงาน
+                </button>
             </div>
 
-            <div id="view-dashboard" class="app-view">
-                <div class="stats-grid">
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);"><i class="fa-solid fa-folder-open"></i></div>
-                        <div>
-                            <div class="text-sm text-muted">งานทั้งหมด</div>
-                            <div class="font-bold" style="font-size: 1.5rem;" id="stat-total">0</div>
-                        </div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);"><i class="fa-solid fa-fire"></i></div>
-                        <div>
-                            <div class="text-sm text-muted">ค้างส่ง/ด่วน</div>
-                            <div class="font-bold" style="font-size: 1.5rem;" id="stat-pending">0</div>
-                        </div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);"><i class="fa-solid fa-check-circle"></i></div>
-                        <div>
-                            <div class="text-sm text-muted">เสร็จแล้ว</div>
-                            <div class="font-bold" style="font-size: 1.5rem;" id="stat-completed">0</div>
-                        </div>
-                    </div>
-                </div>
+            <input type="text" id="search-input" placeholder="🔍 ค้นหางาน วิชา หรือรายละเอียด..." onkeyup="renderTasks()">
 
-                <div class="charts-area">
-                    <div class="card">
-                        <h4><i class="fa-solid fa-chart-simple"></i> งานในอีก 7 วันข้างหน้า</h4>
-                        <canvas id="barChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h4><i class="fa-solid fa-chart-pie"></i> สัดส่วนรายวิชา</h4>
-                        <canvas id="pieChart"></canvas>
-                    </div>
+            <div id="task-container" class="task-grid">
                 </div>
-            </div>
-
-            <div id="view-tasks" class="app-view hidden">
-                <div class="task-filters">
-                    <div class="filter-chip active" onclick="filterTasks('all', this)">ทั้งหมด</div>
-                    <div class="filter-chip" onclick="filterTasks('pending', this)">ยังไม่เสร็จ</div>
-                    <div class="filter-chip" onclick="filterTasks('completed', this)">เสร็จแล้ว</div>
-                    <div class="filter-chip" onclick="filterTasks('high', this)">🔥 ด่วนมาก</div>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <input type="text" id="search-tasks" placeholder="ค้นหางาน, วิชา, รายละเอียด..." onkeyup="renderTasks()">
-                </div>
-                <div id="task-grid" class="task-list-container">
-                    </div>
-            </div>
-
-            <div id="view-calendar" class="app-view hidden">
-                <div class="card">
-                    <div class="flex justify-between items-center" style="margin-bottom: 1rem;">
-                        <button class="btn btn-sm btn-ghost" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                        <h3 id="calendar-month-year" style="margin: 0;"></h3>
-                        <button class="btn btn-sm btn-ghost" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
-                    </div>
-                    <div class="calendar-grid" id="calendar-body">
-                        </div>
-                </div>
-            </div>
-
-            <div id="view-settings" class="app-view hidden">
-                <div class="card" style="max-width: 600px;">
-                    <h3><i class="fa-solid fa-user-gear"></i> การตั้งค่าโปรไฟล์</h3>
-                    <div style="margin: 1.5rem 0;">
-                        <label>ชื่อที่แสดง</label>
-                        <input type="text" id="setting-name" placeholder="ชื่อเล่นของคุณ">
-                    </div>
-                    <div style="margin-bottom: 1.5rem;">
-                        <label>URL รูปโปรไฟล์ (Link รูปภาพ)</label>
-                        <input type="text" id="setting-avatar" placeholder="https://example.com/me.jpg">
-                    </div>
-                    <button class="btn btn-primary" onclick="saveProfile()">บันทึกข้อมูล</button>
-                    
-                    <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border);">
-                    
-                    <h3><i class="fa-solid fa-moon"></i> การแสดงผล</h3>
-                    <div class="flex items-center justify-between" style="margin-top: 1rem;">
-                        <span>Dark Mode (โหมดมืด)</span>
-                        <button class="btn btn-sm" id="theme-toggle" onclick="toggleTheme()">เปิดใช้งาน</button>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 
     <div class="modal-overlay" id="task-modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
-                <h3 style="margin: 0;" id="modal-title">เพิ่มงานใหม่</h3>
-                <button class="btn btn-ghost" onclick="closeModal('task-modal')"><i class="fa-solid fa-xmark"></i></button>
+        <div class="modal-box">
+            <h3 style="margin-top: 0;">รายละเอียดงาน</h3>
+            <input type="hidden" id="t-id">
+            
+            <label>วิชา</label>
+            <input type="text" id="t-subject" placeholder="เช่น คณิตศาสตร์">
+            
+            <label>รายละเอียด</label>
+            <textarea id="t-content" rows="3"></textarea>
+            
+            <div class="flex gap-2">
+                <div class="w-full">
+                    <label>กำหนดส่ง</label>
+                    <input type="date" id="t-date">
+                </div>
+                <div class="w-full">
+                    <label>ความสำคัญ</label>
+                    <select id="t-priority">
+                        <option value="low">ปกติ</option>
+                        <option value="medium" selected>ปานกลาง</option>
+                        <option value="high">ด่วนมาก</option>
+                    </select>
+                </div>
             </div>
+
+            <label>งานย่อย (Subtasks)</label>
+            <div class="flex gap-2">
+                <input type="text" id="t-sub-input" placeholder="เพิ่มรายการ..." onkeypress="if(event.key==='Enter') addSubtask()">
+                <button class="btn btn-primary" style="margin-bottom: 10px;" onclick="addSubtask()">+</button>
+            </div>
+            <div id="subtask-preview" style="margin-bottom: 15px;"></div>
+
+            <div class="flex justify-between" style="margin-top: 20px;">
+                <button class="btn btn-danger hidden" id="btn-delete" onclick="deleteTask()">ลบงาน</button>
+                <div class="flex gap-2" style="margin-left: auto;">
+                    <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+                    <button class="btn btn-primary" onclick="saveTask()">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-box" style="text-align: center;">
+            <h3>ตั้งค่าโปรไฟล์</h3>
+            <img src="" id="p-avatar-preview" class="avatar" style="width: 80px; height: 80px; margin: 10px auto; display: block;">
             
-            <input type="hidden" id="task-id">
+            <label style="text-align: left; display: block;">ชื่อที่แสดง</label>
+            <input type="text" id="p-name">
             
-            <div class="flex flex-col gap-4">
-                <div>
-                    <label class="text-sm font-bold">วิชา / หัวข้อ</label>
-                    <input type="text" id="inp-subject" placeholder="เช่น คณิตศาสตร์, ภาษาอังกฤษ">
-                </div>
-                
-                <div class="flex gap-4">
-                    <div class="w-full">
-                        <label class="text-sm font-bold">กำหนดส่ง</label>
-                        <input type="date" id="inp-date">
-                    </div>
-                    <div class="w-full">
-                        <label class="text-sm font-bold">ความสำคัญ</label>
-                        <select id="inp-priority">
-                            <option value="low">ปกติ (สีเขียว)</option>
-                            <option value="medium" selected>ปานกลาง (สีเหลือง)</option>
-                            <option value="high">ด่วนมาก (สีแดง)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-sm font-bold">รายละเอียดงาน</label>
-                    <textarea id="inp-content" rows="4" placeholder="รายละเอียด..."></textarea>
-                </div>
-
-                <div>
-                    <label class="text-sm font-bold">งานย่อย (Subtasks)</label>
-                    <div class="flex gap-2" style="margin-bottom: 10px;">
-                        <input type="text" id="inp-subtask" placeholder="เพิ่มรายการย่อย..." onkeypress="if(event.key==='Enter') addSubtaskToUI()">
-                        <button class="btn btn-sm btn-primary" onclick="addSubtaskToUI()">เพิ่ม</button>
-                    </div>
-                    <div id="subtask-list-ui" style="background: var(--bg-body); padding: 10px; border-radius: 8px;">
-                        </div>
-                </div>
-
-                <div class="flex justify-between" style="margin-top: 1rem;">
-                    <button class="btn btn-danger hidden" id="btn-delete-task" onclick="deleteTask()">ลบงานนี้</button>
-                    <div class="flex gap-2" style="margin-left: auto;">
-                        <button class="btn btn-ghost" onclick="closeModal('task-modal')">ยกเลิก</button>
-                        <button class="btn btn-primary" onclick="saveTask()">บันทึก</button>
-                    </div>
-                </div>
+            <label style="text-align: left; display: block;">ลิงก์รูปภาพ (URL)</label>
+            <input type="text" id="p-photo" placeholder="https://..." oninput="document.getElementById('p-avatar-preview').src = this.value || 'https://ui-avatars.com/api/?name=User'">
+            
+            <div class="flex gap-2" style="margin-top: 20px; justify-content: center;">
+                <button class="btn btn-ghost" onclick="document.getElementById('profile-modal').classList.remove('active')">ปิด</button>
+                <button class="btn btn-primary" onclick="saveProfile()">บันทึก</button>
             </div>
         </div>
     </div>
@@ -388,7 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // --- A. CONFIGURATION ---
+        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
             authDomain: "chat-27f96.firebaseapp.com",
@@ -403,22 +242,19 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Global State
         let currentUser = null;
         let tasks = [];
-        let currentSubtasks = []; // temp holder for modal
         let currentFilter = 'all';
-        let calendarDate = new Date();
-        let myCharts = {};
+        let tempSubtasks = [];
 
-        // --- B. AUTHENTICATION SYSTEM ---
+        // --- AUTH ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-layout').classList.remove('hidden');
-                loadUserData();
-                initDataListener();
+                updateProfileUI();
+                loadTasks();
             } else {
                 currentUser = null;
                 document.getElementById('auth-screen').classList.remove('hidden');
@@ -426,425 +262,224 @@
             }
         });
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleAuthAction('login');
-        });
+        async function handleLogin() {
+            const e = document.getElementById('auth-email').value;
+            const p = document.getElementById('auth-pass').value;
+            try { await auth.signInWithEmailAndPassword(e, p); } 
+            catch (err) { Swal.fire('Error', err.message, 'error'); }
+        }
 
-        async function handleAuthAction(type) {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-
-            try {
-                if (type === 'signup') {
-                    await auth.createUserWithEmailAndPassword(email, pass);
-                    Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย', 'success');
-                } else {
-                    await auth.signInWithEmailAndPassword(email, pass);
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                    Toast.fire({ icon: 'success', title: 'ยินดีต้อนรับกลับ!' });
-                }
-            } catch (error) {
-                Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
-            }
+        async function handleSignup() {
+            const e = document.getElementById('auth-email').value;
+            const p = document.getElementById('auth-pass').value;
+            try { 
+                await auth.createUserWithEmailAndPassword(e, p);
+                Swal.fire('สำเร็จ', 'สมัครสมาชิกแล้ว', 'success');
+            } catch (err) { Swal.fire('Error', err.message, 'error'); }
         }
 
         function logout() {
             Swal.fire({
-                title: 'ออกจากระบบ?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'ยืนยัน'
-            }).then((result) => {
-                if(result.isConfirmed) auth.signOut();
-            });
+                title: 'ออกจากระบบ?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ใช่'
+            }).then((r) => { if(r.isConfirmed) auth.signOut(); });
         }
 
-        // --- C. DATA HANDLING (FIRESTORE) ---
-        function initDataListener() {
+        // --- PROFILE ---
+        function updateProfileUI() {
+            const name = currentUser.displayName || currentUser.email.split('@')[0];
+            // Fix: ใช้ UI Avatars ถ้าไม่มีรูป
+            const photo = currentUser.photoURL || `https://ui-avatars.com/api/?name=${name}&background=random`;
+            
+            document.getElementById('user-name').innerText = name;
+            document.getElementById('user-avatar').src = photo;
+            
+            // Set modal values
+            document.getElementById('p-name').value = name;
+            document.getElementById('p-photo').value = currentUser.photoURL || '';
+            document.getElementById('p-avatar-preview').src = photo;
+        }
+
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.add('active');
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('p-name').value;
+            const photo = document.getElementById('p-photo').value;
+            
+            try {
+                await currentUser.updateProfile({ displayName: name, photoURL: photo });
+                updateProfileUI();
+                document.getElementById('profile-modal').classList.remove('active');
+                Swal.fire('บันทึก', 'อัปเดตข้อมูลแล้ว', 'success');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        }
+
+        // --- TASKS LOGIC ---
+        function loadTasks() {
             db.collection('homeworks').doc(currentUser.uid).collection('items')
-                .orderBy('dueDate', 'asc')
-                .onSnapshot(snapshot => {
-                    tasks = [];
-                    snapshot.forEach(doc => {
-                        tasks.push({ id: doc.id, ...doc.data() });
-                    });
-                    updateDashboard();
-                    renderTasks();
-                    renderCalendar();
-                });
+              .orderBy('dueDate', 'asc')
+              .onSnapshot(snapshot => {
+                  tasks = [];
+                  snapshot.forEach(doc => tasks.push({ id: doc.id, ...doc.data() }));
+                  renderTasks();
+              });
         }
 
-        function loadUserData() {
-            // Load Profile settings if exist
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                if(doc.exists) {
-                    const data = doc.data();
-                    updateProfileUI(data.displayName, data.avatarUrl);
-                    if(data.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
-                } else {
-                    updateProfileUI(currentUser.email.split('@')[0], null);
-                }
-            });
-        }
-
-        // --- D. UI RENDERING & LOGIC ---
-
-        // Router
-        function router(viewName) {
-            // Hide all views
-            document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            
-            // Show selected view
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            
-            // Update Active Menu
-            const menuMap = { 'dashboard': 0, 'tasks': 1, 'calendar': 2, 'settings': 3 };
-            document.querySelectorAll('.nav-link')[menuMap[viewName]].classList.add('active');
-
-            // Update Header Title
-            const titles = {
-                'dashboard': 'ภาพรวมวันนี้',
-                'tasks': 'งานและการบ้าน',
-                'calendar': 'ปฏิทินการส่งงาน',
-                'settings': 'ตั้งค่าระบบ'
-            };
-            document.getElementById('page-header-title').innerText = titles[viewName];
-
-            // Specific View Logic
-            if(viewName === 'dashboard') updateDashboard();
-            if(viewName === 'calendar') renderCalendar();
-        }
-
-        // Dashboard & Charts
-        function updateDashboard() {
-            // Stats
-            const total = tasks.length;
-            const completed = tasks.filter(t => t.isCompleted).length;
-            const pending = total - completed;
-            
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-completed').innerText = completed;
-            document.getElementById('stat-pending').innerText = pending;
-
-            // Chart Data Prep
-            const subjects = {};
-            tasks.forEach(t => { subjects[t.subject] = (subjects[t.subject] || 0) + 1; });
-            
-            // Render Charts (using Chart.js)
-            renderCharts(subjects);
-        }
-
-        function renderCharts(subjectData) {
-            // Destroy old charts if exist
-            if(myCharts.bar) myCharts.bar.destroy();
-            if(myCharts.pie) myCharts.pie.destroy();
-
-            // 1. Bar Chart (Next 7 Days Load)
-            const days = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
-            const next7Days = Array.from({length: 7}, (_, i) => {
-                const d = new Date(); d.setDate(d.getDate() + i);
-                return { label: days[d.getDay()], date: d.toISOString().split('T')[0], count: 0 };
-            });
-
-            tasks.forEach(t => {
-                if(!t.isCompleted) {
-                    const found = next7Days.find(d => d.date === t.dueDate);
-                    if(found) found.count++;
-                }
-            });
-
-            const ctxBar = document.getElementById('barChart').getContext('2d');
-            myCharts.bar = new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels: next7Days.map(d => d.label),
-                    datasets: [{ label: 'งานที่ต้องส่ง', data: next7Days.map(d => d.count), backgroundColor: '#4f46e5', borderRadius: 5 }]
-                },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-            });
-
-            // 2. Pie Chart (Subjects)
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
-            myCharts.pie = new Chart(ctxPie, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(subjectData),
-                    datasets: [{ data: Object.values(subjectData), backgroundColor: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#6366f1', '#8b5cf6'] }]
-                },
-                options: { responsive: true }
-            });
-        }
-
-        // Task List Logic
-        function filterTasks(type, el) {
-            currentFilter = type;
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        function switchView(view, el) {
+            currentFilter = view;
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
+            
+            const titles = { 'all': 'งานทั้งหมด', 'pending': 'งานค้างส่ง', 'completed': 'ทำเสร็จแล้ว' };
+            document.getElementById('page-title').innerText = titles[view];
             renderTasks();
         }
 
         function renderTasks() {
-            const grid = document.getElementById('task-grid');
-            const search = document.getElementById('search-tasks').value.toLowerCase();
-            grid.innerHTML = '';
+            const container = document.getElementById('task-container');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            container.innerHTML = '';
 
             const filtered = tasks.filter(t => {
                 const matchSearch = t.subject.toLowerCase().includes(search) || t.content.toLowerCase().includes(search);
-                let matchFilter = true;
-                if(currentFilter === 'pending') matchFilter = !t.isCompleted;
-                if(currentFilter === 'completed') matchFilter = t.isCompleted;
-                if(currentFilter === 'high') matchFilter = t.priority === 'high';
-                return matchSearch && matchFilter;
+                let matchType = true;
+                if (currentFilter === 'pending') matchType = !t.isCompleted;
+                if (currentFilter === 'completed') matchType = t.isCompleted;
+                return matchSearch && matchType;
             });
 
+            if(filtered.length === 0) {
+                container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #999; margin-top: 50px;">ไม่มีรายการงานในหน้านี้</p>`;
+                return;
+            }
+
             filtered.forEach(t => {
-                // Calculate progress
-                const totalSub = t.subtasks ? t.subtasks.length : 0;
-                const doneSub = t.subtasks ? t.subtasks.filter(s => s.done).length : 0;
-                const progress = totalSub === 0 ? (t.isCompleted ? 100 : 0) : (doneSub / totalSub) * 100;
+                const subCount = t.subtasks ? t.subtasks.length : 0;
+                const date = new Date(t.dueDate);
+                const isLate = !t.isCompleted && new Date() > date;
+                const dateStr = date.toLocaleDateString('th-TH');
+                
+                let statusBadge = t.isCompleted 
+                    ? `<span class="task-status status-done">เสร็จแล้ว</span>` 
+                    : (isLate ? `<span class="task-status status-late">เกินกำหนด</span>` : `<span class="task-status">รอส่ง</span>`);
 
-                const diffDays = Math.ceil((new Date(t.dueDate) - new Date().setHours(0,0,0,0)) / (86400000));
-                let badge = diffDays < 0 ? '<span class="text-danger">เกินกำหนด</span>' : `อีก ${diffDays} วัน`;
-                if(t.isCompleted) badge = '<span class="text-success">เสร็จแล้ว</span>';
-
-                const card = document.createElement('div');
-                card.className = `card task-card priority-${t.priority}`;
-                card.onclick = (e) => { if(!e.target.closest('button')) openTaskModal(t.id); };
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold" style="background:var(--bg-body); padding:2px 8px; borderRadius:4px;">${t.subject}</span>
-                        <span class="text-xs font-bold">${badge}</span>
+                const div = document.createElement('div');
+                div.className = `task-card p-${t.priority}`;
+                div.onclick = (e) => { if(!e.target.closest('button')) openModal(t.id); };
+                
+                div.innerHTML = `
+                    <div class="task-header">
+                        <span class="task-subject">${t.subject}</span>
+                        ${statusBadge}
                     </div>
-                    <h4 style="margin: 10px 0;">${t.content}</h4>
-                    
-                    ${totalSub > 0 ? `<div class="text-xs text-muted mb-1">งานย่อย ${doneSub}/${totalSub}</div>` : ''}
-                    <div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>
-                    
-                    <div class="flex justify-between items-center" style="margin-top: 15px;">
-                        <span class="text-xs text-muted"><i class="fa-regular fa-clock"></i> ${new Date(t.dueDate).toLocaleDateString('th-TH')}</span>
-                        <button class="btn btn-sm ${t.isCompleted ? 'btn-ghost' : 'btn-primary'}" onclick="event.stopPropagation(); toggleComplete('${t.id}', ${t.isCompleted})">
-                            ${t.isCompleted ? '<i class="fa-solid fa-rotate-left"></i>' : '<i class="fa-solid fa-check"></i>'}
+                    <div style="font-size: 0.9rem; color: #4b5563; margin-bottom: 10px;">${t.content || '-'}</div>
+                    <div style="font-size: 0.8rem; color: #6b7280; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-regular fa-clock"></i> ${dateStr}</span>
+                        ${subCount > 0 ? `<span><i class="fa-solid fa-list-check"></i> งานย่อย ${subCount}</span>` : ''}
+                    </div>
+                    <div style="margin-top: 15px; text-align: right;">
+                        <button class="btn btn-ghost" style="padding: 5px 10px;" onclick="event.stopPropagation(); toggleStatus('${t.id}', ${t.isCompleted})">
+                            ${t.isCompleted ? '<i class="fa-solid fa-rotate-left"></i> ทำใหม่' : '<i class="fa-solid fa-check"></i> เสร็จสิ้น'}
                         </button>
                     </div>
                 `;
-                grid.appendChild(card);
+                container.appendChild(div);
             });
         }
 
-        // Calendar Logic
-        function renderCalendar() {
-            const body = document.getElementById('calendar-body');
-            const monthLabel = document.getElementById('calendar-month-year');
-            body.innerHTML = '';
-            
-            // Header (Days)
-            ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'].forEach(d => {
-                body.innerHTML += `<div class="calendar-day-header">${d}</div>`;
-            });
-
-            const year = calendarDate.getFullYear();
-            const month = calendarDate.getMonth();
-            monthLabel.innerText = calendarDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            // Empty slots
-            for(let i=0; i<firstDay; i++) body.innerHTML += `<div></div>`;
-
-            // Days
-            const todayStr = new Date().toISOString().split('T')[0];
-            for(let i=1; i<=daysInMonth; i++) {
-                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                const isToday = dateStr === todayStr ? 'today' : '';
-                
-                // Find events
-                const dayTasks = tasks.filter(t => t.dueDate === dateStr);
-                let eventsHTML = '';
-                dayTasks.forEach(t => {
-                    const color = t.isCompleted ? '#10b981' : (t.priority === 'high' ? '#ef4444' : '#4f46e5');
-                    eventsHTML += `<div class="cal-event" style="background:${color}" onclick="openTaskModal('${t.id}')">${t.subject}</div>`;
-                });
-
-                body.innerHTML += `
-                    <div class="calendar-day ${isToday}">
-                        <span class="day-number">${i}</span>
-                        ${eventsHTML}
-                    </div>
-                `;
-            }
-        }
-        function changeMonth(dir) {
-            calendarDate.setMonth(calendarDate.getMonth() + dir);
-            renderCalendar();
-        }
-
-        // --- E. MODAL & TASK MANAGEMENT ---
-        function openTaskModal(id = null) {
+        // --- MODAL & DATA ACTIONS ---
+        function openModal(id = null) {
             const modal = document.getElementById('task-modal');
             modal.classList.add('active');
             
             if(id) {
-                // Edit Mode
                 const t = tasks.find(x => x.id === id);
-                document.getElementById('modal-title').innerText = 'แก้ไขรายละเอียด';
-                document.getElementById('task-id').value = id;
-                document.getElementById('inp-subject').value = t.subject;
-                document.getElementById('inp-date').value = t.dueDate;
-                document.getElementById('inp-priority').value = t.priority;
-                document.getElementById('inp-content').value = t.content;
-                document.getElementById('btn-delete-task').classList.remove('hidden');
-                currentSubtasks = t.subtasks || [];
+                document.getElementById('t-id').value = id;
+                document.getElementById('t-subject').value = t.subject;
+                document.getElementById('t-content').value = t.content;
+                document.getElementById('t-date').value = t.dueDate;
+                document.getElementById('t-priority').value = t.priority;
+                document.getElementById('btn-delete').classList.remove('hidden');
+                tempSubtasks = t.subtasks || [];
             } else {
-                // New Mode
-                document.getElementById('modal-title').innerText = 'เพิ่มงานใหม่';
-                document.getElementById('task-id').value = '';
-                document.getElementById('inp-subject').value = '';
-                document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
-                document.getElementById('inp-priority').value = 'medium';
-                document.getElementById('inp-content').value = '';
-                document.getElementById('btn-delete-task').classList.add('hidden');
-                currentSubtasks = [];
+                document.getElementById('t-id').value = '';
+                document.getElementById('t-subject').value = '';
+                document.getElementById('t-content').value = '';
+                document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
+                document.getElementById('t-priority').value = 'medium';
+                document.getElementById('btn-delete').classList.add('hidden');
+                tempSubtasks = [];
             }
-            renderSubtasksUI();
+            renderSubtasks();
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+        function closeModal() {
+            document.getElementById('task-modal').classList.remove('active');
         }
 
-        // Subtasks Logic
-        function addSubtaskToUI() {
-            const txt = document.getElementById('inp-subtask').value.trim();
-            if(!txt) return;
-            currentSubtasks.push({ title: txt, done: false });
-            document.getElementById('inp-subtask').value = '';
-            renderSubtasksUI();
+        function addSubtask() {
+            const val = document.getElementById('t-sub-input').value;
+            if(val) {
+                tempSubtasks.push({ text: val, done: false });
+                document.getElementById('t-sub-input').value = '';
+                renderSubtasks();
+            }
         }
-        function toggleSubtaskUI(index) {
-            currentSubtasks[index].done = !currentSubtasks[index].done;
-            renderSubtasksUI();
-        }
-        function deleteSubtaskUI(index) {
-            currentSubtasks.splice(index, 1);
-            renderSubtasksUI();
-        }
-        function renderSubtasksUI() {
-            const con = document.getElementById('subtask-list-ui');
-            con.innerHTML = '';
-            currentSubtasks.forEach((s, i) => {
-                con.innerHTML += `
-                    <div class="subtask-item ${s.done ? 'done' : ''}">
-                        <input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSubtaskUI(${i})">
-                        <span class="flex-1 text-sm">${s.title}</span>
-                        <i class="fa-solid fa-times text-muted cursor-pointer" onclick="deleteSubtaskUI(${i})"></i>
-                    </div>
-                `;
+
+        function renderSubtasks() {
+            const div = document.getElementById('subtask-preview');
+            div.innerHTML = '';
+            tempSubtasks.forEach((s, i) => {
+                div.innerHTML += `<div class="subtask-item">
+                    <i class="fa-solid fa-circle-dot"></i> ${s.text} 
+                    <span style="color: red; cursor: pointer; margin-left: auto;" onclick="tempSubtasks.splice(${i},1); renderSubtasks()">x</span>
+                </div>`;
             });
         }
 
-        // Save Task
         async function saveTask() {
-            const id = document.getElementById('task-id').value;
+            const id = document.getElementById('t-id').value;
             const data = {
-                subject: document.getElementById('inp-subject').value,
-                dueDate: document.getElementById('inp-date').value,
-                priority: document.getElementById('inp-priority').value,
-                content: document.getElementById('inp-content').value,
-                subtasks: currentSubtasks,
+                subject: document.getElementById('t-subject').value,
+                content: document.getElementById('t-content').value,
+                dueDate: document.getElementById('t-date').value,
+                priority: document.getElementById('t-priority').value,
+                subtasks: tempSubtasks,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            if(!data.subject || !data.dueDate) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกวิชาและวันที่', 'warning');
+            if(!data.subject) return Swal.fire('แจ้งเตือน', 'กรุณากรอกชื่อวิชา', 'warning');
 
             const ref = db.collection('homeworks').doc(currentUser.uid).collection('items');
-            
             try {
                 if(id) {
                     await ref.doc(id).update(data);
-                    Swal.fire('สำเร็จ', 'อัปเดตข้อมูลแล้ว', 'success');
                 } else {
                     data.isCompleted = false;
                     data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                     await ref.add(data);
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                    Toast.fire({ icon: 'success', title: 'เพิ่มงานใหม่แล้ว' });
                 }
-                closeModal('task-modal');
-            } catch (err) { Swal.fire('Error', err.message, 'error'); }
+                closeModal();
+                Swal.fire({ icon: 'success', title: 'บันทึกเรียบร้อย', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
         }
 
-        async function toggleComplete(id, status) {
-            await db.collection('homeworks').doc(currentUser.uid).collection('items').doc(id).update({ isCompleted: !status });
+        async function toggleStatus(id, current) {
+            await db.collection('homeworks').doc(currentUser.uid).collection('items').doc(id).update({ isCompleted: !current });
         }
 
         async function deleteTask() {
-            const id = document.getElementById('task-id').value;
-            Swal.fire({
-                title: 'ลบงานนี้?', text: 'ไม่สามารถกู้คืนได้', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'
-            }).then(async (r) => {
+            const id = document.getElementById('t-id').value;
+            Swal.fire({ title: 'ลบงานนี้?', showCancelButton: true, confirmButtonText: 'ลบ', confirmButtonColor: '#dc2626' })
+            .then(async (r) => {
                 if(r.isConfirmed) {
                     await db.collection('homeworks').doc(currentUser.uid).collection('items').doc(id).delete();
-                    closeModal('task-modal');
+                    closeModal();
                     Swal.fire('ลบแล้ว', '', 'success');
                 }
             });
         }
-
-        // --- F. SETTINGS & PROFILE ---
-        function updateProfileUI(name, avatar) {
-            document.getElementById('sidebar-name').innerText = name || 'User';
-            document.getElementById('setting-name').value = name || '';
-            document.getElementById('setting-avatar').value = avatar || '';
-            
-            const avDiv = document.getElementById('sidebar-avatar');
-            if(avatar) {
-                avDiv.innerHTML = `<img src="${avatar}" alt="user">`;
-            } else {
-                avDiv.innerText = (name || 'U').charAt(0).toUpperCase();
-            }
-        }
-
-        async function saveProfile() {
-            const name = document.getElementById('setting-name').value;
-            const avatar = document.getElementById('setting-avatar').value;
-            
-            await db.collection('users').doc(currentUser.uid).set({
-                displayName: name,
-                avatarUrl: avatar,
-                theme: document.body.getAttribute('data-theme')
-            }, { merge: true });
-            
-            updateProfileUI(name, avatar);
-            Swal.fire('บันทึก', 'อัปเดตโปรไฟล์เรียบร้อย', 'success');
-        }
-
-        function toggleTheme() {
-            const isDark = document.body.getAttribute('data-theme') === 'dark';
-            if(isDark) {
-                document.body.removeAttribute('data-theme');
-                document.getElementById('theme-toggle').innerText = 'เปิดใช้งาน';
-            } else {
-                document.body.setAttribute('data-theme', 'dark');
-                document.getElementById('theme-toggle').innerText = 'ปิดใช้งาน';
-            }
-            saveProfile(); // save preference
-        }
-
-        // Mobile Menu Toggle
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            document.getElementById('main-sidebar').classList.toggle('mobile-active');
-        });
-        document.addEventListener('click', (e) => {
-            const sb = document.getElementById('main-sidebar');
-            const btn = document.getElementById('mobile-menu-btn');
-            if(window.innerWidth <= 768 && !sb.contains(e.target) && !btn.contains(e.target)) {
-                sb.classList.remove('mobile-active');
-            }
-        });
-
     </script>
 </body>
 </html>
