@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallet Pro | กระเป๋าเงินออนไลน์</title>
+    <title>My Wallet | ฝาก-ถอน</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,225 +11,210 @@
 
     <style>
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a0ca3;
-            --accent: #4cc9f0;
-            --success: #2ec4b6;
-            --danger: #e63946;
-            --bg-body: #f8f9fa;
-            --card-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            --primary: #00b894;
+            --secondary: #636e72;
+            --bg-body: #f1f2f6;
+            --card-bg: #ffffff;
+            --nav-height: 70px;
+            --fb-color: #1877F2;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg-body); margin: 0; padding-bottom: 80px; min-height: 100vh; color: #2b2d42; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg-body); margin: 0; min-height: 100vh; padding-bottom: 20px; }
 
         .hidden { display: none !important; }
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-
-        /* Auth Screen */
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
-        .auth-logo { width: 80px; height: 80px; background: var(--primary); border-radius: 20px; display: flex; justify-content: center; align-items: center; color: white; font-size: 2.5rem; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(67, 97, 238, 0.4); }
-        .input-group { width: 100%; margin-bottom: 15px; }
-        input { width: 100%; padding: 15px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 1rem; transition: 0.3s; background: #f8f9fa; font-family: inherit; }
-        input:focus { border-color: var(--primary); background: white; }
-
+        
         /* Buttons */
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-ghost { background: transparent; color: #8d99ae; }
+        .btn { padding: 12px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; font-size: 1rem; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3); }
+        .btn-danger { background: #ff7675; color: white; }
+        .btn-fb { background: var(--fb-color); color: white; box-shadow: 0 4px 10px rgba(24, 119, 242, 0.3); }
+        .btn-ghost { background: transparent; color: var(--secondary); }
+        .btn:active { transform: scale(0.98); }
+
+        input, textarea { width: 100%; padding: 14px; border: 2px solid #dfe6e9; border-radius: 12px; margin-bottom: 15px; font-size: 1rem; font-family: inherit; }
+        
+        /* Auth */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .auth-box { width: 100%; max-width: 400px; text-align: center; }
 
         /* Navbar */
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; margin-bottom: 10px; }
-        .user-profile { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; height: var(--nav-height); background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .brand { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+        .profile-pic { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); }
+
+        /* Container */
+        .container { margin-top: var(--nav-height); padding: 20px; max-width: 600px; margin-left: auto; margin-right: auto; }
 
         /* Wallet Card */
         .wallet-card { 
-            background: linear-gradient(135deg, #4361ee, #f72585); 
-            color: white; padding: 25px; border-radius: 24px; 
-            box-shadow: 0 15px 30px rgba(67, 97, 238, 0.4); margin-bottom: 25px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, #00b894 0%, #0984e3 100%); 
+            color: white; padding: 30px; border-radius: 24px; text-align: center; 
+            box-shadow: 0 10px 20px rgba(9, 132, 227, 0.3); margin-bottom: 25px; position: relative; overflow: hidden;
         }
-        .wallet-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-        .balance-title { font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px; }
-        .balance-val { font-size: 2.8rem; font-weight: 800; line-height: 1; }
-        .balance-unit { font-size: 1rem; font-weight: 500; }
+        .balance-amount { font-size: 3rem; font-weight: 800; margin: 5px 0; }
 
-        /* Actions Grid */
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .action-card { background: white; padding: 20px; border-radius: 18px; text-align: center; box-shadow: var(--card-shadow); cursor: pointer; transition: 0.2s; border: 1px solid white; }
-        .action-card:active { transform: scale(0.96); }
-        .action-icon { width: 50px; height: 50px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; margin: 0 auto 10px auto; }
-        .icon-dep { background: #e0fbfc; color: #00b4d8; }
-        .icon-wit { background: #ffccd5; color: #ff006e; }
+        /* Actions */
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .action-btn { background: white; padding: 20px; border-radius: 16px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.2s; }
+        .action-btn:active { transform: scale(0.95); }
+        .action-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+
+        /* Contact Button */
+        .contact-section { background: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
 
         /* History */
-        .section-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .tx-list { background: white; border-radius: 20px; padding: 10px; box-shadow: var(--card-shadow); }
-        .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f3f5; }
+        .tx-list { background: white; border-radius: 16px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f2f6; }
         .tx-item:last-child { border-bottom: none; }
-        .tx-left { display: flex; align-items: center; gap: 12px; }
-        .tx-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; }
-        .tx-status { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; margin-top: 2px; display: inline-block; }
-        
-        .st-pending { background: #fff3cd; color: #856404; }
-        .st-approved { background: #d1e7dd; color: #0f5132; }
-        .st-rejected { background: #f8d7da; color: #842029; }
+        .status { font-size: 0.75rem; padding: 3px 8px; border-radius: 10px; }
+        .st-pending { background: #ffeaa7; color: #d35400; }
+        .st-approved { background: #55efc4; color: #006266; }
+        .st-rejected { background: #fab1a0; color: #c0392b; }
+
+        /* Support Chat */
+        .chat-box { background: white; border-radius: 16px; padding: 20px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .chat-item { background: #f1f2f6; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 0.9rem; }
+        .chat-admin { background: #e0fbfc; border-left: 4px solid #00b894; }
 
         /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; display: none; justify-content: center; align-items: end; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; display: none; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal-sheet { background: white; width: 100%; max-width: 500px; padding: 30px 20px; border-radius: 24px 24px 0 0; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .bank-info { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px dashed #adb5bd; text-align: center; }
-        .bank-acc { font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: var(--primary); display: block; margin: 5px 0; }
-        .copy-btn { font-size: 0.8rem; color: #6c757d; cursor: pointer; text-decoration: underline; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 20px; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <div class="auth-logo"><i class="fa-solid fa-wallet"></i></div>
-        <h2 style="margin: 0 0 5px 0;">ยินดีต้อนรับ</h2>
-        <p style="color: #8d99ae; margin-bottom: 30px;">เข้าสู่ระบบกระเป๋าเงินของคุณ</p>
-        
-        <div class="input-group">
+        <div class="auth-box">
+            <i class="fa-solid fa-wallet" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 20px;">My Wallet</h2>
             <input type="text" id="auth-input" placeholder="ชื่อผู้ใช้ หรือ อีเมล">
-        </div>
-        <div class="input-group">
             <input type="password" id="auth-pass" placeholder="รหัสผ่าน">
+            <button class="btn btn-primary" onclick="authAction('login')">เข้าสู่ระบบ</button>
+            <button class="btn btn-ghost" onclick="authAction('signup')" style="margin-top:10px;">สมัครสมาชิก</button>
         </div>
-        
-        <button class="btn btn-primary" onclick="authAction('login')">เข้าสู่ระบบ</button>
-        <button class="btn btn-ghost" onclick="authAction('signup')" style="margin-top: 10px;">สมัครสมาชิกใหม่</button>
     </div>
+
+    <nav class="navbar hidden" id="main-nav">
+        <div class="brand">Wallet</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img src="" id="nav-avatar" class="profile-pic">
+            <i class="fa-solid fa-right-from-bracket" style="color:#ff7675; cursor:pointer; font-size:1.2rem;" onclick="logout()"></i>
+        </div>
+    </nav>
 
     <div id="app-container" class="container hidden">
         
-        <div class="navbar">
-            <div class="user-profile">
-                <img src="" id="user-avatar" class="avatar">
-                <div>
-                    <div style="font-size: 0.8rem; color: #8d99ae;">สวัสดี,</div>
-                    <div style="font-weight: 700;" id="user-name">Loading...</div>
-                </div>
-            </div>
-            <button onclick="logout()" style="background: white; border: none; width: 40px; height: 40px; border-radius: 10px; box-shadow: var(--card-shadow); color: var(--danger); cursor: pointer;"><i class="fa-solid fa-power-off"></i></button>
-        </div>
-
         <div class="wallet-card">
-            <div class="balance-title">ยอดเงินคงเหลือ</div>
-            <div>
-                <span class="balance-val" id="user-balance">0.00</span> 
-                <span class="balance-unit">฿</span>
+            <div>ยอดเงินคงเหลือ</div>
+            <div class="balance-amount"><span id="u-bal">0.00</span> ฿</div>
+            <div id="u-name" style="opacity:0.8;">User</div>
+        </div>
+
+        <div class="actions-grid">
+            <div class="action-btn" onclick="openModal('dep')">
+                <i class="fa-solid fa-circle-arrow-down action-icon" style="color:#00b894;"></i>
+                <div>เติมเงิน</div>
             </div>
-            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">
-                <i class="fa-solid fa-shield-halved"></i> Protected
+            <div class="action-btn" onclick="openModal('wit')">
+                <i class="fa-solid fa-circle-arrow-up action-icon" style="color:#d63031;"></i>
+                <div>ถอนเงิน</div>
             </div>
         </div>
 
-        <div class="actions">
-            <div class="action-card" onclick="openModal('dep')">
-                <div class="action-icon icon-dep"><i class="fa-solid fa-arrow-down"></i></div>
-                <div style="font-weight: 600;">เติมเงิน</div>
-            </div>
-            <div class="action-card" onclick="openModal('wit')">
-                <div class="action-icon icon-wit"><i class="fa-solid fa-arrow-up"></i></div>
-                <div style="font-weight: 600;">ถอนเงิน</div>
-            </div>
+        <div class="contact-section">
+            <h3 style="margin-top:0;">ติดต่อแอดมิน / ส่งสลิป</h3>
+            <p style="font-size:0.9rem; color:#636e72;">หากต้องการส่งสลิป หรือมีปัญหาการใช้งาน</p>
+            <button class="btn btn-fb" onclick="openFacebook()">
+                <i class="fa-brands fa-facebook-messenger"></i> แชทผ่าน Messenger
+            </button>
+            <button class="btn btn-ghost" onclick="openModal('support')" style="margin-top:10px; border:1px solid #dfe6e9;">
+                <i class="fa-solid fa-comment-dots"></i> แชทในเว็บ (Support)
+            </button>
         </div>
 
-        <div class="section-title">
-            <span>ประวัติล่าสุด</span>
-            <i class="fa-regular fa-clock" style="font-size: 0.9rem; color: #adb5bd;"></i>
-        </div>
+        <h3 style="margin-bottom:15px;">ประวัติล่าสุด</h3>
         <div id="tx-list" class="tx-list">
-            <div style="text-align: center; padding: 20px; color: #adb5bd;">กำลังโหลด...</div>
+            <div style="text-align:center; color:#b2bec3;">กำลังโหลด...</div>
         </div>
 
     </div>
 
     <div id="dep-modal" class="modal-overlay">
-        <div class="modal-sheet">
-            <h2 style="margin-top: 0;">เติมเงิน</h2>
-            
-            <div class="bank-info">
-                <div>ธนาคารกสิกรไทย (KBank)</div>
-                <div class="bank-acc" id="bank-acc-num">012-3-45678-9</div>
-                <div class="copy-btn" onclick="copyBank()">กดเพื่อคัดลอกเลขบัญชี</div>
-                <div style="font-size: 0.8rem; margin-top: 5px;">ชื่อบัญชี: <b>บริษัท แอดมิน จำกัด</b></div>
+        <div class="modal-content">
+            <h2 style="margin-top:0;">แจ้งเติมเงิน</h2>
+            <div style="background:#e0fbfc; padding:10px; border-radius:8px; margin-bottom:15px; color:#0984e3; text-align:center;">
+                <div style="font-size:0.9rem;">เลขบัญชี: <b>012-345-6789</b></div>
+                <div style="font-size:0.8rem;">ธนาคารกสิกรไทย (KBank)</div>
             </div>
-
-            <label style="font-weight: 600; margin-bottom: 5px; display: block;">จำนวนเงินที่โอน</label>
-            <input type="number" id="dep-amt" placeholder="0.00">
-            
-            <label style="font-weight: 600; margin: 15px 0 5px 0; display: block;">หลักฐานการโอน (สลิป)</label>
-            <input type="file" id="dep-file" accept="image/*">
-
-            <button class="btn btn-primary" onclick="doDeposit()" style="margin-top: 20px;">แจ้งเติมเงิน</button>
-            <button class="btn btn-ghost" onclick="closeModal('dep')" style="margin-top: 5px;">ยกเลิก</button>
+            <input type="number" id="dep-amt" placeholder="จำนวนเงินที่โอน (บาท)">
+            <p style="font-size:0.8rem; color:red;">*เมื่อกดยืนยัน ระบบจะพาไปที่แชทเพื่อส่งสลิป</p>
+            <button class="btn btn-primary" onclick="doDeposit()">ยืนยันการเติม</button>
+            <button class="btn btn-ghost" onclick="closeModal('dep')" style="margin-top:10px;">ยกเลิก</button>
         </div>
     </div>
 
     <div id="wit-modal" class="modal-overlay">
-        <div class="modal-sheet">
-            <h2 style="margin-top: 0;">ถอนเงิน</h2>
-            <div style="background: #fff5f5; color: var(--danger); padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 15px;">
-                <i class="fa-solid fa-circle-info"></i> ค่าธรรมเนียม 5 บาท / รายการ
+        <div class="modal-content">
+            <h2 style="margin-top:0;">ถอนเงิน</h2>
+            <p style="color:red; font-size:0.9rem;">ค่าธรรมเนียม 5 บาท / รายการ</p>
+            <input type="number" id="wit-amt" placeholder="จำนวนเงิน" oninput="calcWit()">
+            <div style="text-align:right; margin-bottom:15px; font-weight:bold;">
+                ยอดหักจริง: <span id="wit-total" style="color:#d63031;">0</span> ฿
             </div>
+            <button class="btn btn-danger" onclick="doWithdraw()">แจ้งถอนเงิน</button>
+            <button class="btn btn-ghost" onclick="closeModal('wit')" style="margin-top:10px;">ยกเลิก</button>
+        </div>
+    </div>
 
-            <label style="font-weight: 600; margin-bottom: 5px; display: block;">จำนวนเงินที่ต้องการ</label>
-            <input type="number" id="wit-amt" placeholder="0.00" oninput="calcWit()">
-
-            <div style="display: flex; justify-content: space-between; margin: 20px 0; font-weight: 600;">
-                <span>ยอดหักบัญชีทั้งหมด:</span>
-                <span style="color: var(--danger);"><span id="wit-total">0</span> ฿</span>
-            </div>
-
-            <button class="btn btn-primary" style="background: var(--danger); box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);" onclick="doWithdraw()">ยืนยันการถอน</button>
-            <button class="btn btn-ghost" onclick="closeModal('wit')" style="margin-top: 5px;">ยกเลิก</button>
+    <div id="support-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">คุยกับแอดมิน (ในเว็บ)</h3>
+            <div id="support-history" style="max-height:200px; overflow-y:auto; margin-bottom:15px;">
+                </div>
+            <textarea id="sup-msg" rows="3" placeholder="พิมพ์ข้อความ..."></textarea>
+            <button class="btn btn-primary" onclick="sendTicket()">ส่งข้อความ</button>
+            <button class="btn btn-ghost" onclick="closeModal('support')" style="margin-top:5px;">ปิด</button>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // --- ⚠️ แก้ไขตรงนี้ให้ถูกต้อง ไม่งั้นอัปโหลดไม่ได้ ---
+        // 🔴 ใส่ลิงก์ Facebook ของคุณตรงนี้ (เช่น m.me/ชื่อเพจ หรือ ลิงก์โปรไฟล์)
+        const FB_LINK = "https://m.me/yourpage"; 
+
         const firebaseConfig = {
             apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
             authDomain: "chat-27f96.firebaseapp.com",
             projectId: "chat-27f96",
-            // 🔴 ไปเอา link Bucket ใน Firebase Console > Storage มาใส่ตรงนี้! (เช่น chat-27f96.appspot.com)
-            storageBucket: "chat-27f96.firebasestorage.app", 
+            storageBucket: "chat-27f96.firebasestorage.app",
             messagingSenderId: "336686938010",
-            appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
+            appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23",
+            measurementId: "G-GR38B5JHZZ"
         };
-
-        // Init Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
 
         let currentUser = null;
         let currentBal = 0;
 
-        // AUTH CHECK
         auth.onAuthStateChanged(user => {
             if(user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-nav').classList.remove('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                loadData();
+                initData();
+                loadSupport();
             } else {
                 document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('main-nav').classList.add('hidden');
                 document.getElementById('app-container').classList.add('hidden');
             }
         });
@@ -239,11 +224,10 @@
             const pass = document.getElementById('auth-pass').value;
             if(!inp || !pass) return Swal.fire('ข้อมูลไม่ครบ','','warning');
 
-            Swal.showLoading();
             try {
                 let email = inp;
                 if(!inp.includes('@')) {
-                    const snap = await db.collection('users').where('username', '==', inp).get();
+                    const snap = await db.collection('users').where('username','==',inp).get();
                     if(snap.empty) throw new Error('ไม่พบชื่อผู้ใช้นี้');
                     email = snap.docs[0].data().email;
                 }
@@ -251,186 +235,126 @@
                 if(type === 'login') {
                     await auth.signInWithEmailAndPassword(email, pass);
                 } else {
-                    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-                    // สร้าง User Data เริ่มต้น
-                    await db.collection('users').doc(cred.user.uid).set({
-                        email: email, 
-                        username: inp.split('@')[0], 
-                        balance: 0.00,
-                        photoURL: `https://ui-avatars.com/api/?name=${inp}&background=random`,
-                        createdAt: new Date()
+                    const c = await auth.createUserWithEmailAndPassword(email, pass);
+                    await db.collection('users').doc(c.user.uid).set({
+                        email: email, username: inp.split('@')[0], balance: 0.00,
+                        photoURL: `https://ui-avatars.com/api/?name=${inp}&background=random`
                     });
+                    Swal.fire('สมัครสำเร็จ','','success');
                 }
-                Swal.close();
-            } catch(e) { 
-                Swal.fire('Error', e.message, 'error'); 
-            }
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
         }
 
-        function loadData() {
-            // โหลดข้อมูล User
+        function initData() {
             db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
-                if(doc.exists) {
-                    const d = doc.data();
-                    currentBal = d.balance || 0;
-                    document.getElementById('user-balance').innerText = currentBal.toLocaleString('en-US', {minimumFractionDigits: 2});
-                    document.getElementById('user-name').innerText = d.username || 'User';
-                    document.getElementById('user-avatar').src = d.photoURL || 'https://via.placeholder.com/50';
-                }
+                const d = doc.data();
+                currentBal = d.balance || 0;
+                document.getElementById('u-bal').innerText = currentBal.toFixed(2);
+                document.getElementById('u-name').innerText = d.username;
+                document.getElementById('nav-avatar').src = d.photoURL;
             });
 
-            // โหลดประวัติ
-            db.collection('transactions')
-                .where('uid', '==', currentUser.uid)
-                .orderBy('timestamp', 'desc')
-                .limit(20)
-                .onSnapshot(snap => {
-                    const list = document.getElementById('tx-list');
-                    list.innerHTML = '';
-                    if(snap.empty) { 
-                        list.innerHTML = '<div style="text-align:center; padding:20px; color:#adb5bd;">ยังไม่มีรายการ</div>'; 
-                        return; 
-                    }
-
-                    snap.forEach(doc => {
-                        const t = doc.data();
-                        
-                        let icon = t.type === 'deposit' 
-                            ? '<div class="tx-icon" style="background:#e0fbfc; color:#00b4d8;"><i class="fa-solid fa-arrow-down"></i></div>' 
-                            : '<div class="tx-icon" style="background:#ffccd5; color:#ff006e;"><i class="fa-solid fa-arrow-up"></i></div>';
-                        
-                        let title = t.type === 'deposit' ? 'เติมเงิน' : 'ถอนเงิน';
-                        let amountClass = t.type === 'deposit' ? 'color:#00b4d8;' : 'color:#ff006e;';
-                        let sign = t.type === 'deposit' ? '+' : '-';
-                        
-                        let statusBadges = {
-                            'pending': '<span class="tx-status st-pending">รออนุมัติ</span>',
-                            'approved': '<span class="tx-status st-approved">สำเร็จ</span>',
-                            'rejected': '<span class="tx-status st-rejected">ถูกปฏิเสธ</span>'
-                        };
-
-                        let timeStr = t.timestamp ? new Date(t.timestamp.seconds*1000).toLocaleString('th-TH', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : 'เมื่อสักครู่';
-
-                        list.innerHTML += `
-                            <div class="tx-item">
-                                <div class="tx-left">
-                                    ${icon}
-                                    <div>
-                                        <div style="font-weight:600;">${title}</div>
-                                        <div style="font-size:0.8rem; color:#adb5bd;">${timeStr}</div>
-                                    </div>
-                                </div>
-                                <div style="text-align:right;">
-                                    <div style="font-weight:700; ${amountClass}">${sign} ${t.amount.toLocaleString()} ฿</div>
-                                    ${statusBadges[t.status]}
-                                </div>
-                            </div>
-                        `;
-                    });
+            db.collection('transactions').where('uid','==',currentUser.uid).orderBy('timestamp','desc').limit(10).onSnapshot(snap => {
+                const div = document.getElementById('tx-list');
+                div.innerHTML = '';
+                if(snap.empty) { div.innerHTML = '<div style="text-align:center;color:#ccc;">ไม่มีรายการ</div>'; return; }
+                snap.forEach(doc => {
+                    const t = doc.data();
+                    let st = t.status==='pending'?'รออนุมัติ':(t.status==='approved'?'สำเร็จ':'ปฏิเสธ');
+                    let cl = t.status==='pending'?'st-pending':(t.status==='approved'?'st-approved':'st-rejected');
+                    let type = t.type==='deposit' ? '+ ฝาก' : '- ถอน';
+                    div.innerHTML += `
+                        <div class="tx-item">
+                            <div><b>${type}</b> <span class="status ${cl}">${st}</span><br><small style="color:#ccc">${new Date(t.timestamp.seconds*1000).toLocaleString('th-TH')}</small></div>
+                            <div style="font-weight:bold;">${t.amount} ฿</div>
+                        </div>`;
                 });
+            });
         }
 
-        // DEPOSIT LOGIC
+        // --- DEPOSIT (NO IMAGE) ---
         async function doDeposit() {
             const amt = parseFloat(document.getElementById('dep-amt').value);
-            const file = document.getElementById('dep-file').files[0];
-
-            if(!amt || amt <= 0) return Swal.fire('ระบุจำนวนเงิน', '', 'warning');
-            if(!file) return Swal.fire('กรุณาแนบสลิป', '', 'warning');
-
-            // Show Loading
-            Swal.fire({
-                title: 'กำลังอัปโหลด...',
-                text: 'กรุณารอสักครู่ ห้ามปิดหน้านี้',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading() }
-            });
+            if(!amt || amt <= 0) return Swal.fire('ระบุจำนวนเงิน','','warning');
 
             try {
-                // 1. Upload Slip to Storage
-                // สร้างชื่อไฟล์ไม่ซ้ำ
-                const fileName = `${Date.now()}_${currentUser.uid}`;
-                const ref = storage.ref().child(`slips/${fileName}`);
-                
-                // สั่งอัปโหลด
-                await ref.put(file);
-                
-                // ขอดึงลิงก์รูป
-                const url = await ref.getDownloadURL();
-
-                // 2. Save Transaction info to Firestore
+                // บันทึกรายการลงฐานข้อมูล (ไม่มี slipURL)
                 await db.collection('transactions').add({
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    type: 'deposit',
-                    amount: amt,
-                    slipURL: url,
-                    status: 'pending',
+                    uid: currentUser.uid, email: currentUser.email, type: 'deposit',
+                    amount: amt, status: 'pending', slipURL: '', // เว้นว่างไว้
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 closeModal('dep');
-                Swal.fire({ icon: 'success', title: 'แจ้งเติมเงินสำเร็จ', text: 'รอแอดมินตรวจสอบยอดเงิน', timer: 2000, showConfirmButton: false });
                 
-                // Clear Input
-                document.getElementById('dep-amt').value = '';
-                document.getElementById('dep-file').value = '';
-
-            } catch(e) {
-                console.error(e);
-                // แจ้งเตือนถ้าอัปโหลดไม่ได้
+                // แจ้งให้ไปส่งสลิป
                 Swal.fire({
-                    icon: 'error',
-                    title: 'อัปโหลดไม่สำเร็จ',
-                    text: 'กรุณาเช็ค Storage Rules หรือ Bucket URL ในโค้ด',
-                    footer: '<small>Error: ' + e.message + '</small>'
+                    icon: 'success',
+                    title: 'ทำรายการสำเร็จ',
+                    text: 'กรุณาส่งรูปสลิปให้แอดมินทางแชท',
+                    confirmButtonText: 'ไปส่งสลิป',
+                    showCancelButton: true,
+                    cancelButtonText: 'ไว้ทีหลัง'
+                }).then((r) => {
+                    if(r.isConfirmed) openFacebook();
                 });
-            }
+
+                document.getElementById('dep-amt').value = '';
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
         }
 
-        // WITHDRAW LOGIC
+        // --- WITHDRAW ---
         function calcWit() {
-            const v = parseFloat(document.getElementById('wit-amt').value) || 0;
-            document.getElementById('wit-total').innerText = v > 0 ? (v + 5).toLocaleString() : 0;
+            const v = parseFloat(document.getElementById('wit-amt').value)||0;
+            document.getElementById('wit-total').innerText = v>0 ? v+5 : 0;
         }
-
         async function doWithdraw() {
             const amt = parseFloat(document.getElementById('wit-amt').value);
-            if(!amt || amt <= 0) return;
+            if(!amt || amt<=0) return;
+            if((amt+5) > currentBal) return Swal.fire('ยอดเงินไม่พอ','','error');
             
-            const total = amt + 5;
-            if(total > currentBal) return Swal.fire('ยอดเงินไม่พอ', `(รวมค่าธรรมเนียมต้องมี ${total} ฿)`, 'error');
-
             try {
                 await db.collection('transactions').add({
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    type: 'withdraw',
-                    amount: amt,
-                    fee: 5,
-                    totalDeduct: total,
-                    status: 'pending',
+                    uid: currentUser.uid, email: currentUser.email, type: 'withdraw',
+                    amount: amt, fee: 5, totalDeduct: amt+5, status: 'pending',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 closeModal('wit');
-                Swal.fire('สำเร็จ', 'ส่งเรื่องถอนเงินแล้ว', 'success');
-                document.getElementById('wit-amt').value = '';
-            } catch(e) {
-                Swal.fire('Error', e.message, 'error');
-            }
+                Swal.fire('แจ้งถอนแล้ว','รออนุมัติ','success');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        }
+
+        // --- SUPPORT CHAT ---
+        async function sendTicket() {
+            const msg = document.getElementById('sup-msg').value;
+            if(!msg) return;
+            await db.collection('reports').add({
+                uid: currentUser.uid, email: currentUser.email, subject: 'แชท', message: msg,
+                status: 'pending', timestamp: firebase.firestore.FieldValue.serverTimestamp(), type: 'chat'
+            });
+            document.getElementById('sup-msg').value = '';
+        }
+
+        function loadSupport() {
+            db.collection('reports').where('uid','==',currentUser.uid).orderBy('timestamp','desc').onSnapshot(snap => {
+                const div = document.getElementById('support-history');
+                div.innerHTML = '';
+                snap.forEach(doc => {
+                    const t = doc.data();
+                    let adminReply = t.adminReply ? `<div class="chat-item chat-admin"><b>Admin:</b> ${t.adminReply}</div>` : '';
+                    div.innerHTML += `
+                        <div class="chat-item"><b>Me:</b> ${t.message}</div>
+                        ${adminReply}
+                    `;
+                });
+            });
         }
 
         // Utils
         function openModal(id) { document.getElementById(id+'-modal').classList.add('active'); }
         function closeModal(id) { document.getElementById(id+'-modal').classList.remove('active'); }
         function logout() { auth.signOut(); }
-        function copyBank() {
-            const text = document.getElementById('bank-acc-num').innerText.replace(/-/g, '');
-            navigator.clipboard.writeText(text).then(() => {
-                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
-                Toast.fire({ icon: 'success', title: 'คัดลอกเลขบัญชีแล้ว' });
-            });
-        }
+        function openFacebook() { window.open(FB_LINK, '_blank'); }
     </script>
 </body>
 </html>
