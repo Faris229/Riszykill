@@ -2,86 +2,108 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodApp | ลูกค้า</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FoodApp | Customer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #ff4757; --bg: #f8f9fa; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
-        
-        /* Components */
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
-        .input-box { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; }
-        
-        /* Wallet */
-        .wallet-card { background: linear-gradient(135deg, #ff6b6b, #ff4757); color: white; text-align: center; padding: 25px; border-radius: 20px; margin: 20px; box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3); }
-        .balance { font-size: 2.5rem; font-weight: 800; }
-        
-        /* Bottom Nav */
-        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; }
-        .nav-item { flex: 1; text-align: center; color: #aaa; cursor: pointer; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 3px; }
+        :root { --primary: #ff4757; --bg: #f8f9fa; --text: #2f3542; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
 
         /* Auth */
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 1000; display: flex; flex-direction: column; justify-content: center; padding: 30px; }
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 3000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+        .input-box { width: 100%; padding: 14px; border: 1px solid #eee; background: #f9f9f9; border-radius: 12px; margin-bottom: 12px; font-family: inherit; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); font-size: 1rem; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
+        
+        /* App UI */
+        .header { background: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; }
+        .wallet-card { background: linear-gradient(135deg, #ff6b6b, #ff4757); color: white; padding: 25px; border-radius: 20px; margin: 20px; box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3); }
+        .card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        
+        /* Nav */
+        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 12px 0; border-top: 1px solid #f1f1f1; border-radius: 20px 20px 0 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        .nav-item { flex: 1; text-align: center; color: #ccc; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+
+        /* Pages */
+        .page { display: none; padding: 0 20px; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <h1 style="color:var(--primary); text-align:center;">Food Customer</h1>
-        <input id="email" placeholder="อีเมล" class="input-box">
-        <input id="pass" type="password" placeholder="รหัสผ่าน" class="input-box">
-        <button class="btn" onclick="login()">เข้าสู่ระบบ</button>
-        <button class="btn" style="background:none; color:#555; margin-top:10px;" onclick="register()">สมัครสมาชิกใหม่</button>
+        <h1 style="color:var(--primary); text-align:center; font-size:2.5rem;"><i class="fa-solid fa-burger"></i></h1>
+        <h2 style="text-align:center;">เข้าสู่ระบบลูกค้า</h2>
+        <div id="login-form">
+            <input id="l-email" class="input-box" placeholder="อีเมล">
+            <input id="l-pass" type="password" class="input-box" placeholder="รหัสผ่าน">
+            <button class="btn" onclick="login()">เข้าสู่ระบบ</button>
+            <p style="text-align:center; color:#aaa; margin-top:20px;" onclick="toggleAuth()">สมัครสมาชิกใหม่</p>
+        </div>
+        <div id="reg-form" style="display:none;">
+            <input id="r-name" class="input-box" placeholder="ชื่อเล่น">
+            <input id="r-email" class="input-box" placeholder="อีเมล">
+            <input id="r-phone" class="input-box" placeholder="เบอร์โทร">
+            <input id="r-pass" type="password" class="input-box" placeholder="รหัสผ่าน">
+            <input id="r-bank" class="input-box" placeholder="ธนาคาร (ไว้รับเงินคืน)">
+            <input id="r-no" class="input-box" placeholder="เลขบัญชี">
+            <button class="btn" onclick="register()">สมัครสมาชิก</button>
+            <p style="text-align:center; color:#aaa; margin-top:20px;" onclick="toggleAuth()">กลับไปล็อกอิน</p>
+        </div>
     </div>
 
     <div id="app" style="display:none;">
-        <div style="padding:20px; font-weight:bold; font-size:1.2rem; color:var(--primary);">FoodApp 🍔</div>
+        <div class="header">
+            <b style="color:var(--primary); font-size:1.2rem;">FoodApp</b>
+            <div onclick="auth.signOut()"><i class="fa-solid fa-right-from-bracket" style="color:#aaa;"></i></div>
+        </div>
 
-        <div id="page-home">
+        <div id="p-home" class="page active">
             <div class="wallet-card">
-                <div>ยอดเงินคงเหลือ</div>
-                <div class="balance">฿ <span id="u-bal">0.00</span></div>
-                <button onclick="deposit()" style="background:rgba(255,255,255,0.2); border:none; padding:8px 20px; color:white; border-radius:20px; cursor:pointer; margin-top:10px;">+ เติมเงิน</button>
-            </div>
-
-            <div style="padding:0 20px;">
-                <h3>เมนูแนะนำ</h3>
-                <div class="card" onclick="openOrder()">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="width:50px; height:50px; background:#ffeaa7; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">🍜</div>
-                        <div>
-                            <b>สั่งอาหาร / ฝากซื้อ</b><br>
-                            <span style="color:#888; font-size:0.9rem;">กดที่นี่เพื่อสั่งออเดอร์ใหม่</span>
-                        </div>
-                    </div>
+                <div style="opacity:0.9;">ยอดเงินคงเหลือ</div>
+                <div style="font-size:2.5rem; font-weight:800;">฿ <span id="bal">0.00</span></div>
+                <div style="margin-top:15px; display:flex; gap:10px;">
+                    <button onclick="deposit()" style="flex:1; padding:8px; border:none; background:rgba(255,255,255,0.2); color:white; border-radius:10px;">+ เติมเงิน</button>
                 </div>
+            </div>
+            <h3 style="color:#555;">ออเดอร์ของฉัน</h3>
+            <div id="my-orders">Loading...</div>
+        </div>
 
-                <h3>ออเดอร์ของฉัน</h3>
-                <div id="my-orders">Loading...</div>
+        <div id="p-order" class="page">
+            <h2>สั่งอาหาร</h2>
+            <div class="card">
+                <label>เมนู</label><input id="ord-menu" class="input-box">
+                <label>ราคาอาหาร (บาท)</label><input id="ord-price" type="number" class="input-box">
+                <label>ค่าหิ้ว (Tip)</label><input id="ord-tip" type="number" class="input-box" value="20">
+                <label>ที่อยู่จัดส่ง</label><textarea id="ord-addr" class="input-box" rows="2"></textarea>
+                <label>ชำระเงิน</label>
+                <select id="ord-pay" class="input-box">
+                    <option value="wallet">ตัด Wallet (แนะนำ)</option>
+                    <option value="cash">เงินสดปลายทาง</option>
+                </select>
+                <button class="btn" onclick="createOrder()">ยืนยันการสั่ง</button>
             </div>
         </div>
 
-        <div id="page-profile" style="display:none; padding:20px;">
-            <h2>โปรไฟล์</h2>
-            <div class="card">
-                <label>ชื่อผู้ใช้งาน</label>
-                <input id="p-name" class="input-box">
-                <label>เบอร์โทร</label>
-                <input id="p-phone" class="input-box">
-                <button class="btn" onclick="updateProfile()">บันทึก</button>
+        <div id="p-chat" class="page">
+            <h2>ข้อความ</h2>
+            <div class="card" onclick="openSupport()" style="display:flex; align-items:center; gap:15px;">
+                <div style="width:40px; height:40px; background:#ff9f43; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white;"><i class="fa-solid fa-headset"></i></div>
+                <b>ติดต่อแอดมิน</b>
             </div>
-            <button class="btn" style="background:#dc3545;" onclick="auth.signOut()">ออกจากระบบ</button>
+            <div id="chat-list"></div>
         </div>
 
         <div class="nav">
-            <div class="nav-item active" onclick="nav('home', this)"><i class="fa-solid fa-house"></i>หน้าหลัก</div>
-            <div class="nav-item" onclick="nav('profile', this)"><i class="fa-solid fa-user"></i>โปรไฟล์</div>
+            <div class="nav-item active" onclick="nav('home',this)"><i class="fa-solid fa-house"></i>หน้าหลัก</div>
+            <div class="nav-item" onclick="nav('order',this)"><i class="fa-solid fa-circle-plus"></i>สั่งเลย</div>
+            <div class="nav-item" onclick="nav('chat',this)"><i class="fa-solid fa-comment-dots"></i>แชท</div>
         </div>
     </div>
 
@@ -89,198 +111,95 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
-            authDomain: "chat-27f96.firebaseapp.com",
-            projectId: "chat-27f96",
-            storageBucket: "chat-27f96.firebasestorage.app",
-            messagingSenderId: "336686938010",
-            appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        let currentUser = null;
+        const config = { apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI", authDomain: "chat-27f96.firebaseapp.com", projectId: "chat-27f96" };
+        firebase.initializeApp(config);
+        const auth = firebase.auth(), db = firebase.firestore();
+        let uid = null;
 
-        auth.onAuthStateChanged(user => {
-            if(user) {
-                // เช็คว่าใช่ลูกค้าไหม
-                db.collection('users').doc(user.uid).get().then(doc => {
-                    if(doc.data().role === 'rider') {
-                        Swal.fire('ผิดแอป','บัญชีนี้เป็นไรเดอร์ กรุณาไปใช้แอป Rider','error').then(()=>auth.signOut());
-                    } else {
-                        currentUser = user;
-                        document.getElementById('auth-screen').style.display = 'none';
-                        document.getElementById('app').style.display = 'block';
-                        loadData();
-                    }
-                });
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-                document.getElementById('app').style.display = 'none';
-            }
+        auth.onAuthStateChanged(u => {
+            if(u) { uid=u.uid; document.getElementById('auth-screen').style.display='none'; document.getElementById('app').style.display='block'; init(); }
+            else { document.getElementById('auth-screen').style.display='flex'; document.getElementById('app').style.display='none'; }
         });
 
-        // Auth Functions
-        async function login() {
+        function toggleAuth() { 
+            const l = document.getElementById('login-form'), r = document.getElementById('reg-form');
+            if(l.style.display==='none') { l.style.display='block'; r.style.display='none'; } else { l.style.display='none'; r.style.display='block'; }
+        }
+
+        async function login() { auth.signInWithEmailAndPassword(document.getElementById('l-email').value, document.getElementById('l-pass').value).catch(e=>Swal.fire('Error',e.message,'error')); }
+        async function register() {
             try {
-                await auth.signInWithEmailAndPassword(
-                    document.getElementById('email').value,
-                    document.getElementById('pass').value
-                );
+                const c = await auth.createUserWithEmailAndPassword(document.getElementById('r-email').value, document.getElementById('r-pass').value);
+                await db.collection('users').doc(c.user.uid).set({
+                    username: document.getElementById('r-name').value, phone: document.getElementById('r-phone').value,
+                    bankName: document.getElementById('r-bank').value, bankNo: document.getElementById('r-no').value,
+                    role: 'customer', balance: 0, email: c.user.email
+                });
             } catch(e) { Swal.fire('Error',e.message,'error'); }
         }
 
-        async function register() {
-            const {value: form} = await Swal.fire({
-                title: 'สมัครสมาชิก (ลูกค้า)',
-                html: '<input id="sw-name" class="swal2-input" placeholder="ชื่อเล่น">' +
-                      '<input id="sw-phone" class="swal2-input" placeholder="เบอร์โทร">',
-                focusConfirm: false,
-                preConfirm: () => [document.getElementById('sw-name').value, document.getElementById('sw-phone').value]
-            });
-            if(form) {
-                const email = document.getElementById('email').value;
-                const pass = document.getElementById('pass').value;
-                if(!email || !pass) return Swal.fire('กรอกอีเมล/รหัสผ่านหน้าแรกก่อน','','warning');
-                
-                try {
-                    const c = await auth.createUserWithEmailAndPassword(email, pass);
-                    await db.collection('users').doc(c.user.uid).set({
-                        email, username: form[0], phone: form[1], 
-                        role: 'customer', balance: 0
-                    });
-                    Swal.fire('สมัครสำเร็จ','','success');
-                } catch(e) { Swal.fire('Error',e.message,'error'); }
-            }
-        }
-
-        // App Functions
-        function loadData() {
-            // Balance
-            db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
-                const d = doc.data();
-                document.getElementById('u-bal').innerText = d.balance.toFixed(2);
-                document.getElementById('p-name').value = d.username;
-                document.getElementById('p-phone').value = d.phone;
-            });
-
-            // My Orders
-            db.collection('orders').where('buyerId','==',currentUser.uid).orderBy('timestamp','desc').onSnapshot(snap => {
-                const div = document.getElementById('my-orders');
-                div.innerHTML = '';
-                snap.forEach(doc => {
-                    const o = doc.data();
-                    const statusColor = o.status==='completed' ? 'green' : (o.status==='pending'?'orange':'blue');
-                    
-                    // ปุ่มกดรับของ (เฉพาะตอนที่ไรเดอร์มาส่งแล้ว)
-                    let btnHTML = '';
-                    if(o.status === 'delivering') {
-                        btnHTML = `<button onclick="confirmReceive('${doc.id}')" style="margin-top:10px; width:100%; padding:8px; background:#2ed573; color:white; border:none; border-radius:5px; cursor:pointer;">ได้รับอาหารแล้ว (จ่ายเงิน)</button>`;
-                    }
-
-                    div.innerHTML += `
-                        <div class="card" style="border-left:5px solid ${statusColor}">
-                            <div style="display:flex; justify-content:space-between;">
-                                <b>${o.menu}</b>
-                                <span style="color:${statusColor}; font-size:0.8rem;">${o.status.toUpperCase()}</span>
-                            </div>
-                            <div style="font-size:0.9rem; color:#666;">
-                                ${o.address}<br>
-                                ราคา: ${o.price} + ค่าหิ้ว: ${o.tip} = <b>${o.price+o.tip} ฿</b> (${o.payment})
-                            </div>
-                            ${btnHTML}
-                        </div>
-                    `;
+        function init() {
+            db.collection('users').doc(uid).onSnapshot(d => document.getElementById('bal').innerText = d.data().balance.toFixed(2));
+            db.collection('orders').where('buyerId','==',uid).orderBy('timestamp','desc').onSnapshot(snap => {
+                let h = '';
+                snap.forEach(d => {
+                    const o = d.data();
+                    let btn = '';
+                    if(o.status === 'delivering') btn = `<button class="btn" style="background:#2ed573; margin-top:10px;" onclick="finish('${d.id}')">ได้รับอาหารแล้ว (ตัดเงิน)</button>`;
+                    h += `<div class="card" style="border-left:5px solid ${o.status==='completed'?'grey':'#ff4757'}">
+                        <b>${o.menu}</b> (${o.status})<br>
+                        ราคา: ${o.price+o.tip} ฿ (${o.payment})
+                        ${btn}
+                    </div>`;
                 });
+                document.getElementById('my-orders').innerHTML = h || '<p style="text-align:center;color:#ccc">ไม่มีรายการ</p>';
             });
         }
 
-        async function openOrder() {
-            const {value: form} = await Swal.fire({
-                title: 'สั่งอาหาร',
-                html: 
-                    '<input id="od-menu" class="swal2-input" placeholder="เมนู">' +
-                    '<input id="od-price" type="number" class="swal2-input" placeholder="ค่าอาหาร (บาท)">' +
-                    '<input id="od-tip" type="number" class="swal2-input" placeholder="ค่าหิ้ว (Tip)">' +
-                    '<input id="od-addr" class="swal2-input" placeholder="ที่อยู่จัดส่ง">' +
-                    '<select id="od-pay" class="swal2-input"><option value="wallet">ตัด Wallet (แนะนำ)</option><option value="cash">เงินสด</option></select>',
-                focusConfirm: false,
-                preConfirm: () => [
-                    document.getElementById('od-menu').value,
-                    document.getElementById('od-price').value,
-                    document.getElementById('od-tip').value,
-                    document.getElementById('od-addr').value,
-                    document.getElementById('od-pay').value
-                ]
-            });
+        async function createOrder() {
+            const menu = document.getElementById('ord-menu').value;
+            const price = parseFloat(document.getElementById('ord-price').value);
+            const tip = parseFloat(document.getElementById('ord-tip').value);
+            const addr = document.getElementById('ord-addr').value;
+            const pay = document.getElementById('ord-pay').value;
 
-            if(form) {
-                const total = parseFloat(form[1]) + parseFloat(form[2]);
-                // ถ้าตัด Wallet ต้องเช็คเงินก่อน
-                if(form[4] === 'wallet') {
-                    const u = await db.collection('users').doc(currentUser.uid).get();
-                    if(u.data().balance < total) return Swal.fire('เงินไม่พอ','กรุณาเติมเงิน','error');
-                }
-
-                await db.collection('orders').add({
-                    buyerId: currentUser.uid, menu: form[0], price: parseFloat(form[1]), tip: parseFloat(form[2]),
-                    address: form[3], payment: form[4], status: 'pending', timestamp: new Date()
-                });
-                Swal.fire('สั่งแล้ว','รอไรเดอร์รับงาน','success');
+            if(!menu || !price) return Swal.fire('กรอกข้อมูลให้ครบ','','warning');
+            if(pay === 'wallet') {
+                const u = await db.collection('users').doc(uid).get();
+                if(u.data().balance < price+tip) return Swal.fire('เงินไม่พอ','เติมเงินก่อน','error');
             }
+
+            await db.collection('orders').add({ buyerId: uid, menu, price, tip, address: addr, payment: pay, status: 'pending', timestamp: new Date() });
+            Swal.fire('สั่งสำเร็จ','','success');
+            nav('home', document.querySelectorAll('.nav-item')[0]);
         }
 
-        async function confirmReceive(orderId) {
-            const oDoc = await db.collection('orders').doc(orderId).get();
-            const o = oDoc.data();
+        async function finish(oid) {
+            const oDoc = await db.collection('orders').doc(oid).get(); const o = oDoc.data();
             const total = o.price + o.tip;
-
             if(o.payment === 'wallet') {
-                // ระบบตัดเงิน Auto
                 await db.runTransaction(async t => {
-                    const buyerRef = db.collection('users').doc(currentUser.uid);
-                    const riderRef = db.collection('users').doc(o.riderId);
-                    
-                    const bBal = (await t.get(buyerRef)).data().balance;
+                    const bRef = db.collection('users').doc(uid); const rRef = db.collection('users').doc(o.riderId);
+                    const bBal = (await t.get(bRef)).data().balance;
                     if(bBal < total) throw "เงินไม่พอ";
-
-                    t.update(buyerRef, { balance: bBal - total });
-                    t.update(riderRef, { balance: (await t.get(riderRef)).data().balance + total });
-                    t.update(db.collection('orders').doc(orderId), { status: 'completed' });
-                    t.set(db.collection('transactions').doc(), { type:'pay', from:currentUser.uid, to:o.riderId, amt:total, ts:new Date() });
+                    t.update(bRef, {balance: bBal-total}); t.update(rRef, {balance: (await t.get(rRef)).data().balance+total});
+                    t.update(db.collection('orders').doc(oid), {status:'completed'});
+                    t.set(db.collection('transactions').doc(), {type:'pay', from:uid, to:o.riderId, amount:total, timestamp:new Date()});
                 });
-                Swal.fire('สำเร็จ','ระบบตัดเงินให้ไรเดอร์แล้ว','success');
-            } else {
-                // เงินสด
-                await db.collection('orders').doc(orderId).update({ status: 'completed' });
-                Swal.fire('จบงาน','อย่าลืมจ่ายเงินสดให้ไรเดอร์','success');
-            }
+            } else { await db.collection('orders').doc(oid).update({status:'completed'}); }
+            Swal.fire('สำเร็จ','','success');
         }
 
         async function deposit() {
-            const {value: n} = await Swal.fire({title:'เติมเงิน', input:'number'});
-            if(n) {
-                await db.collection('transactions').add({uid:currentUser.uid, type:'deposit', amount:parseFloat(n), status:'pending'});
-                Swal.fire('แจ้งเติมเงินแล้ว','รอแอดมินอนุมัติ','success');
-            }
+            const {value:n} = await Swal.fire({title:'เติมเงิน',input:'number'});
+            if(n) { await db.collection('transactions').add({uid, type:'deposit', amount:parseFloat(n), status:'pending'}); Swal.fire('แจ้งเติมเงินแล้ว','','success'); }
         }
 
-        async function updateProfile() {
-            await db.collection('users').doc(currentUser.uid).update({
-                username: document.getElementById('p-name').value,
-                phone: document.getElementById('p-phone').value
-            });
-            Swal.fire('บันทึกแล้ว','','success');
-        }
-
-        function nav(page, el) {
-            document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('page-home').style.display = page==='home'?'block':'none';
-            document.getElementById('page-profile').style.display = page==='profile'?'block':'none';
+        function nav(p,el) {
+            document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active');
+            ['home','order','chat'].forEach(x=>document.getElementById('p-'+x).style.display='none');
+            document.getElementById('p-'+p).style.display='block';
         }
     </script>
 </body>
