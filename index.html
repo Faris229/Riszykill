@@ -3,152 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monopoly Wallet | เกมเศรษฐี</title>
+    <title>FoodRunner | ฝากซื้ออาหาร</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
     <style>
-        :root {
-            --bg: #121212;
-            --card-bg: linear-gradient(135deg, #1e1e1e, #2c2c2c);
-            --gold: #ffd700;
-            --neon-blue: #00f3ff;
-            --neon-pink: #ff00ff;
-            --text: #ffffff;
-        }
-
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-
-        /* --- 1. LOBBY SCREEN --- */
-        #lobby-screen { width: 100%; max-width: 400px; padding: 40px 20px; text-align: center; display: flex; flex-direction: column; gap: 20px; margin-top: 50px; }
-        .game-logo { font-size: 4rem; color: var(--gold); text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        :root { --primary: #ff6b6b; --secondary: #ffa502; --bg: #f7f1e3; --dark: #2f3542; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding-bottom: 70px; color: var(--dark); }
         
-        input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; color: white; border-radius: 12px; font-size: 1.1rem; text-align: center; font-family: 'Prompt', sans-serif; }
-        input::placeholder { color: #888; }
-
-        .btn { padding: 15px; border-radius: 50px; border: none; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; width: 100%; }
-        .btn-create { background: linear-gradient(45deg, #ff00ff, #ff7300); color: white; box-shadow: 0 4px 15px rgba(255, 0, 255, 0.4); }
-        .btn-join { background: linear-gradient(45deg, #00f3ff, #0066ff); color: white; box-shadow: 0 4px 15px rgba(0, 243, 255, 0.4); }
-        .btn:active { transform: scale(0.95); }
-
-        /* --- 2. GAME SCREEN --- */
-        #game-screen { width: 100%; max-width: 500px; padding: 20px; display: none; }
-
         /* Navbar */
-        .room-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #222; padding: 10px 20px; border-radius: 50px; border: 1px solid #444; }
-        .room-code { font-family: 'Share Tech Mono', monospace; font-size: 1.5rem; color: var(--neon-blue); letter-spacing: 2px; }
+        .navbar { background: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); }
+        .user-pill { background: #f1f2f6; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
 
-        /* CREDIT CARD UI */
-        .credit-card {
-            width: 100%; height: 220px; border-radius: 20px; 
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative; padding: 25px; overflow: hidden;
-            margin-bottom: 30px;
-        }
-        /* Hologram effect */
-        .credit-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 5s infinite; }
-        @keyframes shine { 0% {left: -100%;} 100% {left: 100%;} }
+        /* Wallet Card */
+        .wallet-card { background: linear-gradient(135deg, #ff6b6b, #ff4757); color: white; margin: 20px; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3); position: relative; overflow: hidden; }
+        .wallet-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .w-btn { flex: 1; background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px; border-radius: 10px; cursor: pointer; backdrop-filter: blur(5px); }
 
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .chip { width: 50px; height: 35px; background: linear-gradient(135deg, #ffd700, #b8860b); border-radius: 6px; position: relative; }
-        .bank-logo { font-weight: bold; font-style: italic; color: rgba(255,255,255,0.7); }
+        /* Action Grid */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; }
+        .menu-card { background: white; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.2s; }
+        .menu-card:active { transform: scale(0.95); }
+        .menu-icon { font-size: 2rem; margin-bottom: 5px; display: block; }
+
+        /* Feed List */
+        .section-title { padding: 0 20px; margin-top: 25px; margin-bottom: 10px; font-weight: bold; color: #57606f; }
+        .order-list { padding: 0 20px; display: flex; flex-direction: column; gap: 15px; }
         
-        .card-number { margin-top: 30px; font-family: 'Share Tech Mono', monospace; font-size: 2.2rem; letter-spacing: 3px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); color: #fff; }
+        .order-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.03); border-left: 5px solid var(--secondary); position: relative; }
+        .order-card.my-order { border-left-color: var(--primary); }
         
-        .card-bottom { margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .card-holder-label { font-size: 0.6rem; text-transform: uppercase; color: #aaa; }
-        .card-holder { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .role-badge { background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
+        .status-badge { position: absolute; top: 15px; right: 15px; font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; background: #f1f2f6; color: #747d8c; }
+        .st-pending { background: #dfe6e9; }
+        .st-accepted { background: #ffeaa7; color: #d35400; }
+        .st-delivering { background: #7bed9f; color: #2ed573; }
+        .st-completed { background: #2ed573; color: white; }
 
-        /* Player List */
-        .player-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .player-row { 
-            background: #222; padding: 15px; border-radius: 15px; display: flex; 
-            justify-content: space-between; align-items: center; border: 1px solid #333;
-        }
-        .p-info { display: flex; align-items: center; gap: 10px; }
-        .p-avatar { width: 40px; height: 40px; border-radius: 50%; background: #444; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
-        .p-name { font-weight: bold; font-size: 1rem; }
-        .p-money { color: var(--gold); font-family: 'Share Tech Mono', monospace; }
-        
-        .p-actions { display: flex; gap: 5px; }
-        .btn-icon { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; color: white; }
-        .btn-pay { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); color: black; }
-        .btn-bank { background: var(--gold); box-shadow: 0 0 10px var(--gold); color: black; }
-        .btn-house { background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); color: white; }
+        /* Floating Button (Create Order) */
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4); cursor: pointer; z-index: 200; }
 
-        /* Bank Panel */
-        .bank-panel { border: 2px solid var(--gold); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; }
-        .bank-panel.active { display: block; }
-        .bank-title { color: var(--gold); text-transform: uppercase; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; }
+        /* Chat & Detail Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: flex-end; }
+        .modal-overlay.active { display: flex; }
+        .modal-sheet { background: white; width: 100%; height: 90vh; border-radius: 20px 20px 0 0; padding: 20px; display: flex; flex-direction: column; animation: slideUp 0.3s; }
+        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
 
-        /* Property List */
-        .prop-list { font-size: 0.8rem; color: #aaa; margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px; }
-        .prop-tag { background: #333; padding: 2px 6px; border-radius: 4px; border: 1px solid #555; }
+        .chat-box { flex: 1; background: #f1f2f6; border-radius: 10px; margin: 10px 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; max-width: 80%; }
+        .msg-me { background: var(--primary); color: white; align-self: flex-end; }
+        .msg-other { background: white; align-self: flex-start; }
 
+        /* Stepper */
+        .stepper { display: flex; justify-content: space-between; margin-bottom: 20px; position: relative; }
+        .step { z-index: 2; background: #dfe6e9; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; color: white; }
+        .step.active { background: var(--primary); }
+        .step-line { position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: #dfe6e9; z-index: 1; }
+
+        /* Auth */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; flex-direction: column; justify-content: center; padding: 30px; }
+        input, textarea { width: 100%; padding: 12px; border: 2px solid #f1f2f6; border-radius: 10px; margin-bottom: 10px; font-family: inherit; }
+        .btn-main { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="lobby-screen">
-        <div class="game-logo"><i class="fa-solid fa-dice"></i></div>
-        <h1 style="margin:0;">MONOPOLY WALLET</h1>
-        <input type="text" id="nickname" placeholder="ตั้งชื่อเล่นของคุณ">
-        <input type="number" id="room-code-input" placeholder="ใส่รหัสห้อง (ถ้ามี)">
-        
-        <button class="btn btn-create" onclick="createRoom()">👑 สร้างห้อง (เป็นธนาคาร)</button>
-        <button class="btn btn-join" onclick="joinRoom()">🚀 เข้าร่วมห้อง</button>
+    <div id="auth-screen">
+        <h1 style="color:var(--primary); text-align:center; font-size:3rem;"><i class="fa-solid fa-burger"></i></h1>
+        <h2 style="text-align:center;">FoodRunner</h2>
+        <input id="auth-email" placeholder="อีเมล">
+        <input id="auth-pass" type="password" placeholder="รหัสผ่าน">
+        <div style="display:flex; gap:10px;">
+            <input id="auth-name" placeholder="ชื่อเล่น" style="flex:1;">
+            <input id="auth-phone" placeholder="เบอร์โทร" style="flex:1;">
+        </div>
+        <button class="btn-main" onclick="authAction('login')">เข้าสู่ระบบ</button>
+        <button class="btn-main" onclick="authAction('signup')" style="margin-top:10px; background:#dfe6e9; color:#2f3542;">สมัครสมาชิก</button>
     </div>
 
-    <div id="game-screen">
-        <div class="room-info">
-            <div><span style="color:#888;">ROOM:</span> <span id="display-room-code" class="room-code">0000</span></div>
-            <button onclick="location.reload()" style="background:none; border:none; color:red;"><i class="fa-solid fa-right-from-bracket"></i></button>
+    <div id="app" style="display:none;">
+        <nav class="navbar">
+            <div class="logo"><i class="fa-solid fa-bowl-food"></i> FoodRunner</div>
+            <div class="user-pill" onclick="logout()"><i class="fa-regular fa-user"></i> <span id="u-name">User</span></div>
+        </nav>
+
+        <div class="wallet-card">
+            <div style="font-size:0.9rem; opacity:0.9;">Wallet Balance</div>
+            <div style="font-size:2.5rem; font-weight:800;">฿ <span id="u-bal">0.00</span></div>
+            <div class="wallet-actions">
+                <button class="w-btn" onclick="deposit()"><i class="fa-solid fa-circle-plus"></i> เติมเงิน</button>
+                <button class="w-btn" onclick="withdraw()"><i class="fa-solid fa-circle-minus"></i> ถอนเงิน</button>
+            </div>
         </div>
 
-        <div class="credit-card" id="my-card">
-            <div class="card-top">
-                <div class="chip"></div>
-                <div class="bank-logo">Universal Bank</div>
+        <div class="grid-menu">
+            <div class="menu-card" onclick="openSupport()">
+                <span class="menu-icon">💬</span> แจ้งปัญหา
             </div>
-            <div class="card-number">$ <span id="my-balance">0</span></div>
-            <div class="card-bottom">
-                <div>
-                    <div class="card-holder-label">Card Holder</div>
-                    <div class="card-holder" id="my-name">PLAYER</div>
+            <div class="menu-card" style="background:#e1f5fe;">
+                <span class="menu-icon">🛵</span> สมัครไรเดอร์
+            </div>
+        </div>
+
+        <div class="section-title">รายการฝากซื้อล่าสุด (Job Feed)</div>
+        <div id="feed-list" class="order-list">Loading...</div>
+
+        <div class="fab" onclick="openCreateOrder()"><i class="fa-solid fa-plus"></i></div>
+    </div>
+
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3 style="margin:0;">ติดตามสถานะ</h3>
+                <button onclick="closeModal()" style="background:none; border:none; font-size:1.2rem;">✕</button>
+            </div>
+
+            <div class="stepper">
+                <div class="step-line"></div>
+                <div class="step" id="step-1">1</div>
+                <div class="step" id="step-2">2</div>
+                <div class="step" id="step-3">3</div>
+                <div class="step" id="step-4">4</div>
+            </div>
+            <div style="text-align:center; font-size:0.8rem; color:#57606f; margin-bottom:15px;" id="status-text">รอคนรับงาน</div>
+
+            <div style="background:#f1f2f6; padding:10px; border-radius:10px; margin-bottom:10px;">
+                <div id="ord-detail" style="font-weight:bold;">กระเพราหมูสับ</div>
+                <div style="font-size:0.9rem; color:#666;">
+                    💰 ราคา: <span id="ord-price">50</span> บาท<br>
+                    📍 ส่งที่: <span id="ord-addr">...</span><br>
+                    📞 โทร: <span id="ord-phone">...</span>
                 </div>
-                <div class="role-badge" id="my-role">PLAYER</div>
+            </div>
+
+            <button id="action-btn" class="btn-main" style="margin-bottom:10px;">รับงานนี้</button>
+
+            <div class="chat-box" id="chat-box"></div>
+            <div style="display:flex; gap:10px;">
+                <input id="chat-inp" placeholder="พิมพ์ข้อความ..." style="margin:0;">
+                <button onclick="sendChat()" style="width:50px; background:var(--primary); color:white; border:none; border-radius:10px;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
-
-        <div style="margin-bottom: 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span>🏠 โฉนดที่ดิน (บ้านเลขที่)</span>
-                <button class="btn-icon btn-house" onclick="addMyProperty()" style="width:auto; padding:0 10px; font-size:0.8rem;">+ จดเพิ่ม</button>
-            </div>
-            <div id="my-properties" class="prop-list"></div>
-        </div>
-
-        <div id="bank-panel" class="bank-panel">
-            <div class="bank-title">🏦 เครื่องมือธนาคาร</div>
-            <p style="font-size:0.8rem; color:#ccc;">คุณคือธนาคาร สามารถเสกเงิน หรือโอนเงินกองกลางให้ผู้เล่นได้</p>
-        </div>
-
-        <h3>ผู้เล่นอื่นในห้อง</h3>
-        <div id="players-list" class="player-grid">Loading...</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // ⚠️ ใส่ Config ของคุณที่นี่
         const firebaseConfig = {
             apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
             authDomain: "chat-27f96.firebaseapp.com",
@@ -158,113 +164,95 @@
             appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
         };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let myId = localStorage.getItem('poly_uid') || 'user_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('poly_uid', myId);
-        
-        let currentRoom = null;
-        let myRole = 'player';
-        let myName = '';
+        let currentUser = null;
+        let currentOrder = null;
 
-        // --- LOBBY ---
-        async function createRoom() {
-            myName = document.getElementById('nickname').value.trim();
-            if(!myName) return Swal.fire('ตั้งชื่อก่อน!','','warning');
-
-            const code = Math.floor(1000 + Math.random() * 9000).toString(); // 4 Digit Code
-            
-            await db.collection('rooms').doc(code).set({
-                bankerId: myId,
-                status: 'waiting',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            // Add myself as Banker
-            await joinRoomLogic(code, 'banker', 15000000); // เริ่มต้น 15 ล้าน (ตัวอย่าง)
-        }
-
-        async function joinRoom() {
-            myName = document.getElementById('nickname').value.trim();
-            const code = document.getElementById('room-code-input').value.trim();
-            if(!myName || !code) return Swal.fire('ข้อมูลไม่ครบ','','warning');
-
-            const doc = await db.collection('rooms').doc(code).get();
-            if(!doc.exists) return Swal.fire('ไม่พบห้องนี้','','error');
-            
-            // Join as Player
-            await joinRoomLogic(code, 'player', 2000000); // เริ่มต้น 2 ล้าน
-        }
-
-        async function joinRoomLogic(code, role, startMoney) {
-            currentRoom = code;
-            myRole = role;
-
-            await db.collection('rooms').doc(code).collection('players').doc(myId).set({
-                name: myName, role: role, balance: startMoney, properties: []
-            });
-
-            enterGame();
-        }
-
-        function enterGame() {
-            document.getElementById('lobby-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'block';
-            document.getElementById('display-room-code').innerText = currentRoom;
-            document.getElementById('my-name').innerText = myName;
-            document.getElementById('my-role').innerText = myRole.toUpperCase();
-
-            if(myRole === 'banker') {
-                document.getElementById('bank-panel').classList.add('active');
-                document.getElementById('my-card').style.background = 'linear-gradient(135deg, #ffd700, #b8860b)'; // สีทองสำหรับธนาคาร
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                currentUser = user;
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                loadUserData();
+                loadFeed();
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
             }
+        });
 
-            listenRoom();
+        // --- AUTH ---
+        async function authAction(type) {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            if(type === 'login') {
+                auth.signInWithEmailAndPassword(email, pass).catch(e => Swal.fire('ผิดพลาด', e.message, 'error'));
+            } else {
+                const name = document.getElementById('auth-name').value;
+                const phone = document.getElementById('auth-phone').value;
+                try {
+                    const c = await auth.createUserWithEmailAndPassword(email, pass);
+                    await db.collection('users').doc(c.user.uid).set({
+                        email, username: name, phone, balance: 0, role: 'user', createdAt: new Date()
+                    });
+                } catch(e) { Swal.fire('ผิดพลาด', e.message, 'error'); }
+            }
         }
 
-        // --- REALTIME LISTENER ---
-        function listenRoom() {
-            // ฟังข้อมูลตัวเอง
-            db.collection('rooms').doc(currentRoom).collection('players').doc(myId).onSnapshot(doc => {
-                if(doc.exists) {
-                    const d = doc.data();
-                    document.getElementById('my-balance').innerText = d.balance.toLocaleString();
-                    renderProperties('my-properties', d.properties || []);
-                }
+        function loadUserData() {
+            db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
+                const d = doc.data();
+                document.getElementById('u-name').innerText = d.username;
+                document.getElementById('u-bal').innerText = d.balance.toFixed(2);
+            });
+        }
+
+        // --- MAIN LOGIC ---
+        async function openCreateOrder() {
+            const { value: form } = await Swal.fire({
+                title: 'อยากกินอะไร?',
+                html: 
+                    '<input id="sw-menu" placeholder="เมนู / รายการที่ฝาก">' +
+                    '<input id="sw-price" type="number" placeholder="ค่าอาหารโดยประมาณ (บาท)">' +
+                    '<input id="sw-tip" type="number" placeholder="ค่าหิ้ว (Tip)">' +
+                    '<textarea id="sw-addr" placeholder="ที่อยู่จัดส่ง / จุดนัดรับ"></textarea>',
+                focusConfirm: false,
+                preConfirm: () => [
+                    document.getElementById('sw-menu').value,
+                    document.getElementById('sw-price').value,
+                    document.getElementById('sw-tip').value,
+                    document.getElementById('sw-addr').value
+                ]
             });
 
-            // ฟังผู้เล่นคนอื่น
-            db.collection('rooms').doc(currentRoom).collection('players').onSnapshot(snap => {
-                const div = document.getElementById('players-list');
+            if(form && form[0]) {
+                await db.collection('orders').add({
+                    buyerId: currentUser.uid,
+                    menu: form[0], price: form[1], tip: form[2], address: form[3],
+                    status: 'pending', riderId: null,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                Swal.fire('โพสต์สำเร็จ', 'รอไรเดอร์รับงาน', 'success');
+            }
+        }
+
+        function loadFeed() {
+            db.collection('orders').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                const div = document.getElementById('feed-list');
                 div.innerHTML = '';
-                
                 snap.forEach(doc => {
-                    if(doc.id === myId) return; // ข้ามตัวเอง
-
-                    const p = doc.data();
-                    const isBanker = p.role === 'banker';
+                    const o = doc.data();
+                    const isMine = o.buyerId === currentUser.uid;
+                    const statusMap = {'pending':'รอรับงาน', 'accepted':'รับงานแล้ว', 'buying':'กำลังซื้อ', 'delivering':'กำลังไปส่ง', 'completed':'เสร็จสิ้น'};
                     
-                    // ปุ่มสำหรับเรา (Player) โอนให้เขา
-                    let actions = `<button class="btn-icon btn-pay" onclick="transferTo('${doc.id}', '${p.name}')"><i class="fa-solid fa-money-bill-wave"></i></button>`;
-                    
-                    // ปุ่มสำหรับธนาคาร (Banker Only)
-                    if(myRole === 'banker') {
-                        actions += `<button class="btn-icon btn-bank" onclick="bankGive('${doc.id}', '${p.name}')"><i class="fa-solid fa-plus"></i></button>`;
-                        actions += `<button class="btn-icon btn-bank" style="background:#ff4757" onclick="bankTake('${doc.id}', '${p.name}')"><i class="fa-solid fa-minus"></i></button>`;
-                    }
-
                     div.innerHTML += `
-                        <div class="player-row">
-                            <div class="p-info">
-                                <div class="p-avatar" style="color:${isBanker?'gold':'white'}"><i class="fa-solid ${isBanker?'fa-crown':'fa-user'}"></i></div>
-                                <div>
-                                    <div class="p-name">${p.name}</div>
-                                    <div class="p-money">$ ${p.balance.toLocaleString()}</div>
-                                    <div class="prop-list">${(p.properties||[]).map(x=>`<span class="prop-tag">${x}</span>`).join('')}</div>
-                                </div>
-                            </div>
-                            <div class="p-actions">
-                                ${actions}
+                        <div class="order-card ${isMine?'my-order':''}" onclick="openOrderDetail('${doc.id}')">
+                            <span class="status-badge st-${o.status}">${statusMap[o.status]}</span>
+                            <div style="font-weight:bold; font-size:1.1rem;">${o.menu}</div>
+                            <div style="font-size:0.9rem; color:#666;">
+                                <i class="fa-solid fa-location-dot"></i> ${o.address} <br>
+                                <span style="color:var(--primary); font-weight:bold;">ค่าหิ้ว ${o.tip} บ.</span>
                             </div>
                         </div>
                     `;
@@ -272,91 +260,160 @@
             });
         }
 
-        // --- ACTIONS ---
+        // --- ORDER DETAIL & CHAT ---
+        function openOrderDetail(id) {
+            currentOrder = id;
+            document.getElementById('order-modal').classList.add('active');
+            
+            db.collection('orders').doc(id).onSnapshot(doc => {
+                const o = doc.data();
+                if(!o) return;
 
-        // 1. ผู้เล่นโอนเงินหากัน
-        async function transferTo(targetId, targetName) {
-            const { value: amount } = await Swal.fire({
-                title: `โอนเงินให้ ${targetName}`,
-                input: 'number', inputPlaceholder: 'จำนวนเงิน',
-                background: '#222', color: '#fff'
-            });
-
-            if(amount && parseFloat(amount) > 0) {
-                const val = parseFloat(amount);
+                // UI Data
+                document.getElementById('ord-detail').innerText = o.menu;
+                document.getElementById('ord-price').innerText = o.price;
+                document.getElementById('ord-addr').innerText = o.address;
                 
-                // เช็คเงินตัวเองก่อน
-                const myDoc = await db.collection('rooms').doc(currentRoom).collection('players').doc(myId).get();
-                if(myDoc.data().balance < val) return Swal.fire('เงินไม่พอ!','','error');
+                // Stepper Logic
+                const steps = ['pending', 'accepted', 'buying', 'delivering', 'completed'];
+                const idx = steps.indexOf(o.status);
+                for(let i=1; i<=4; i++) {
+                    document.getElementById(`step-${i}`).classList.toggle('active', i <= idx+1); // Map status index to visual steps
+                }
+                const statusTexts = ['รอรับงาน', 'ไรเดอร์รับงานแล้ว', 'กำลังซื้ออาหาร', 'กำลังไปส่ง', 'อิ่มอร่อยเรียบร้อย'];
+                document.getElementById('status-text').innerText = statusTexts[idx];
 
-                await db.runTransaction(async (t) => {
-                    const meRef = db.collection('rooms').doc(currentRoom).collection('players').doc(myId);
-                    const toRef = db.collection('rooms').doc(currentRoom).collection('players').doc(targetId);
+                // Button Logic
+                const btn = document.getElementById('action-btn');
+                if(o.buyerId === currentUser.uid) {
+                    // I am Buyer
+                    if(o.status === 'delivering') {
+                        btn.style.display = 'block';
+                        btn.innerText = 'ได้รับอาหารแล้ว (โอนเงิน)';
+                        btn.onclick = () => completeOrder(o);
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                } else if (!o.riderId && o.status === 'pending') {
+                    // I am Rider (Job available)
+                    btn.style.display = 'block';
+                    btn.innerText = 'รับงานนี้';
+                    btn.onclick = () => acceptJob(id);
+                } else if (o.riderId === currentUser.uid) {
+                    // I am current Rider
+                    if(o.status === 'accepted') {
+                        btn.innerText = 'ถึงร้านแล้ว/กำลังซื้อ';
+                        btn.onclick = () => updateStatus(id, 'buying');
+                    } else if (o.status === 'buying') {
+                        btn.innerText = 'ซื้อเสร็จแล้ว/กำลังไปส่ง';
+                        btn.onclick = () => updateStatus(id, 'delivering');
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                } else {
+                    btn.style.display = 'none';
+                }
+
+                loadChat(id);
+            });
+        }
+
+        // Chat
+        function loadChat(orderId) {
+            db.collection('chats').doc(orderId).collection('messages').orderBy('time').onSnapshot(snap => {
+                const div = document.getElementById('chat-box');
+                div.innerHTML = '';
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    const cls = m.uid === currentUser.uid ? 'msg-me' : 'msg-other';
+                    div.innerHTML += `<div class="msg ${cls}">${m.text}</div>`;
+                });
+                div.scrollTop = div.scrollHeight;
+            });
+        }
+
+        function sendChat() {
+            const txt = document.getElementById('chat-inp').value;
+            if(!txt) return;
+            db.collection('chats').doc(currentOrder).collection('messages').add({
+                text: txt, uid: currentUser.uid, time: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('chat-inp').value = '';
+        }
+
+        // Actions
+        async function acceptJob(id) {
+            await db.collection('orders').doc(id).update({
+                riderId: currentUser.uid, status: 'accepted'
+            });
+        }
+
+        async function updateStatus(id, st) {
+            await db.collection('orders').doc(id).update({ status: st });
+        }
+
+        async function completeOrder(o) {
+            const total = parseFloat(o.price) + parseFloat(o.tip);
+            
+            // Check Buyer Balance
+            db.collection('users').doc(currentUser.uid).get().then(async userDoc => {
+                if(userDoc.data().balance < total) return Swal.fire('เงินไม่พอจ่าย','กรุณาเติมเงิน','error');
+
+                await db.runTransaction(async t => {
+                    const buyerRef = db.collection('users').doc(o.buyerId);
+                    const riderRef = db.collection('users').doc(o.riderId);
+                    const orderRef = db.collection('orders').doc(currentOrder);
+
+                    const buyerData = (await t.get(buyerRef)).data();
+                    const riderData = (await t.get(riderRef)).data();
+
+                    t.update(buyerRef, { balance: buyerData.balance - total });
+                    t.update(riderRef, { balance: riderData.balance + total });
+                    t.update(orderRef, { status: 'completed' });
+                });
+                Swal.fire('สำเร็จ!','โอนเงินให้ไรเดอร์แล้ว','success');
+                closeModal();
+            });
+        }
+
+        // --- WALLET ---
+        async function deposit() {
+            const {value: amt} = await Swal.fire({title:'เติมเงิน', input:'number'});
+            if(amt) {
+                await db.collection('transactions').add({
+                    uid: currentUser.uid, type: 'deposit', amount: parseFloat(amt), status: 'pending', timestamp: new Date()
+                });
+                Swal.fire('แจ้งเติมเงินแล้ว','รอแอดมินอนุมัติ','success');
+            }
+        }
+
+        async function withdraw() {
+            const {value: amt} = await Swal.fire({title:'ถอนเงิน', text:'*ค่าธรรมเนียม 1 บาท', input:'number'});
+            if(amt) {
+                const totalDeduct = parseFloat(amt) + 1;
+                db.collection('users').doc(currentUser.uid).get().then(async doc => {
+                    if(doc.data().balance < totalDeduct) return Swal.fire('เงินไม่พอ','(รวมค่าธรรมเนียม)','error');
                     
-                    const meData = (await t.get(meRef)).data();
-                    const toData = (await t.get(toRef)).data();
-
-                    t.update(meRef, { balance: meData.balance - val });
-                    t.update(toRef, { balance: toData.balance + val });
-                });
-                Swal.fire({icon:'success', title:'โอนสำเร็จ', timer:1000, showConfirmButton:false, background:'#222', color:'#fff'});
-            }
-        }
-
-        // 2. จดโฉนด (บ้านเลขที่)
-        async function addMyProperty() {
-            const { value: prop } = await Swal.fire({
-                title: 'จดบันทึกโฉนด/ที่ดิน',
-                input: 'text', inputPlaceholder: 'เช่น กรุงเทพ, สีลม, บ้านเลขที่ 88',
-                background: '#222', color: '#fff'
-            });
-
-            if(prop) {
-                const ref = db.collection('rooms').doc(currentRoom).collection('players').doc(myId);
-                const doc = await ref.get();
-                let props = doc.data().properties || [];
-                props.push(prop);
-                await ref.update({ properties: props });
-            }
-        }
-
-        // 3. ธนาคารเสกเงิน (ให้ผู้เล่น)
-        async function bankGive(targetId, name) {
-            const { value: amount } = await Swal.fire({
-                title: `ธนาคารมอบเงินให้ ${name}`,
-                input: 'number',
-                background: '#222', color: '#ffd700'
-            });
-            if(amount) {
-                const ref = db.collection('rooms').doc(currentRoom).collection('players').doc(targetId);
-                await db.runTransaction(async t => {
-                    const d = (await t.get(ref)).data();
-                    t.update(ref, { balance: d.balance + parseFloat(amount) });
+                    await db.collection('transactions').add({
+                        uid: currentUser.uid, type: 'withdraw', amount: parseFloat(amt), fee: 1, total: totalDeduct, status: 'pending', timestamp: new Date()
+                    });
+                    Swal.fire('แจ้งถอนแล้ว','รออนุมัติ','success');
                 });
             }
         }
 
-        // 4. ธนาคารยึดเงิน (ค่าปรับ/ภาษี)
-        async function bankTake(targetId, name) {
-             const { value: amount } = await Swal.fire({
-                title: `เก็บเงิน/ค่าปรับ จาก ${name}`,
-                input: 'number',
-                background: '#222', color: '#ff4757'
-            });
-            if(amount) {
-                const ref = db.collection('rooms').doc(currentRoom).collection('players').doc(targetId);
-                await db.runTransaction(async t => {
-                    const d = (await t.get(ref)).data();
-                    t.update(ref, { balance: d.balance - parseFloat(amount) });
+        async function openSupport() {
+            const {value: msg} = await Swal.fire({title:'แจ้งปัญหา', input:'textarea'});
+            if(msg) {
+                await db.collection('support').add({
+                    uid: currentUser.uid, message: msg, status: 'pending', timestamp: new Date()
                 });
+                Swal.fire('ส่งแล้ว','','success');
             }
         }
 
-        function renderProperties(elId, props) {
-            const el = document.getElementById(elId);
-            el.innerHTML = props.map(p => `<span class="prop-tag">${p}</span>`).join('');
-        }
-
+        function closeModal() { document.getElementById('order-modal').classList.remove('active'); currentOrder = null; }
+        function logout() { auth.signOut(); }
     </script>
 </body>
 </html>
