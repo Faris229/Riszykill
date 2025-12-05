@@ -3,174 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FoodRunner Pro</title>
+    <title>FoodRunner | ลูกค้า</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
     <style>
-        :root { --primary: #ff4757; --secondary: #2f3542; --bg: #f1f2f6; --green: #2ed573; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; color: var(--secondary); }
-        
-        /* Auth */
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 3000; padding: 30px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
-        .auth-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #dfe4ea; border-radius: 12px; margin-bottom: 12px; font-family: inherit; background: #f8f9fa; }
-        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); }
-        .btn-outline { background: white; border: 1px solid var(--secondary); color: var(--secondary); }
-        .btn-rider { background: var(--secondary); color: white; }
+        :root {
+            --primary: #ff4757;
+            --primary-dark: #e84118;
+            --bg: #f8f9fa;
+            --text: #2f3542;
+            --card-bg: #ffffff;
+            --grey: #a4b0be;
+        }
 
-        /* App UI */
-        .navbar { background: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .balance-box { font-size: 0.9rem; font-weight: bold; color: var(--primary); background: #ffeaa7; padding: 5px 12px; border-radius: 20px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; }
+
+        /* --- AUTH SCREEN --- */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 3000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
+        .logo-box { text-align: center; margin-bottom: 40px; }
+        .logo-icon { font-size: 4rem; color: var(--primary); margin-bottom: 10px; }
+        
+        input, textarea, select { width: 100%; padding: 16px; border: 1px solid #dfe4ea; border-radius: 12px; margin-bottom: 15px; font-family: inherit; background: #f1f2f6; font-size: 1rem; transition: 0.3s; }
+        input:focus { border-color: var(--primary); background: white; }
+
+        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
+        .btn-ghost { background: transparent; color: #57606f; box-shadow: none; margin-top: 10px; }
+
+        /* --- APP UI --- */
+        .header { background: white; padding: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 15px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; }
+        .app-logo { font-weight: 800; font-size: 1.4rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; }
+        .avatar { width: 35px; height: 35px; background: #dfe4ea; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #747d8c; }
+
+        .container { padding: 20px; animation: fadeIn 0.5s; }
+        
+        /* Wallet Card */
+        .wallet-card { 
+            background: linear-gradient(135deg, #ff6b6b, #ee5253); color: white; 
+            border-radius: 20px; padding: 25px; margin-bottom: 25px; 
+            box-shadow: 0 10px 20px rgba(238, 82, 83, 0.3); position: relative; overflow: hidden;
+        }
+        .balance-label { font-size: 0.9rem; opacity: 0.9; }
+        .balance-amount { font-size: 2.5rem; font-weight: 800; margin: 5px 0; }
+        .wallet-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .w-btn { flex: 1; background: rgba(255,255,255,0.2); border: none; padding: 10px; border-radius: 10px; color: white; cursor: pointer; backdrop-filter: blur(5px); font-weight: 600; }
+
+        /* Order List */
+        .section-header { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .order-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); position: relative; border-left: 5px solid #ccc; transition: transform 0.2s; }
+        .order-card:active { transform: scale(0.98); }
+        .order-card.pending { border-left-color: #ffa502; }
+        .order-card.accepted { border-left-color: #3742fa; }
+        .order-card.delivering { border-left-color: #2ed573; }
+        .order-card.completed { border-left-color: #a4b0be; opacity: 0.8; }
+
+        .order-status { position: absolute; top: 20px; right: 20px; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; background: #f1f2f6; font-weight: bold; color: #57606f; }
+        
+        /* Floating Button */
+        .fab { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; z-index: 200; transition: 0.3s; }
+        .fab:hover { transform: scale(1.1); }
 
         /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; display: flex; justify-content: space-around; border-top: 1px solid #eee; z-index: 200; }
-        .nav-item { text-align: center; color: #a4b0be; font-size: 0.8rem; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 12px; display: flex; justify-content: space-around; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 500; }
+        .nav-item { text-align: center; color: #a4b0be; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .nav-item i { font-size: 1.5rem; display: block; margin-bottom: 4px; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 2px; }
 
-        /* Feed */
-        .container { padding: 20px; }
-        .order-card { background: white; border-radius: 16px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); position: relative; border-left: 5px solid #ccc; }
-        .order-card.cash { border-left-color: #2ed573; } /* เงินสด สีเขียว */
-        .order-card.wallet { border-left-color: #3742fa; } /* Wallet สีฟ้า */
-        
-        .badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: #eee; float: right; }
-        .badge-cash { background: #d1fae5; color: #065f46; }
-        .badge-wallet { background: #dbeafe; color: #1e40af; }
-
-        /* FAB */
-        .fab { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; z-index: 150; }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: flex-end; }
-        .modal-overlay.active { display: flex; }
-        .modal-sheet { background: white; width: 100%; height: 90vh; border-radius: 20px 20px 0 0; padding: 20px; display: flex; flex-direction: column; animation: slideUp 0.3s; }
+        /* Modals */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: flex-end; }
+        .modal.active { display: flex; }
+        .sheet { background: white; width: 100%; height: 85vh; border-radius: 25px 25px 0 0; padding: 25px; display: flex; flex-direction: column; animation: slideUp 0.3s; }
         @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 
-        /* Profile */
-        .profile-header { text-align: center; margin-bottom: 20px; }
-        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: #dfe4ea; margin: 0 auto 10px; display: flex; justify-content: center; align-items: center; font-size: 2rem; color: #747d8c; }
+        /* Chat UI */
+        .chat-container { flex: 1; background: #f8f9fa; border-radius: 15px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin: 15px 0; border: 1px solid #eee; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; line-height: 1.4; }
+        .msg-me { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-other { background: white; border: 1px solid #eee; align-self: flex-start; border-bottom-left-radius: 2px; }
+
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <h1 style="color:var(--primary); text-align:center;"><i class="fa-solid fa-utensils"></i> FoodPro</h1>
-        
-        <div id="login-section">
+        <div class="logo-box">
+            <i class="fa-solid fa-burger logo-icon"></i>
+            <h1>FoodRunner</h1>
+            <p style="color:#747d8c;">บริการฝากซื้ออาหารเดลิเวอรี่</p>
+        </div>
+
+        <div id="login-form">
             <input id="l-email" placeholder="อีเมล">
             <input id="l-pass" type="password" placeholder="รหัสผ่าน">
             <button class="btn btn-primary" onclick="login()">เข้าสู่ระบบ</button>
-            <div style="text-align:center; margin:15px; color:#aaa;">- หรือ สมัครสมาชิก -</div>
-            <div class="auth-btn-group">
-                <button class="btn btn-outline" onclick="showReg('user')">ลูกค้าทั่วไป</button>
-                <button class="btn btn-rider" onclick="showReg('rider')">สมัครไรเดอร์</button>
-            </div>
+            <button class="btn btn-ghost" onclick="toggleAuth('reg')">สมัครสมาชิกใหม่</button>
         </div>
 
-        <div id="reg-section" style="display:none;">
-            <h3 id="reg-title">สมัครสมาชิก</h3>
-            <input id="r-name" placeholder="ชื่อ-สกุล">
+        <div id="reg-form" style="display:none;">
+            <h3 style="margin-bottom:20px;">สมัครสมาชิก (ลูกค้า)</h3>
+            <input id="r-name" placeholder="ชื่อเล่น">
             <input id="r-email" placeholder="อีเมล">
+            <input id="r-phone" placeholder="เบอร์โทรติดต่อ">
             <input id="r-pass" type="password" placeholder="รหัสผ่าน">
-            <input id="r-phone" placeholder="เบอร์โทรศัพท์">
             
-            <div style="background:#f8f9fa; padding:10px; border-radius:10px; margin-bottom:10px;">
-                <label style="font-size:0.8rem; color:#666;">ข้อมูลบัญชี (สำหรับรับเงิน)</label>
-                <select id="r-bank">
+            <div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-bottom:15px;">
+                <label style="font-size:0.8rem; font-weight:bold; color:#57606f;">บัญชีธนาคาร (สำหรับรับเงินคืน)</label>
+                <select id="r-bank" style="margin-top:5px;">
                     <option value="">เลือกธนาคาร</option>
                     <option value="kbank">กสิกรไทย</option>
                     <option value="scb">ไทยพาณิชย์</option>
-                    <option value="bbl">กรุงเทพ</option>
-                    <option value="ktb">กรุงไทย</option>
                     <option value="wallet">TrueMoney Wallet</option>
                 </select>
-                <input id="r-bank-no" placeholder="เลขที่บัญชี / เบอร์วอลเล็ท">
+                <input id="r-bank-no" placeholder="เลขที่บัญชี / เบอร์วอลเล็ท" style="margin-bottom:0;">
             </div>
 
             <button class="btn btn-primary" onclick="register()">ยืนยันการสมัคร</button>
-            <button class="btn btn-outline" style="margin-top:10px;" onclick="showLogin()">ยกเลิก</button>
+            <button class="btn btn-ghost" onclick="toggleAuth('login')">กลับไปหน้าล็อกอิน</button>
         </div>
     </div>
 
     <div id="app" style="display:none;">
-        <nav class="navbar">
-            <div style="font-weight:bold; font-size:1.2rem;">FoodPro</div>
-            <div class="balance-box" onclick="walletAction()">฿ <span id="u-bal">0.00</span></div>
-        </nav>
+        <div class="header">
+            <div class="app-logo"><i class="fa-solid fa-utensils"></i> FoodRunner</div>
+            <div class="user-profile">
+                <span id="u-name">User</span>
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+            </div>
+        </div>
 
         <div id="page-home" class="container">
-            <h3 style="margin-top:0;">รายการฝากซื้อ (Feed)</h3>
-            <div id="feed-list">Loading...</div>
-        </div>
-
-        <div id="page-jobs" class="container" style="display:none;">
-            <h3>สถานะงานของฉัน</h3>
-            <div id="my-jobs-list">...</div>
-        </div>
-
-        <div id="page-profile" class="container" style="display:none;">
-            <div class="profile-header">
-                <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
-                <h2 id="p-name" style="margin:5px 0;">User</h2>
-                <div id="p-role" style="color:#aaa;">Role</div>
+            <div class="wallet-card">
+                <div class="balance-label">ยอดเงินคงเหลือ</div>
+                <div class="balance-amount">฿ <span id="u-bal">0.00</span></div>
+                <div class="wallet-btns">
+                    <button class="w-btn" onclick="openDeposit()"><i class="fa-solid fa-plus"></i> เติมเงิน</button>
+                    <button class="w-btn" onclick="openWithdraw()"><i class="fa-solid fa-arrow-right-from-bracket"></i> ถอนเงิน</button>
+                </div>
             </div>
-            
-            <label>บัญชีธนาคาร (แก้ไขได้)</label>
-            <select id="p-bank">
-                <option value="kbank">กสิกรไทย</option>
-                <option value="scb">ไทยพาณิชย์</option>
-                <option value="wallet">TrueMoney Wallet</option>
-            </select>
-            <input id="p-bank-no" placeholder="เลขบัญชี">
-            <button class="btn btn-primary" onclick="updateProfile()">บันทึกข้อมูล</button>
-            
-            <button class="btn btn-outline" style="margin-top:20px; color:red; border-color:red;" onclick="logout()">ออกจากระบบ</button>
+
+            <div class="section-header">
+                <span>ออเดอร์ของฉัน</span>
+                <span style="font-size:0.8rem; color:#a4b0be;" id="order-count">0 รายการ</span>
+            </div>
+
+            <div id="my-order-list">
+                <div style="text-align:center; padding:40px; color:#ccc;">
+                    <i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:10px;"></i><br>
+                    ยังไม่มีการสั่งอาหาร<br>กดปุ่ม + ด้านล่างเพื่อสั่งเลย
+                </div>
+            </div>
         </div>
 
-        <div class="fab" id="fab-add" onclick="openOrderModal()"><i class="fa-solid fa-plus"></i></div>
+        <div id="page-support" class="container" style="display:none; height:80vh; display:flex; flex-direction:column;">
+            <h3 style="margin-top:0;">ติดต่อแอดมิน / แจ้งปัญหา</h3>
+            <div class="chat-container" id="admin-chat-box"></div>
+            <div style="display:flex; gap:10px;">
+                <input id="admin-chat-inp" placeholder="พิมพ์ข้อความหาแอดมิน..." style="margin:0;">
+                <button onclick="sendAdminChat()" style="width:50px; border:none; background:var(--primary); color:white; border-radius:10px;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <div class="fab" onclick="openOrderModal()"><i class="fa-solid fa-plus"></i></div>
 
         <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchPage('home', this)">
+            <div class="nav-item active" onclick="nav('home', this)">
                 <i class="fa-solid fa-house"></i> หน้าหลัก
             </div>
-            <div class="nav-item" onclick="switchPage('jobs', this)">
-                <i class="fa-solid fa-list-check"></i> งานฉัน
+            <div class="nav-item" onclick="nav('support', this)">
+                <i class="fa-solid fa-headset"></i> ติดต่อแอดมิน
             </div>
-            <div class="nav-item" onclick="switchPage('profile', this)">
-                <i class="fa-solid fa-user-gear"></i> โปรไฟล์
+            <div class="nav-item" onclick="logout()">
+                <i class="fa-solid fa-power-off" style="color:#ff4757;"></i> ออกจากระบบ
             </div>
         </div>
     </div>
 
-    <div id="detail-modal" class="modal-overlay">
-        <div class="modal-sheet">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <h3 style="margin:0;">รายละเอียด</h3>
-                <button onclick="closeModal()" style="background:none; border:none; font-size:1.5rem;">&times;</button>
+    <div id="detail-modal" class="modal">
+        <div class="sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0; font-size:1.2rem;">รายละเอียดคำสั่งซื้อ</h2>
+                <button onclick="closeModal('detail')" style="border:none; background:none; font-size:1.5rem;">&times;</button>
             </div>
-            <div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-bottom:15px;">
-                <h2 id="d-menu" style="margin:0 0 5px 0;">Menu Name</h2>
-                <p id="d-address" style="color:#666; margin:0;"><i class="fa-solid fa-location-dot"></i> Address</p>
-                <div style="margin-top:10px; font-weight:bold;">
-                    ค่าอาหาร: <span id="d-price">0</span> + ค่าหิ้ว: <span id="d-tip">0</span>
+            
+            <div style="background:#f1f2f6; padding:15px; border-radius:12px; margin-top:15px;">
+                <h3 id="d-menu" style="margin:0 0 5px 0;">Menu</h3>
+                <p id="d-addr" style="color:#666; margin:0; font-size:0.9rem;">Address</p>
+                <div style="margin-top:10px; display:flex; justify-content:space-between; font-weight:bold;">
+                    <span>ราคา+ค่าหิ้ว: <span id="d-total" style="color:var(--primary)">0</span> ฿</span>
+                    <span id="d-status" style="color:#2ed573">Status</span>
                 </div>
-                <div id="d-payment-badge" style="margin-top:5px; display:inline-block; font-size:0.8rem; padding:3px 8px; border-radius:5px;"></div>
             </div>
 
-            <div id="action-area"></div>
-
-            <div style="flex:1; background:#f8f9fa; border-radius:12px; margin-top:10px; padding:10px; overflow-y:auto;" id="chat-box"></div>
-            <div style="display:flex; gap:10px; margin-top:10px;">
-                <input id="chat-inp" placeholder="พิมพ์ข้อความ..." style="margin:0;">
-                <button class="btn btn-primary" style="width:60px;" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
+            <div style="margin-top:10px; font-weight:bold; color:#57606f;">แชทกับไรเดอร์</div>
+            <div class="chat-container" id="rider-chat-box"></div>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input id="rider-chat-inp" placeholder="คุยกับคนส่งอาหาร..." style="margin:0;">
+                <button onclick="sendRiderChat()" style="width:50px; border:none; background:var(--primary); color:white; border-radius:10px;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
+
+            <button id="btn-complete" class="btn btn-primary" style="display:none; background:#2ed573;" onclick="completeOrder()">ได้รับอาหารแล้ว (จบงาน)</button>
         </div>
     </div>
 
@@ -193,33 +232,27 @@
         const db = firebase.firestore();
 
         let currentUser = null;
-        let currentRole = 'user'; // 'user' or 'rider'
-        let currentOrderId = null;
+        let currentOrderId = null; // For Rider Chat Modal
 
+        // --- AUTH ---
         auth.onAuthStateChanged(user => {
             if(user) {
                 currentUser = user;
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
+                nav('home', document.querySelector('.nav-item')); // Reset view
                 loadUserData();
-                loadFeed();
+                loadMyOrders();
+                loadAdminChat();
             } else {
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('app').style.display = 'none';
             }
         });
 
-        // --- AUTH ---
-        let regRole = 'user';
-        function showReg(role) {
-            regRole = role;
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('reg-section').style.display = 'block';
-            document.getElementById('reg-title').innerText = role==='rider' ? 'สมัครเป็นไรเดอร์' : 'สมัครสมาชิกทั่วไป';
-        }
-        function showLogin() {
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('reg-section').style.display = 'none';
+        function toggleAuth(mode) {
+            document.getElementById('login-form').style.display = mode==='login'?'block':'none';
+            document.getElementById('reg-form').style.display = mode==='reg'?'block':'none';
         }
 
         async function register() {
@@ -230,64 +263,85 @@
             const bank = document.getElementById('r-bank').value;
             const bankNo = document.getElementById('r-bank-no').value;
 
-            if(!email || !pass || !name) return Swal.fire('กรอกข้อมูลให้ครบ','','warning');
+            if(!email || !pass || !name) return Swal.fire('ข้อมูลไม่ครบ','','warning');
 
             try {
                 const c = await auth.createUserWithEmailAndPassword(email, pass);
-                // Save User Data with Bank Info & Role
                 await db.collection('users').doc(c.user.uid).set({
                     email, username: name, phone, 
                     bankName: bank, bankNo: bankNo, 
-                    role: regRole, balance: 0, createdAt: new Date()
+                    role: 'customer', balance: 0, createdAt: new Date()
                 });
-                Swal.fire('สำเร็จ','','success');
+                Swal.fire('สมัครสำเร็จ','','success');
             } catch(e) { Swal.fire('Error', e.message, 'error'); }
         }
 
-        async function login() {
-            const email = document.getElementById('l-email').value;
-            const pass = document.getElementById('l-pass').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(e => Swal.fire('Error', e.message, 'error'));
+        function login() {
+            const e = document.getElementById('l-email').value;
+            const p = document.getElementById('l-pass').value;
+            auth.signInWithEmailAndPassword(e, p).catch(err => Swal.fire('Login Failed', err.message, 'error'));
         }
 
+        function logout() { auth.signOut(); }
+
+        // --- DATA LOADING ---
         function loadUserData() {
             db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
                 const d = doc.data();
-                currentRole = d.role;
+                document.getElementById('u-name').innerText = d.username;
                 document.getElementById('u-bal').innerText = d.balance.toFixed(2);
-                document.getElementById('p-name').innerText = d.username;
-                document.getElementById('p-role').innerText = d.role.toUpperCase();
+            });
+        }
+
+        function loadMyOrders() {
+            // Query เฉพาะออเดอร์ของฉัน (buyerId == currentUid)
+            db.collection('orders')
+              .where('buyerId', '==', currentUser.uid)
+              .orderBy('timestamp', 'desc')
+              .onSnapshot(snap => {
+                const div = document.getElementById('my-order-list');
+                document.getElementById('order-count').innerText = snap.size + ' รายการ';
                 
-                // Set Profile Inputs
-                if(d.bankName) document.getElementById('p-bank').value = d.bankName;
-                document.getElementById('p-bank-no').value = d.bankNo || '';
+                if(snap.empty) {
+                    div.innerHTML = `<div style="text-align:center; padding:40px; color:#ccc;">
+                        <i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:10px;"></i><br>
+                        ไม่มีรายการสั่งซื้อ
+                    </div>`;
+                    return;
+                }
 
-                // Hide Add Button if Rider (Riders usually accept jobs, don't create)
-                // document.getElementById('fab-add').style.display = currentRole==='rider' ? 'none' : 'flex';
+                div.innerHTML = '';
+                snap.forEach(doc => {
+                    const o = doc.data();
+                    const stMap = {'pending':'รอคนรับงาน', 'accepted':'ไรเดอร์รับแล้ว', 'buying':'กำลังซื้อ', 'delivering':'กำลังมาส่ง', 'completed':'เสร็จสิ้น'};
+                    
+                    div.innerHTML += `
+                        <div class="order-card ${o.status}" onclick="openDetail('${doc.id}')">
+                            <span class="order-status">${stMap[o.status]}</span>
+                            <div style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">${o.menu}</div>
+                            <div style="font-size:0.9rem; color:#666;">
+                                <i class="fa-solid fa-location-dot"></i> ${o.address}
+                            </div>
+                            <div style="margin-top:10px; font-weight:bold; color:var(--primary);">
+                                รวม: ${o.price + o.tip} บาท 
+                                <span style="font-size:0.7rem; color:#aaa; font-weight:normal;">(${o.payment})</span>
+                            </div>
+                        </div>
+                    `;
+                });
             });
         }
 
-        async function updateProfile() {
-            await db.collection('users').doc(currentUser.uid).update({
-                bankName: document.getElementById('p-bank').value,
-                bankNo: document.getElementById('p-bank-no').value
-            });
-            Swal.fire('บันทึกแล้ว','','success');
-        }
-
-        // --- ORDERING LOGIC ---
+        // --- ORDERING ---
         async function openOrderModal() {
             const { value: form } = await Swal.fire({
-                title: 'ฝากซื้ออะไรดี?',
+                title: 'สั่งอาหาร / ฝากซื้อ',
                 html: 
-                    '<input id="sw-menu" placeholder="รายการอาหาร/ของที่ฝาก">' +
-                    '<input id="sw-price" type="number" placeholder="ค่าของโดยประมาณ (บาท)">' +
-                    '<input id="sw-tip" type="number" placeholder="ค่าหิ้ว (Tip)">' +
-                    '<input id="sw-addr" placeholder="สถานที่ส่ง">' +
-                    '<select id="sw-pay" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc;">' +
-                        '<option value="wallet">💳 ตัดเงินในแอป (Wallet)</option>' +
-                        '<option value="cash">💵 จ่ายเงินสดปลายทาง (Cash)</option>' +
-                    '</select>',
+                    '<input id="sw-menu" placeholder="เมนูที่ต้องการ">' +
+                    '<input id="sw-price" type="number" placeholder="ราคาอาหารประมาณ (บาท)">' +
+                    '<input id="sw-tip" type="number" placeholder="ค่าหิ้วให้ไรเดอร์ (บาท)">' +
+                    '<textarea id="sw-addr" placeholder="ที่อยู่จัดส่ง / รายละเอียดเพิ่มเติม"></textarea>' +
+                    '<select id="sw-pay"><option value="wallet">ตัดเงินในแอป (Wallet)</option><option value="cash">เงินสดปลายทาง (Cash)</option></select>',
                 focusConfirm: false,
                 preConfirm: () => [
                     document.getElementById('sw-menu').value,
@@ -299,12 +353,11 @@
             });
 
             if(form && form[0]) {
-                const totalCost = parseFloat(form[1]) + parseFloat(form[2]);
+                const total = parseFloat(form[1]) + parseFloat(form[2]);
                 
-                // ถ้าเลือก Wallet ต้องเช็คเงินก่อน
                 if(form[4] === 'wallet') {
                     const uDoc = await db.collection('users').doc(currentUser.uid).get();
-                    if(uDoc.data().balance < totalCost) return Swal.fire('เงินไม่พอ','กรุณาเติมเงิน','error');
+                    if(uDoc.data().balance < total) return Swal.fire('เงินไม่พอ','กรุณาเติมเงิน','error');
                 }
 
                 await db.collection('orders').add({
@@ -312,191 +365,176 @@
                     menu: form[0], price: parseFloat(form[1]), tip: parseFloat(form[2]), address: form[3], payment: form[4],
                     status: 'pending', riderId: null, timestamp: new Date()
                 });
-                Swal.fire('โพสต์งานแล้ว','รอไรเดอร์กดรับ','success');
+                Swal.fire('สั่งเรียบร้อย', 'รอไรเดอร์รับงานสักครู่', 'success');
             }
         }
 
-        function loadFeed() {
-            // Show all pending orders
-            db.collection('orders').where('status','==','pending').orderBy('timestamp','desc').onSnapshot(snap => {
-                const div = document.getElementById('feed-list');
-                div.innerHTML = '';
-                snap.forEach(doc => renderCard(doc, div));
-            });
-
-            // Load My Jobs (Active)
-            db.collection('orders').onSnapshot(snap => { // Simple fetch all and filter client side for prototype
-                const div = document.getElementById('my-jobs-list');
-                div.innerHTML = '';
-                snap.forEach(doc => {
-                    const o = doc.data();
-                    if(o.buyerId === currentUser.uid || o.riderId === currentUser.uid) {
-                        if(o.status !== 'completed' && o.status !== 'pending') renderCard(doc, div);
-                        // Also show pending if I am buyer
-                        if(o.status === 'pending' && o.buyerId === currentUser.uid) renderCard(doc, div);
-                    }
-                });
-            });
-        }
-
-        function renderCard(doc, container) {
-            const o = doc.data();
-            const payBadge = o.payment==='cash' 
-                ? '<span class="badge badge-cash">เงินสด</span>' 
-                : '<span class="badge badge-wallet">ตัดแอป</span>';
-            
-            container.innerHTML += `
-                <div class="order-card ${o.payment}" onclick="openDetail('${doc.id}')">
-                    ${payBadge}
-                    <div style="font-weight:bold; font-size:1.1rem;">${o.menu}</div>
-                    <div style="font-size:0.9rem; color:#666;">
-                        <i class="fa-solid fa-location-dot"></i> ${o.address}<br>
-                        ค่าหิ้ว: <b style="color:var(--primary)">${o.tip}</b> ฿
-                    </div>
-                    <div style="font-size:0.7rem; color:#aaa; margin-top:5px;">สถานะ: ${o.status.toUpperCase()}</div>
-                </div>
-            `;
-        }
+        // --- ORDER DETAIL & RIDER CHAT ---
+        let riderChatUnsub = null;
 
         function openDetail(id) {
             currentOrderId = id;
             document.getElementById('detail-modal').classList.add('active');
             
+            // Listen Order Data
             db.collection('orders').doc(id).onSnapshot(doc => {
                 const o = doc.data();
-                if(!o) return;
-
                 document.getElementById('d-menu').innerText = o.menu;
-                document.getElementById('d-address').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${o.address}`;
-                document.getElementById('d-price').innerText = o.price;
-                document.getElementById('d-tip').innerText = o.tip;
+                document.getElementById('d-addr').innerText = o.address;
+                document.getElementById('d-total').innerText = o.price + o.tip;
+                document.getElementById('d-status').innerText = o.status.toUpperCase();
                 
-                const badge = document.getElementById('d-payment-badge');
-                if(o.payment === 'cash') {
-                    badge.style.background = '#d1fae5'; badge.style.color='#065f46'; badge.innerText = '💵 เงินสด (จ่ายกับไรเดอร์)';
+                // Show Complete Button if delivering
+                const btn = document.getElementById('btn-complete');
+                if(o.status === 'delivering') {
+                    btn.style.display = 'block';
+                    // Logic check payment type for button text
+                    btn.innerText = o.payment==='wallet' ? 'ได้รับของแล้ว (โอนเงินให้ไรเดอร์)' : 'ได้รับของแล้ว (จ่ายเงินสด)';
                 } else {
-                    badge.style.background = '#dbeafe'; badge.style.color='#1e40af'; badge.innerText = '💳 ตัดผ่านแอป (ปลอดภัย)';
+                    btn.style.display = 'none';
                 }
-
-                // Action Button Logic
-                const area = document.getElementById('action-area');
-                area.innerHTML = '';
-
-                // Logic for Rider
-                if(currentUser.uid !== o.buyerId) {
-                    if(o.status === 'pending') {
-                        area.innerHTML = `<button class="btn btn-primary" onclick="acceptJob('${id}')">รับงานนี้</button>`;
-                    } else if (o.riderId === currentUser.uid && o.status !== 'completed') {
-                        area.innerHTML = `<button class="btn btn-primary" onclick="updateStatus('${id}','delivering')">ฉันกำลังไปส่ง</button>`;
-                    }
-                }
-                
-                // Logic for Buyer (Complete & Transfer)
-                if(currentUser.uid === o.buyerId && o.status === 'delivering') {
-                    area.innerHTML = `<button class="btn btn-primary" style="background:#2ed573;" onclick="completeOrder('${id}')">ได้รับของแล้ว (จบงาน)</button>`;
-                }
-
-                loadChat(id);
             });
-        }
 
-        // --- ACTIONS & MONEY TRANSFER FIX ---
-        async function acceptJob(id) {
-            await db.collection('orders').doc(id).update({ riderId: currentUser.uid, status: 'accepted' });
-        }
-
-        async function updateStatus(id, st) {
-            await db.collection('orders').doc(id).update({ status: st });
-        }
-
-        async function completeOrder(id) {
-            // ดึงข้อมูลออเดอร์ล่าสุด
-            const orderDoc = await db.collection('orders').doc(id).get();
-            const o = orderDoc.data();
-            const total = parseFloat(o.price) + parseFloat(o.tip);
-
-            if(o.payment === 'wallet') {
-                // 1. เช็คเงินผู้ซื้ออีกรอบเพื่อความชัวร์
-                const buyerRef = db.collection('users').doc(o.buyerId);
-                const riderRef = db.collection('users').doc(o.riderId);
-                
-                const buyerSnap = await buyerRef.get();
-                if(buyerSnap.data().balance < total) return Swal.fire('Error','เงินผู้ซื้อไม่พอ','error');
-
-                // 2. Transaction ตัดเงิน -> เพิ่มเงิน
-                await db.runTransaction(async t => {
-                    const bData = (await t.get(buyerRef)).data();
-                    const rData = (await t.get(riderRef)).data();
-
-                    t.update(buyerRef, { balance: bData.balance - total });
-                    t.update(riderRef, { balance: rData.balance + total });
-                    
-                    // บันทึก Log การโอน
-                    const txRef = db.collection('transactions').doc();
-                    t.set(txRef, {
-                        type: 'transfer', from: o.buyerId, to: o.riderId, amount: total, 
-                        orderId: id, timestamp: new Date()
-                    });
-
-                    t.update(db.collection('orders').doc(id), { status: 'completed' });
-                });
-                Swal.fire('สำเร็จ','ระบบโอนเงินให้ไรเดอร์แล้ว','success');
-
-            } else {
-                // จ่ายเงินสด แค่อัปเดตสถานะ
-                await db.collection('orders').doc(id).update({ status: 'completed' });
-                Swal.fire('จบงาน','คุณต้องจ่ายเงินสดให้ไรเดอร์','success');
-            }
-            closeModal();
-        }
-
-        // --- CHAT ---
-        function loadChat(oid) {
-            db.collection('orders').doc(oid).collection('chat').orderBy('time').onSnapshot(snap => {
-                const div = document.getElementById('chat-box');
-                div.innerHTML = '';
+            // Listen Chat
+            if(riderChatUnsub) riderChatUnsub();
+            riderChatUnsub = db.collection('orders').doc(id).collection('chat').orderBy('time').onSnapshot(snap => {
+                const box = document.getElementById('rider-chat-box');
+                box.innerHTML = '';
                 snap.forEach(d => {
                     const m = d.data();
-                    const align = m.uid===currentUser.uid ? 'text-align:right;' : '';
-                    const bg = m.uid===currentUser.uid ? 'background:#dbeafe;' : 'background:white; border:1px solid #eee;';
-                    div.innerHTML += `<div style="${align} margin-bottom:5px;"><span style="${bg} padding:5px 10px; border-radius:10px; display:inline-block;">${m.msg}</span></div>`;
+                    const cls = m.uid === currentUser.uid ? 'msg-me' : 'msg-other';
+                    box.innerHTML += `<div class="msg ${cls}">${m.msg}</div>`;
                 });
-                div.scrollTop = div.scrollHeight;
+                box.scrollTop = box.scrollHeight;
             });
         }
-        function sendChat() {
-            const txt = document.getElementById('chat-inp').value;
+
+        function sendRiderChat() {
+            const txt = document.getElementById('rider-chat-inp').value;
             if(!txt) return;
             db.collection('orders').doc(currentOrderId).collection('chat').add({
                 uid: currentUser.uid, msg: txt, time: new Date()
             });
-            document.getElementById('chat-inp').value = '';
+            document.getElementById('rider-chat-inp').value = '';
+        }
+
+        async function completeOrder() {
+            const orderRef = db.collection('orders').doc(currentOrderId);
+            const o = (await orderRef.get()).data();
+            const total = o.price + o.tip;
+
+            if(o.payment === 'wallet') {
+                // Transaction logic
+                const buyerRef = db.collection('users').doc(currentUser.uid);
+                const riderRef = db.collection('users').doc(o.riderId); // Must ensure riderId exists
+
+                if(!o.riderId) return Swal.fire('Error','ไม่มีไรเดอร์รับงาน','error');
+
+                await db.runTransaction(async t => {
+                    const bBal = (await t.get(buyerRef)).data().balance;
+                    if(bBal < total) throw "เงินไม่พอ";
+                    
+                    const rBal = (await t.get(riderRef)).data().balance;
+                    t.update(buyerRef, { balance: bBal - total });
+                    t.update(riderRef, { balance: rBal + total });
+                    t.update(orderRef, { status: 'completed' });
+                    
+                    // Log
+                    const txRef = db.collection('transactions').doc();
+                    t.set(txRef, { type:'payment', from:currentUser.uid, to:o.riderId, amount:total, order:currentOrderId, timestamp: new Date() });
+                });
+                Swal.fire('เรียบร้อย','ตัดเงินจาก Wallet ให้ไรเดอร์แล้ว','success');
+            } else {
+                // Cash
+                await orderRef.update({ status: 'completed' });
+                Swal.fire('เรียบร้อย','จ่ายเงินสดให้ไรเดอร์แล้ว','success');
+            }
+            closeModal('detail');
+        }
+
+        // --- ADMIN CHAT ---
+        function loadAdminChat() {
+            // ใช้ sub-collection หรือ collection แยกก็ได้ ในที่นี้ใช้ collection 'support' โดย filter uid
+            // เพื่อให้ง่ายสำหรับ prototype นี้ ผมจะใช้ collection 'support_msgs' ที่มี uid แปะไว้
+            db.collection('support_msgs').where('roomId', '==', currentUser.uid).orderBy('time').onSnapshot(snap => {
+                const box = document.getElementById('admin-chat-box');
+                box.innerHTML = '';
+                if(snap.empty) box.innerHTML = '<div style="text-align:center; color:#ccc;">เริ่มสนทนากับแอดมิน</div>';
+                
+                snap.forEach(d => {
+                    const m = d.data();
+                    const cls = m.uid === currentUser.uid ? 'msg-me' : 'msg-other'; // Admin reply will have admin uid
+                    box.innerHTML += `<div class="msg ${cls}">${m.msg}</div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        async function sendAdminChat() {
+            const txt = document.getElementById('admin-chat-inp').value;
+            if(!txt) return;
+            
+            // Check if chat room exists in 'support' list for admin to see
+            const supRef = db.collection('support').doc(currentUser.uid);
+            await supRef.set({
+                uid: currentUser.uid,
+                email: currentUser.email,
+                lastMsg: txt,
+                timestamp: new Date(),
+                status: 'pending' // Admin sees this
+            }, { merge: true });
+
+            // Add message
+            await db.collection('support_msgs').add({
+                roomId: currentUser.uid,
+                uid: currentUser.uid,
+                msg: txt,
+                time: new Date()
+            });
+            document.getElementById('admin-chat-inp').value = '';
         }
 
         // --- WALLET ---
-        async function walletAction() {
-            const { isConfirmed, isDenied } = await Swal.fire({
-                title: 'กระเป๋าเงิน',
-                text: `ยอดเงิน: ${document.getElementById('u-bal').innerText}`,
-                showDenyButton: true, confirmButtonText: 'เติมเงิน', denyButtonText: 'ถอนเงิน'
-            });
+        async function openDeposit() {
+            const {value:n} = await Swal.fire({title:'เติมเงิน', input:'number'});
+            if(n) {
+                await db.collection('transactions').add({
+                    uid: currentUser.uid, type: 'deposit', amount: parseFloat(n), status: 'pending', timestamp: new Date()
+                });
+                Swal.fire('แจ้งเติมเงินแล้ว','','success');
+            }
+        }
+        async function openWithdraw() {
+            const {value:n} = await Swal.fire({title:'ถอนเงิน', text:'*มีค่าธรรมเนียม 1 บาท', input:'number'});
+            if(n) {
+                const amount = parseFloat(n);
+                // Check Balance (+1 fee)
+                const uDoc = await db.collection('users').doc(currentUser.uid).get();
+                if(uDoc.data().balance < amount + 1) return Swal.fire('เงินไม่พอ','(รวมค่าธรรมเนียม 1 บาท)','error');
 
-            if (isConfirmed) { // Deposit
-                const {value:n} = await Swal.fire({title:'เติมเงิน',input:'number'});
-                if(n) await db.collection('transactions').add({uid:currentUser.uid, type:'deposit', amount:parseFloat(n), status:'pending'});
-            } else if (isDenied) { // Withdraw
-                const {value:n} = await Swal.fire({title:'ถอนเงิน (หัก 1 บาท)',input:'number'});
-                if(n) await db.collection('transactions').add({uid:currentUser.uid, type:'withdraw', amount:parseFloat(n), fee:1, status:'pending'});
+                await db.collection('transactions').add({
+                    uid: currentUser.uid, type: 'withdraw', amount: amount, fee: 1, total: amount+1, status: 'pending', timestamp: new Date()
+                });
+                Swal.fire('แจ้งถอนแล้ว','','success');
             }
         }
 
-        function closeModal() { document.getElementById('detail-modal').classList.remove('active'); }
-        function logout() { auth.signOut(); }
-        function switchPage(page, el) {
-            document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-            el.classList.add('active');
-            ['home','jobs','profile'].forEach(p => document.getElementById('page-'+p).style.display='none');
-            document.getElementById('page-'+page).style.display='block';
+        // --- UTILS ---
+        function closeModal(id) { document.getElementById(id+'-modal').classList.remove('active'); }
+        function nav(page, el) {
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            if(el) el.classList.add('active');
+            
+            // Toggle Display
+            if(page === 'home') {
+                document.getElementById('page-home').style.display = 'block';
+                document.getElementById('page-support').style.display = 'none';
+                document.getElementById('fab-add').style.display = 'flex';
+            } else {
+                document.getElementById('page-home').style.display = 'none';
+                document.getElementById('page-support').style.display = 'flex'; // Flex for chat layout
+                document.getElementById('fab-add').style.display = 'none';
+            }
         }
     </script>
 </body>
