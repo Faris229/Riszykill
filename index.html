@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer | FoodRunner</title>
+    <title>Customer App</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -27,7 +27,7 @@
     <input id="email" placeholder="อีเมล">
     <input id="pass" type="password" placeholder="รหัสผ่าน">
     <button class="btn" onclick="authFunc('login')">เข้าสู่ระบบ</button>
-    <button class="btn" style="background:none; color:#555; margin-top:10px;" onclick="regPopup()">สมัครใหม่</button>
+    <button class="btn" style="background:none; color:#555; margin-top:10px;" onclick="regPopup()">สมัครสมาชิก</button>
 </div>
 
 <div id="app" style="display:none;">
@@ -50,7 +50,6 @@
 
     <div class="nav">
         <div class="nav-item active"><i class="fa-solid fa-house" style="font-size:1.5rem"></i><br>หน้าหลัก</div>
-        <div class="nav-item" onclick="openSupport()"><i class="fa-solid fa-headset" style="font-size:1.5rem"></i><br>แอดมิน</div>
         <div class="nav-item" onclick="firebase.auth().signOut()"><i class="fa-solid fa-right-from-bracket" style="font-size:1.5rem"></i><br>ออก</div>
     </div>
 </div>
@@ -60,9 +59,17 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // ⚠️ ใส่ Config ของคุณตรงนี้
-    const config = { apiKey: "AIzaSy...", authDomain: "...", projectId: "..." };
-    try { firebase.initializeApp(config); } catch(e){}
+    // ✅ Config ของคุณ
+    const config = {
+        apiKey: "AIzaSyA2NTzJKFK3GtULDl-l2EvEH3VamDh-VZI",
+        authDomain: "chat-27f96.firebaseapp.com",
+        databaseURL: "https://chat-27f96-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "chat-27f96",
+        storageBucket: "chat-27f96.firebasestorage.app",
+        messagingSenderId: "336686938010",
+        appId: "1:336686938010:web:9ea0e0ddd8d93e8358ec23"
+    };
+    firebase.initializeApp(config);
     const auth = firebase.auth(), db = firebase.firestore();
     let uid = null;
 
@@ -72,17 +79,17 @@
     });
 
     async function authFunc(type) {
-        const e=document.getElementById('email').value, p=document.getElementById('pass').value;
-        try { await auth.signInWithEmailAndPassword(e,p); } catch(err){ Swal.fire('Error',err.message,'error'); }
+        try { await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value); }
+        catch(err){ Swal.fire('Error',err.message,'error'); }
     }
+
     async function regPopup() {
         const {value:f} = await Swal.fire({title:'สมัครสมาชิก', html:'<input id="r-name" class="swal2-input" placeholder="ชื่อเล่น"><input id="r-tel" class="swal2-input" placeholder="เบอร์โทร">', focusConfirm:false, preConfirm:()=>[document.getElementById('r-name').value, document.getElementById('r-tel').value]});
         if(f) {
-            const e=document.getElementById('email').value, p=document.getElementById('pass').value;
             try {
-                const c = await auth.createUserWithEmailAndPassword(e,p);
-                await db.collection('users').doc(c.user.uid).set({email:e, username:f[0], phone:f[1], role:'customer', balance:0});
-                Swal.fire('สำเร็จ','','success');
+                const c = await auth.createUserWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value);
+                await db.collection('users').doc(c.user.uid).set({username:f[0], phone:f[1], role:'customer', balance:0});
+                Swal.fire('สำเร็จ','เข้าสู่ระบบได้เลย','success');
             } catch(er){ Swal.fire('Error',er.message,'error'); }
         }
     }
@@ -90,11 +97,10 @@
     function init() {
         db.collection('users').doc(uid).onSnapshot(d => { if(d.exists) document.getElementById('bal').innerText = d.data().balance.toFixed(2); });
         
-        // Load Orders (No orderBy to prevent index error)
         db.collection('orders').where('buyerId','==',uid).onSnapshot(snap => {
             const list = [];
             snap.forEach(d => list.push({id:d.id, ...d.data()}));
-            list.sort((a,b) => b.timestamp - a.timestamp); // Sort JS
+            list.sort((a,b) => b.timestamp - a.timestamp);
 
             let h = '';
             list.forEach(o => {
@@ -155,8 +161,6 @@
         const {value:n} = await Swal.fire({title:'เติมเงิน', input:'number'});
         if(n) { await db.collection('transactions').add({uid, type:'deposit', amount:parseFloat(n), status:'pending'}); Swal.fire('แจ้งแล้ว','รออนุมัติ','success'); }
     }
-    
-    function openSupport() { Swal.fire('ติดต่อแอดมิน','Line ID: @foodrunner','info'); }
 </script>
 </body>
 </html>
