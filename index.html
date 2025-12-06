@@ -4,203 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>จองคิวออนไลน์</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --bg-body: #f8fafc;
-            --surface: #ffffff;
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-        }
-
-        body { font-family: 'Kanit', sans-serif; background-color: var(--bg-body); color: var(--text-main); -webkit-font-smoothing: antialiased; }
-
-        /* --- Announcement Bar --- */
-        .marquee-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 40px;
-            background: var(--primary); color: white; z-index: 100;
-            display: flex; align-items: center; box-shadow: 0 4px 12px rgba(37,99,235,0.2);
-        }
-        .marquee-label { background: rgba(0,0,0,0.2); height: 100%; display: flex; align-items: center; padding: 0 16px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; z-index: 2; }
-        .marquee-text-wrap { overflow: hidden; white-space: nowrap; flex: 1; position: relative; }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; font-size: 0.875rem; font-weight: 500; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .card { background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
+        .btn-primary { background: #2563eb; color: white; border-radius: 1rem; transition: transform 0.1s; }
+        .btn-primary:active { transform: scale(0.97); }
+        .status-badge { padding: 4px 12px; border-radius: 99px; font-weight: bold; font-size: 0.8rem; }
+        .st-wait { background: #eff6ff; color: #2563eb; }
+        .st-call { background: #ecfdf5; color: #059669; animation: flash 1s infinite; }
+        .marquee-wrap { position: fixed; top: 0; width: 100%; height: 36px; background: #2563eb; color: white; z-index: 50; display: flex; align-items: center; }
+        .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; padding-left: 100%; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-
-        /* --- Layout --- */
-        .app-container { max-width: 480px; margin: 0 auto; padding: 60px 20px 40px 20px; min-height: 100vh; display: flex; flex-direction: column; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        
-        /* --- Cards --- */
-        .status-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border: 1px solid var(--border); border-radius: 24px;
-            padding: 24px; text-align: center; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
-            margin-bottom: 24px; position: relative; overflow: hidden;
-        }
-        .status-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--primary), #60a5fa);
-        }
-
-        .form-card {
-            background: var(--surface); border-radius: 24px; padding: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--border);
-        }
-
-        /* --- Inputs --- */
-        .input-group { margin-bottom: 16px; }
-        .input-label { display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
-        .input-box {
-            width: 100%; padding: 14px 16px; border-radius: 14px;
-            border: 1px solid var(--border); background: #f8fafc;
-            font-size: 1rem; transition: all 0.2s; color: var(--text-main);
-        }
-        .input-box:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
-
-        /* --- Buttons --- */
-        .btn-main {
-            width: 100%; background: var(--primary); color: white;
-            padding: 16px; border-radius: 16px; font-weight: 600; font-size: 1rem;
-            box-shadow: 0 8px 20px -4px rgba(37,99,235,0.4);
-            transition: transform 0.1s, background 0.2s; border: none; cursor: pointer;
-        }
-        .btn-main:active { transform: scale(0.98); }
-        .btn-main:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
-
-        /* --- Ticket --- */
-        .ticket-view { display: none; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-        .ticket-wrapper {
-            background: white; border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); border: 1px solid var(--border);
-        }
-        .ticket-top {
-            background: #f1f5f9; padding: 30px; text-align: center;
-            border-bottom: 2px dashed #cbd5e1; position: relative;
-        }
-        .ticket-top::after, .ticket-top::before {
-            content: ''; position: absolute; bottom: -12px; width: 24px; height: 24px;
-            background: var(--bg-body); border-radius: 50%;
-        }
-        .ticket-top::after { left: -12px; } .ticket-top::before { right: -12px; }
-
-        .ticket-bottom { padding: 30px; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.875rem; }
-        .info-label { color: var(--text-sub); }
-        .info-val { font-weight: 600; color: var(--text-main); }
-
-        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .status-badge { padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .st-wait { background: #eff6ff; color: var(--primary); }
-        .st-call { background: #ecfdf5; color: #059669; animation: pulse 1s infinite; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col pt-12">
 
-    <div id="ann-bar" class="marquee-container hidden">
-        <div class="marquee-label"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
-        <div class="marquee-text-wrap"><div id="ann-text" class="marquee-text">...</div></div>
+    <div id="ann-bar" class="marquee-wrap hidden">
+        <div class="bg-blue-800 h-full px-4 flex items-center font-bold z-10 text-xs"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
+        <div id="ann-text" class="marquee-content text-sm font-medium">...</div>
     </div>
 
-    <div class="app-container">
-        
-        <header class="header">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800" id="shop-name">Loading...</h1>
-                <p class="text-xs text-slate-400">ระบบจองคิวอัจฉริยะ</p>
-            </div>
-            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-green-200 shadow-lg"></div>
-        </header>
+    <header class="p-6 bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-gray-100">
+        <div class="flex justify-between items-center max-w-md mx-auto">
+            <div><h1 class="font-bold text-xl text-slate-800" id="shop-name">Loading...</h1><p class="text-xs text-gray-400">ระบบจองคิว</p></div>
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
+    </header>
 
-        <div class="status-card">
-            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">คิวที่กำลังให้บริการ</div>
-            <h2 class="text-6xl font-black text-slate-800 mb-2 tracking-tighter" id="display-current">A-000</h2>
-            <p class="text-sm text-blue-600 font-medium bg-blue-50 inline-block px-3 py-1 rounded-full">
-                <i class="fa-solid fa-users mr-1"></i> รออีก <span id="display-wait">0</span> คิว
-            </p>
+    <main class="flex-1 max-w-md mx-auto w-full p-6 flex flex-col justify-center">
+        <div class="text-center mb-8">
+            <h2 class="text-5xl font-bold text-slate-800" id="current-q">A-000</h2>
+            <p class="text-sm text-gray-400 mt-1">คิวปัจจุบัน</p>
+            <div class="mt-4"><span class="text-xl font-bold text-blue-600" id="wait-count">0</span> <span class="text-xs text-gray-400">คิวรอ</span></div>
         </div>
 
-        <div id="form-section" class="form-card">
-            <h3 class="text-lg font-bold mb-6 flex items-center"><i class="fa-solid fa-ticket mr-2 text-blue-500"></i> จองคิวใหม่</h3>
-            <form onsubmit="App.book(event)">
-                <div class="input-group">
-                    <label class="input-label">ชื่อลูกค้า</label>
-                    <input id="inp-name" type="text" class="input-box" placeholder="เช่น คุณสมชาย" required>
+        <div id="form-section" class="card p-6">
+            <h3 class="font-bold text-lg mb-4">จองคิวใหม่</h3>
+            <form onsubmit="App.book(event)" class="space-y-3">
+                <input id="inp-name" class="w-full bg-slate-50 border rounded-xl p-3" placeholder="ชื่อลูกค้า" required>
+                <input id="inp-phone" type="tel" class="w-full bg-slate-50 border rounded-xl p-3" placeholder="เบอร์โทร">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="inp-pax" class="w-full bg-slate-50 border rounded-xl p-3"><option value="1">1 ท่าน</option><option value="2">2 ท่าน</option><option value="3+">3+ ท่าน</option></select>
+                    <input id="inp-time" type="time" class="w-full bg-slate-50 border rounded-xl p-3 text-blue-600 font-bold" required>
                 </div>
-                <div class="input-group">
-                    <label class="input-label">เบอร์โทรศัพท์</label>
-                    <input id="inp-phone" type="tel" class="input-box" placeholder="08x-xxx-xxxx" required>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="input-group">
-                        <label class="input-label">จำนวน (ท่าน)</label>
-                        <select id="inp-pax" class="input-box">
-                            <option value="1">1 ท่าน</option>
-                            <option value="2">2 ท่าน</option>
-                            <option value="3">3 ท่าน</option>
-                            <option value="4">4 ท่าน</option>
-                            <option value="5+">5+ ท่าน</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label text-blue-600">เวลาจะมาถึง</label>
-                        <input id="inp-time" type="time" class="input-box border-blue-200 bg-blue-50 text-blue-800 font-bold" required>
-                    </div>
-                </div>
-                <button type="submit" id="btn-book" class="btn-main mt-4">
-                    ยืนยันการจองคิว
-                </button>
+                <button id="btn-book" class="btn-primary w-full py-3.5 font-bold shadow-lg mt-2">กดรับบัตรคิว</button>
             </form>
         </div>
 
-        <div id="ticket-section" class="ticket-view">
-            <div class="ticket-wrapper">
-                <div class="ticket-top">
-                    <div class="text-xs text-slate-400 font-bold uppercase mb-2">หมายเลขคิวของคุณ</div>
-                    <div class="text-6xl font-black text-slate-800" id="my-q-num">...</div>
-                    <div id="my-status" class="status-badge st-wait inline-block mt-4">WAITING</div>
+        <div id="ticket-section" class="hidden card overflow-hidden animate__animated animate__fadeInUp">
+            <div class="bg-slate-50 p-6 border-b border-dashed text-center">
+                <div class="text-xs text-gray-400 uppercase">Your Queue</div>
+                <div id="my-q-num" class="text-5xl font-black text-slate-800 mt-2">A-001</div>
+                <div id="my-status" class="status-badge st-wait inline-block mt-3">WAITING</div>
+            </div>
+            <div class="p-6">
+                <div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Name</span><span class="font-bold" id="my-name">...</span></div>
+                <div class="flex justify-between text-sm mb-4"><span class="text-gray-400">Arrival</span><span class="font-bold text-blue-600" id="my-arrival">...</span></div>
+                <div class="bg-yellow-50 p-3 rounded text-xs text-yellow-700 mb-4 border border-yellow-100">
+                    <i class="fa-solid fa-volume-high mr-1"></i> กรุณาเปิดเสียงเพื่อรอเรียกคิว
                 </div>
-                <div class="ticket-bottom">
-                    <div class="info-row">
-                        <span class="info-label">ชื่อลูกค้า</span>
-                        <span class="info-val" id="my-name">...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">เวลาที่จอง</span>
-                        <span class="info-val" id="my-book-time">...</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label text-blue-600 font-bold">แจ้งเวลามาถึง</span>
-                        <span class="info-val text-blue-600" id="my-arrival">...</span>
-                    </div>
-                    
-                    <div class="mt-6 bg-yellow-50 border border-yellow-100 p-4 rounded-xl text-xs text-yellow-800 leading-relaxed">
-                        <i class="fa-solid fa-volume-high mr-1"></i> ระบบจะเรียกคิวด้วยเสียงภาษาไทย กรุณาเปิดเสียงโทรศัพท์และรอเรียก
-                    </div>
-
-                    <button onclick="App.cancel()" class="w-full mt-6 text-red-500 font-bold text-sm hover:underline">
-                        ยกเลิกคิวนี้
-                    </button>
-                </div>
+                <button onclick="App.cancel()" class="w-full text-center text-xs text-red-400 mt-2 underline">ยกเลิกคิว</button>
             </div>
         </div>
-
-    </div>
+    </main>
 
     <script>
-        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -209,180 +86,152 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        
-        // --- APP CLASS ---
-        class QueueClient {
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        class CustomerApp {
             constructor() {
-                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-                this.db = firebase.firestore();
-                this.myId = localStorage.getItem('q_id_v2'); // Use v2 key
-                this.lastAnnounce = null;
+                this.myId = localStorage.getItem('q_id_pro');
+                this.lastCallTime = null;
                 this.init();
             }
 
             init() {
-                this.listenSystem();
+                this.listenConfig();
                 if(this.myId) this.listenTicket();
             }
 
-            // 1. Listen Global Config
-            listenSystem() {
-                this.db.collection('q_system').doc('config').onSnapshot(doc => {
+            listenConfig() {
+                db.collection('q_system').doc('config').onSnapshot(doc => {
                     if(doc.exists) {
                         const d = doc.data();
                         document.getElementById('shop-name').innerText = d.shopName || 'Queue System';
-                        document.getElementById('display-current').innerText = d.current || 'A-000';
+                        document.getElementById('current-q').innerText = d.current || 'A-000';
                         
-                        // Announcement
                         const bar = document.getElementById('ann-bar');
-                        if(d.showAnnounce && d.announceText) {
+                        if(d.showAnnounce) {
                             bar.classList.remove('hidden');
                             document.getElementById('ann-text').innerText = d.announceText;
-                            document.querySelector('.app-container').style.paddingTop = '60px';
-                        } else {
-                            bar.classList.add('hidden');
-                            document.querySelector('.app-container').style.paddingTop = '20px';
-                        }
-
-                        // TTS Logic (Global Call)
-                        if(d.current !== 'A-000' && d.forceUpdate !== this.lastAnnounce) {
-                            this.lastAnnounce = d.forceUpdate; // Use timestamp to check newness
-                            // Only speak if user didn't just load the page (prevent spam on refresh)
-                            // But here we allow it for consistency
-                            // this.speak(`ขอเชิญหมายเลข ${d.current} ค่ะ`); 
-                        }
-                    } else {
-                        this.db.collection('q_system').doc('config').set({current:'A-000', last:0});
+                        } else bar.classList.add('hidden');
+                        
+                        db.collection('q_system').doc('config').collection('queues').where('status','==','waiting')
+                          .onSnapshot(s => document.getElementById('wait-count').innerText = s.size);
                     }
                 });
-
-                // Count Waiting
-                this.db.collection('q_system').doc('config').collection('queues')
-                    .where('status','==','waiting').onSnapshot(s => document.getElementById('display-wait').innerText = s.size);
             }
 
-            // 2. Listen My Ticket
+            // ฟังการเปลี่ยนแปลงของตั๋วตัวเอง
             listenTicket() {
-                this.db.collection('q_system').doc('config').collection('queues').doc(this.myId)
-                    .onSnapshot(doc => {
-                        if(doc.exists) {
-                            const d = doc.data();
-                            if(d.status === 'cancelled' || d.status === 'served') {
-                                this.logout(); return;
-                            }
-                            this.renderTicket(d);
+                db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(doc => {
+                    if(doc.exists) {
+                        const d = doc.data();
+                        if(d.status==='cancelled'||d.status==='served') { this.logout(); return; }
+                        this.renderTicket(d);
 
-                            // TTS Logic (Specific Call) - Double Speak
-                            const callKey = JSON.stringify(d.lastCall);
-                            if(d.status === 'called' && this.lastMyCall !== callKey) {
-                                this.lastMyCall = callKey;
-                                this.playNotification(d.number);
-                            }
-                        } else this.logout();
-                    });
+                        // --- จุดสำคัญ: ตรวจสอบว่าถูกเรียกหรือยัง ---
+                        // ใช้ lastCall timestamp เพื่อเช็คว่าเป็นการเรียกครั้งใหม่หรือไม่ (กันเสียงซ้ำ)
+                        const callKey = JSON.stringify(d.lastCall);
+                        
+                        if(d.status === 'called' && this.lastCallTime !== callKey) {
+                            this.lastCallTime = callKey;
+                            
+                            // ถ้ามีข้อความจากแอดมิน (voiceMessage) ให้ใช้ข้อความนั้น
+                            // ถ้าไม่มี ให้ใช้ข้อความมาตรฐาน
+                            const msg = d.voiceMessage || `ขอเชิญหมายเลข ${d.number} ค่ะ`;
+                            
+                            this.announceDouble(msg);
+                        }
+                    } else this.logout();
+                });
             }
 
-            // 3. Booking Logic
+            announceDouble(msg) {
+                if(navigator.vibrate) navigator.vibrate([500,200,500]); // สั่นแจ้งเตือน
+                
+                // พูดรอบที่ 1
+                this.speak(msg);
+                
+                // พูดรอบที่ 2 (เว้น 4 วิ)
+                setTimeout(() => { this.speak(msg); }, 4000);
+
+                // เด้ง Popup
+                Swal.fire({
+                    title: 'ถึงคิวคุณแล้ว!', 
+                    text: msg, 
+                    icon: 'success',
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#2563eb'
+                });
+            }
+
             async book(e) {
                 e.preventDefault();
-                // Unlock Audio Context
+                // เทคนิคปลดล็อกเสียง (iOS ต้องมี user interaction ก่อนถึงจะเล่นเสียงได้)
                 this.speak(''); 
 
                 const btn = document.getElementById('btn-book');
-                btn.disabled = true; btn.innerHTML = 'กำลังบันทึกข้อมูล...';
-
-                const name = document.getElementById('inp-name').value;
-                const phone = document.getElementById('inp-phone').value;
-                const pax = document.getElementById('inp-pax').value;
-                const arrival = document.getElementById('inp-time').value;
+                btn.disabled = true; btn.innerText = 'Processing...';
 
                 try {
-                    await this.db.runTransaction(async (t) => {
-                        const ref = this.db.collection('q_system').doc('config');
+                    await db.runTransaction(async (t) => {
+                        const ref = db.collection('q_system').doc('config');
                         const doc = await t.get(ref);
-                        let next = (doc.data().last || 0) + 1;
-                        let num = 'A-' + String(next).padStart(3,'0');
-
-                        const newRef = ref.collection('queues').doc();
-                        t.set(newRef, {
+                        let next = (doc.data().last||0)+1;
+                        let num = 'A-'+String(next).padStart(3,'0');
+                        const qRef = ref.collection('queues').doc();
+                        
+                        t.set(qRef, {
                             number: num, raw: next,
-                            name, phone, pax, arrivalTime: arrival, // Save Arrival Time
+                            name: document.getElementById('inp-name').value,
+                            phone: document.getElementById('inp-phone').value,
+                            pax: document.getElementById('inp-pax').value,
+                            arrivalTime: document.getElementById('inp-time').value, // เก็บเวลามาถึง
                             status: 'waiting',
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        t.update(ref, { last: next });
-                        
-                        localStorage.setItem('q_id_v2', newRef.id);
-                        this.myId = newRef.id;
+                        t.update(ref, {last: next});
+                        localStorage.setItem('q_id_pro', qRef.id);
+                        this.myId = qRef.id;
                     });
                     this.listenTicket();
                     Swal.fire({icon:'success', title:'จองสำเร็จ', timer:1500, showConfirmButton:false});
-                } catch(err) {
-                    console.error(err);
-                    btn.disabled = false; btn.innerHTML = 'ยืนยันการจองคิว';
-                    Swal.fire('Error', 'ไม่สามารถจองได้ในขณะนี้', 'error');
+                } catch(e) {
+                    btn.disabled = false; btn.innerText = 'กดรับบัตรคิว';
+                    Swal.fire('Error', e.message, 'error');
                 }
             }
 
-            // 4. Helpers
             renderTicket(d) {
-                document.getElementById('form-section').style.display = 'none';
-                document.getElementById('ticket-section').style.display = 'block';
-                
+                document.getElementById('form-section').classList.add('hidden');
+                document.getElementById('ticket-section').classList.remove('hidden');
                 document.getElementById('my-q-num').innerText = d.number;
                 document.getElementById('my-name').innerText = d.name;
-                document.getElementById('my-book-time').innerText = d.timestamp ? moment(d.timestamp.toDate()).format('HH:mm') : '-';
                 document.getElementById('my-arrival').innerText = d.arrivalTime || '-';
-
-                const badge = document.getElementById('my-status');
-                if(d.status === 'called') {
-                    badge.className = 'status-badge st-call inline-block mt-4';
-                    badge.innerText = 'ถึงคิวคุณแล้ว!';
-                } else {
-                    badge.className = 'status-badge st-wait inline-block mt-4';
-                    badge.innerText = 'WAITING';
-                }
+                
+                const b = document.getElementById('my-status');
+                if(d.status==='called') { b.className='status-badge st-call inline-block mt-3'; b.innerText='CALLED'; }
+                else { b.className='status-badge st-wait inline-block mt-3'; b.innerText='WAITING'; }
             }
 
             cancel() {
-                Swal.fire({title:'ยกเลิกคิว?', text:'คุณแน่ใจหรือไม่', icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626'}).then(r => {
-                    if(r.isConfirmed) {
-                        this.db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'});
-                        this.logout();
-                    }
-                });
+                if(confirm('Cancel Queue?')) {
+                    db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'});
+                    this.logout();
+                }
             }
 
-            logout() { localStorage.removeItem('q_id_v2'); location.reload(); }
-
-            playNotification(num) {
-                if(navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
-                
-                // Speak twice
-                this.speak(`ขอเชิญหมายเลข ${num} ค่ะ`);
-                setTimeout(() => {
-                    this.speak(`ขอเชิญหมายเลข ${num} ค่ะ`);
-                }, 3500);
-
-                Swal.fire({
-                    title: 'ถึงคิวคุณแล้ว!',
-                    text: `เชิญหมายเลข ${num} ที่เคาน์เตอร์`,
-                    icon: 'success',
-                    backdrop: `rgba(0,0,123,0.4)`
-                });
-            }
+            logout() { localStorage.removeItem('q_id_pro'); location.reload(); }
 
             speak(txt) {
                 if('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.cancel(); // หยุดเสียงเก่าก่อน
                     const u = new SpeechSynthesisUtterance(txt);
                     u.lang = 'th-TH'; u.rate = 0.9;
                     window.speechSynthesis.speak(u);
                 }
             }
         }
-
-        const App = new QueueClient();
+        const App = new CustomerApp();
     </script>
 </body>
 </html>
