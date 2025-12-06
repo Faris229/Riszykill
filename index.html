@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HubFu Rewards </title>
-    
+    <title>HubFu Rewards - ลุ้นโชคจัดเต็ม</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,70 +19,54 @@
     <style>
         body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #334155; overflow-x: hidden; }
         
-        /* UI Components */
+        /* Announcement Bar */
+        .marquee-wrap {
+            position: fixed; top: 0; left: 0; width: 100%; height: 40px; 
+            background: #2563eb; color: white; z-index: 60; display: flex; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .marquee-content { display: inline-block; white-space: nowrap; padding-left: 100%; animation: marquee 20s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        /* Spacer for fixed header */
+        .page-spacer { margin-top: 40px; }
+
         .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid #e2e8f0; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
             border-radius: 1.5rem;
         }
-        
-        .nav-btn { transition: all 0.2s; }
         .nav-btn.active { color: #2563eb; background: #eff6ff; font-weight: 600; }
-
-        .input-code {
-            letter-spacing: 2px; text-transform: uppercase; font-family: monospace; font-weight: bold;
-            transition: all 0.2s;
-        }
+        .input-code { letter-spacing: 2px; text-transform: uppercase; font-family: monospace; font-weight: bold; }
         .input-code:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); outline: none; }
 
-        /* Wheel Styles */
+        /* Wheel */
         .wheel-container { position: relative; width: 320px; height: 320px; margin: 0 auto; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); }
         #canvas { width: 100%; height: 100%; transition: transform 0s; }
         .pointer {
             position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10;
-            width: 40px; height: 50px; background: #ef4444; 
-            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            width: 40px; height: 50px; background: #ef4444; clip-path: polygon(50% 100%, 0 0, 100% 0);
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
         }
 
-        /* Mystery Box Styles */
-        .box-container { perspective: 1000px; height: 300px; display: flex; justify-content: center; align-items: center; }
-        .box {
-            width: 150px; height: 150px; position: relative; transform-style: preserve-3d;
-            transition: transform 1s; animation: float 3s ease-in-out infinite; cursor: pointer;
-        }
-        .box-face {
-            position: absolute; width: 150px; height: 150px; background: linear-gradient(135deg, #f59e0b, #d97706);
-            border: 4px solid #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; color: rgba(255,255,255,0.8); box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
-        }
-        .front { transform: translateZ(75px); }
-        .back { transform: rotateY(180deg) translateZ(75px); }
-        .right { transform: rotateY(90deg) translateZ(75px); }
-        .left { transform: rotateY(-90deg) translateZ(75px); }
-        .top { transform: rotateX(90deg) translateZ(75px); }
-        .bottom { transform: rotateX(-90deg) translateZ(75px); box-shadow: 0 50px 50px rgba(0,0,0,0.2); }
-        
-        .box.shaking { animation: shake 0.5s infinite; }
-        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } }
-
-        /* Chat Widget */
+        /* Chat */
         .chat-msg-me { background: #2563eb; color: white; border-radius: 12px 12px 0 12px; }
         .chat-msg-admin { background: #f1f5f9; color: #1e293b; border-radius: 12px 12px 12px 0; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40 px-6 py-4">
+    <div id="announcement-bar" class="marquee-wrap hidden">
+        <div class="bg-blue-800 h-full px-4 flex items-center font-bold z-10 text-xs uppercase"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
+        <div id="announcement-text" class="marquee-content text-sm font-medium">...</div>
+    </div>
+
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40 px-6 py-4 page-spacer" id="main-nav">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <div class="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">HF</div>
                 <span class="font-bold text-lg text-slate-800 tracking-tight">HubFu<span class="text-blue-600">Rewards</span></span>
             </div>
-            
             <div id="auth-section">
                 <button onclick="Auth.openModal()" class="bg-slate-900 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 transition shadow-lg">เข้าสู่ระบบ</button>
             </div>
@@ -95,7 +78,7 @@
         <div class="flex justify-center mb-8">
             <div class="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
                 <button onclick="Router.switch('wheel')" id="tab-wheel" class="nav-btn active px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-dharmachakra"></i> วงล้อเสี่ยงโชค
+                    <i class="fa-solid fa-dharmachakra"></i> วงล้อ
                 </button>
                 <button onclick="Router.switch('box')" id="tab-box" class="nav-btn px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 text-slate-500">
                     <i class="fa-solid fa-box-open"></i> กล่องสุ่ม
@@ -106,53 +89,31 @@
         <div id="page-wheel" class="animate__animated animate__fadeIn">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                 <div class="order-2 md:order-1 text-center md:text-left">
-                    <h1 class="text-4xl font-extrabold text-slate-800 mb-4 leading-tight">หมุนวงล้อ<br><span class="text-blue-600">ลุ้นรางวัลใหญ่!</span></h1>
-                    <p class="text-slate-500 mb-8">กรอกโค้ดที่คุณได้รับจากกิจกรรม เพื่อลุ้นรับของรางวัลสุดพรีเมียมมากมาย</p>
-                    
+                    <h1 class="text-4xl font-extrabold text-slate-800 mb-4">หมุนวงล้อ<br><span class="text-blue-600">ลุ้นรางวัลใหญ่!</span></h1>
                     <div class="glass-card p-6 max-w-sm mx-auto md:mx-0">
                         <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Redeem Code</label>
-                        <div class="flex gap-2">
-                            <input id="wheel-code" type="text" placeholder="CODE-XXXX" class="input-code flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-center">
-                        </div>
-                        <button onclick="Wheel.spin()" id="btn-spin" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition transform active:scale-95 text-lg">
-                            <i class="fa-solid fa-play mr-2"></i> หมุนวงล้อ
-                        </button>
+                        <input id="wheel-code" type="text" placeholder="CODE-XXXX" class="input-code w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-center mb-4">
+                        <button onclick="Wheel.spin()" id="btn-spin" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition">หมุนวงล้อ</button>
                     </div>
                 </div>
                 <div class="order-1 md:order-2 flex justify-center">
                     <div class="wheel-container">
                         <div class="pointer"></div>
                         <canvas id="canvas" width="500" height="500"></canvas>
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl border-4 border-slate-100 z-10">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase">Lucky</span>
-                        </div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl border-4 border-slate-100 z-10 font-bold text-slate-400 text-xs">SPIN</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="page-box" class="hidden animate__animated animate__fadeIn">
-            <div class="text-center mb-10">
-                <h1 class="text-4xl font-extrabold text-slate-800 mb-2">กล่องสุ่มมหัศจรรย์</h1>
-                <p class="text-slate-500">ใช้โค้ดเปิดกล่อง ลุ้นรับไอเทมลับระดับ Rare!</p>
+        <div id="page-box" class="hidden animate__animated animate__fadeIn text-center">
+            <h1 class="text-4xl font-extrabold text-slate-800 mb-8">กล่องสุ่มมหัศจรรย์</h1>
+            <div class="flex justify-center mb-8">
+                <i class="fa-solid fa-gift text-9xl text-yellow-500 animate-bounce"></i>
             </div>
-
-            <div class="box-container mb-10">
-                <div class="box" id="mystery-box" onclick="Box.shake()">
-                    <div class="box-face front"><i class="fa-solid fa-question"></i></div>
-                    <div class="box-face back"></div>
-                    <div class="box-face right"></div>
-                    <div class="box-face left"></div>
-                    <div class="box-face top"></div>
-                    <div class="box-face bottom"></div>
-                </div>
-            </div>
-
-            <div class="max-w-md mx-auto glass-card p-6 text-center">
+            <div class="max-w-md mx-auto glass-card p-6">
                 <input id="box-code" type="text" placeholder="BOX-CODE" class="input-code w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-center mb-4 text-xl">
-                <button onclick="Box.open()" id="btn-open-box" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white font-bold py-3.5 rounded-xl shadow-lg transition transform active:scale-95 text-lg">
-                    เปิดกล่องเลย!
-                </button>
+                <button onclick="Box.open()" id="btn-open-box" class="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold py-3.5 rounded-xl shadow-lg transition">เปิดกล่อง</button>
             </div>
         </div>
 
@@ -160,29 +121,25 @@
             <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติการได้รับรางวัล</h3>
             <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                 <div id="history-list" class="divide-y divide-slate-100 max-h-60 overflow-y-auto">
-                    <div class="p-6 text-center text-slate-400 text-sm">กรุณาเข้าสู่ระบบเพื่อดูประวัติ</div>
+                    <div class="p-6 text-center text-slate-400 text-sm">เข้าสู่ระบบเพื่อดูประวัติ</div>
                 </div>
             </div>
         </div>
-
     </main>
 
     <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         <div id="chat-window" class="hidden bg-white w-80 h-96 rounded-2xl shadow-2xl border border-gray-200 mb-4 flex-col overflow-hidden animate__animated animate__zoomIn origin-bottom-right">
             <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="font-bold text-sm">Live Support</span>
-                </div>
-                <button onclick="Chat.toggle()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <span class="font-bold text-sm">Live Support</span>
+                <button onclick="Chat.toggle()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="chat-messages" class="flex-1 bg-slate-50 p-4 overflow-y-auto space-y-3 text-sm"></div>
             <form onsubmit="Chat.send(event)" class="p-3 bg-white border-t border-gray-100 flex gap-2">
-                <input id="chat-input" class="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="พิมพ์ข้อความ...">
+                <input id="chat-input" class="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm outline-none" placeholder="พิมพ์ข้อความ...">
                 <button type="submit" class="w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition"><i class="fa-solid fa-paper-plane text-xs"></i></button>
             </form>
         </div>
-        <button onclick="Chat.toggle()" class="w-14 h-14 bg-gradient-to-r from-slate-800 to-black text-white rounded-full shadow-2xl flex items-center justify-center text-xl hover:scale-110 transition border-4 border-white">
+        <button onclick="Chat.toggle()" class="w-14 h-14 bg-black text-white rounded-full shadow-2xl flex items-center justify-center text-xl hover:scale-110 transition border-4 border-white">
             <i class="fa-solid fa-comment-dots"></i>
         </button>
     </div>
@@ -192,16 +149,15 @@
             <button onclick="document.getElementById('modal-auth').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">เข้าสู่ระบบ</h2>
             <form onsubmit="Auth.handle(event)">
-                <input id="auth-email" type="email" placeholder="อีเมล" class="w-full mb-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition" required>
-                <input id="auth-pass" type="password" placeholder="รหัสผ่าน" class="w-full mb-6 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition" required>
-                <button type="submit" onclick="Auth.mode='login'" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold mb-3 shadow-lg hover:bg-black transition">Login</button>
+                <input id="auth-email" type="email" placeholder="อีเมล" class="w-full mb-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none" required>
+                <input id="auth-pass" type="password" placeholder="รหัสผ่าน" class="w-full mb-6 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none" required>
+                <button type="submit" onclick="Auth.mode='login'" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold mb-3 shadow-lg">Login</button>
                 <button type="button" onclick="Auth.register()" class="w-full text-slate-500 text-sm hover:underline">สมัครสมาชิกใหม่</button>
             </form>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -215,7 +171,6 @@
         const db = firebase.firestore();
         const rtdb = firebase.database();
 
-        // --- 2. APP STATE ---
         const App = {
             user: null,
             wheelPrizes: [],
@@ -224,20 +179,33 @@
                 auth.onAuthStateChanged(u => {
                     App.user = u;
                     UI.renderAuth(u);
-                    if (u) {
-                        History.load();
-                        Chat.init(u.uid);
-                    }
+                    if(u) { History.load(); Chat.init(u.uid); }
                 });
                 Wheel.loadPrizes();
+                Announce.listen();
             }
         };
 
-        // --- 3. WHEEL SYSTEM ---
+        const Announce = {
+            listen: () => {
+                db.collection('system').doc('announcement').onSnapshot(doc => {
+                    const bar = document.getElementById('announcement-bar');
+                    const nav = document.getElementById('main-nav');
+                    if(doc.exists && doc.data().active) {
+                        bar.classList.remove('hidden');
+                        document.getElementById('announcement-text').innerText = doc.data().text;
+                        nav.style.marginTop = '40px';
+                    } else {
+                        bar.classList.add('hidden');
+                        nav.style.marginTop = '0px';
+                    }
+                });
+            }
+        };
+
         const Wheel = {
-            ctx: null,
             loadPrizes: () => {
-                db.collection('wheel_prizes').orderBy('chance', 'desc').onSnapshot(snap => {
+                db.collection('wheel_prizes').orderBy('chance','desc').onSnapshot(snap => {
                     App.wheelPrizes = snap.docs.map(d => ({id:d.id, ...d.data()}));
                     Wheel.draw();
                 });
@@ -248,22 +216,17 @@
                 const ctx = canvas.getContext('2d');
                 const arc = Math.PI * 2 / App.wheelPrizes.length;
                 ctx.clearRect(0,0,500,500);
-                
                 App.wheelPrizes.forEach((p, i) => {
                     const angle = i * arc;
                     ctx.beginPath();
                     ctx.fillStyle = p.color || '#e2e8f0';
                     ctx.moveTo(250,250);
-                    ctx.arc(250, 250, 240, angle, angle + arc);
+                    ctx.arc(250,250,240, angle, angle + arc);
                     ctx.fill();
-                    ctx.stroke();
-                    
                     ctx.save();
                     ctx.translate(250 + Math.cos(angle + arc/2) * 160, 250 + Math.sin(angle + arc/2) * 160);
                     ctx.rotate(angle + arc/2 + Math.PI/2);
-                    ctx.fillStyle = "white";
-                    ctx.font = "bold 18px Kanit";
-                    ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 4;
+                    ctx.fillStyle = "white"; ctx.font = "bold 18px Kanit";
                     ctx.fillText(p.name, -ctx.measureText(p.name).width/2, 0);
                     ctx.restore();
                 });
@@ -271,166 +234,98 @@
             spin: async () => {
                 if(!App.user) return Auth.openModal();
                 if(App.isSpinning) return;
-                
                 const code = document.getElementById('wheel-code').value.trim();
-                if(!code) return Swal.fire('Warning', 'กรุณากรอกโค้ด', 'warning');
+                if(!code) return Swal.fire('Warning','ใส่โค้ดด้วย','warning');
 
                 App.isSpinning = true;
                 const btn = document.getElementById('btn-spin');
-                btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+                btn.disabled = true; btn.innerText = 'Checking...';
 
                 try {
-                    // 1. Check Code
-                    const codeSnap = await db.collection('codes').where('code','==',code).where('status','==','unused').get();
-                    if(codeSnap.empty) throw new Error('โค้ดไม่ถูกต้อง หรือถูกใช้แล้ว');
-                    const codeDoc = codeSnap.docs[0];
-
-                    // 2. Determine Prize (Weighted)
-                    let totalWeight = App.wheelPrizes.reduce((sum, p) => sum + Number(p.chance), 0);
-                    let random = Math.random() * totalWeight;
-                    let winnerIdx = 0;
+                    const snap = await db.collection('codes').where('code','==',code).where('status','==','unused').get();
+                    if(snap.empty) throw new Error('Code Invalid');
+                    
+                    let total = App.wheelPrizes.reduce((s,p)=>s+Number(p.chance),0);
+                    let rand = Math.random()*total;
+                    let winIdx = 0;
                     for(let i=0; i<App.wheelPrizes.length; i++) {
-                        random -= Number(App.wheelPrizes[i].chance);
-                        if(random <= 0) { winnerIdx = i; break; }
+                        rand -= Number(App.wheelPrizes[i].chance);
+                        if(rand<=0) { winIdx = i; break; }
                     }
-                    const winner = App.wheelPrizes[winnerIdx];
-
-                    // 3. Mark Code Used & Prepare Reward
-                    await db.collection('codes').doc(codeDoc.id).update({
-                        status: 'used', usedBy: App.user.uid, usedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    // 4. Animate Wheel
-                    btn.innerHTML = 'กำลังหมุน...';
-                    const arc = 360 / App.wheelPrizes.length;
-                    const spinAngle = (360 * 5) + (270 - (winnerIdx * arc) - (arc/2)); // Land perfectly
+                    
+                    await db.collection('codes').doc(snap.docs[0].id).update({status:'used', usedBy:App.user.uid, usedAt:firebase.firestore.FieldValue.serverTimestamp()});
+                    
+                    const arc = 360/App.wheelPrizes.length;
+                    const deg = (360*5) + (270 - (winIdx*arc) - (arc/2));
                     
                     const canvas = document.getElementById('canvas');
-                    canvas.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
-                    canvas.style.transform = `rotate(${spinAngle}deg)`;
-
+                    canvas.style.transition = 'transform 5s cubic-bezier(0.25,0.1,0.25,1)';
+                    canvas.style.transform = `rotate(${deg}deg)`;
+                    
                     setTimeout(() => {
                         App.isSpinning = false;
-                        btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-play mr-2"></i> หมุนอีกครั้ง';
+                        btn.disabled = false; btn.innerText = 'หมุนวงล้อ';
                         canvas.style.transition = 'none';
-                        canvas.style.transform = `rotate(${spinAngle % 360}deg)`;
-                        ProcessReward.handle(winner, code, 'wheel');
+                        canvas.style.transform = `rotate(${deg%360}deg)`;
+                        Process.handle(App.wheelPrizes[winIdx], code, 'wheel');
                     }, 5000);
-
-                } catch (err) {
-                    App.isSpinning = false;
-                    btn.disabled = false; btn.innerHTML = 'หมุนวงล้อ';
-                    Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
+                } catch(e) {
+                    App.isSpinning = false; btn.disabled = false; btn.innerText = 'หมุนวงล้อ';
+                    Swal.fire('Error', e.message, 'error');
                 }
             }
         };
 
-        // --- 4. BOX SYSTEM ---
         const Box = {
-            shake: () => {
-                const box = document.getElementById('mystery-box');
-                box.classList.add('shaking');
-                setTimeout(() => box.classList.remove('shaking'), 500);
-            },
             open: async () => {
                 if(!App.user) return Auth.openModal();
                 const code = document.getElementById('box-code').value.trim();
-                if(!code) return Swal.fire('Warning', 'กรุณากรอกโค้ด', 'warning');
-
+                if(!code) return Swal.fire('Warning','ใส่โค้ดด้วย','warning');
+                
                 try {
-                    const btn = document.getElementById('btn-open-box');
-                    btn.disabled = true; btn.innerHTML = 'กำลังเปิด...';
-                    Box.shake();
-
-                    // 1. Check Code
-                    const codeSnap = await db.collection('codes').where('code','==',code).where('status','==','unused').get();
-                    if(codeSnap.empty) throw new Error('โค้ดไม่ถูกต้อง');
-                    const codeDoc = codeSnap.docs[0];
-
-                    // 2. Random Prize (From box_prizes collection)
-                    const prizeSnap = await db.collection('box_prizes').get();
-                    const prizes = prizeSnap.docs.map(d => ({id:d.id, ...d.data()}));
+                    const snap = await db.collection('codes').where('code','==',code).where('status','==','unused').get();
+                    if(snap.empty) throw new Error('Code Invalid');
                     
-                    let totalWeight = prizes.reduce((sum, p) => sum + Number(p.chance), 0);
-                    let random = Math.random() * totalWeight;
-                    let winner = prizes[0];
+                    const pSnap = await db.collection('box_prizes').get();
+                    const prizes = pSnap.docs.map(d=>({id:d.id, ...d.data()}));
+                    let total = prizes.reduce((s,p)=>s+Number(p.chance),0);
+                    let rand = Math.random()*total;
+                    let win = prizes[0];
                     for(let p of prizes) {
-                        random -= Number(p.chance);
-                        if(random <= 0) { winner = p; break; }
+                        rand -= Number(p.chance);
+                        if(rand<=0) { win = p; break; }
                     }
-
-                    // 3. Mark Code
-                    await db.collection('codes').doc(codeDoc.id).update({
-                        status: 'used', usedBy: App.user.uid, usedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    setTimeout(() => {
-                        btn.disabled = false; btn.innerHTML = 'เปิดกล่องเลย!';
-                        ProcessReward.handle(winner, code, 'box');
-                    }, 1000);
-
-                } catch (err) {
-                    document.getElementById('btn-open-box').disabled = false;
-                    document.getElementById('btn-open-box').innerHTML = 'เปิดกล่องเลย!';
-                    Swal.fire('Error', err.message, 'error');
-                }
-            }
-        };
-
-        // --- 5. REWARD HANDLER ---
-        const ProcessReward = {
-            handle: async (prize, code, type) => {
-                let detail = '-';
-                
-                // Nested Item Logic (Stock)
-                if(prize.items && prize.items.length > 0) {
-                    const items = [...prize.items]; // Copy
-                    const wonItem = items.shift(); // Get first
-                    detail = wonItem;
                     
-                    // Update Stock in DB
-                    const col = type === 'wheel' ? 'wheel_prizes' : 'box_prizes';
-                    await db.collection(col).doc(prize.id).update({items: items});
+                    await db.collection('codes').doc(snap.docs[0].id).update({status:'used', usedBy:App.user.uid, usedAt:firebase.firestore.FieldValue.serverTimestamp()});
+                    Process.handle(win, code, 'box');
+                } catch(e) {
+                    Swal.fire('Error', e.message, 'error');
                 }
-
-                // Save History
-                await db.collection('history').add({
-                    userId: App.user.uid,
-                    prizeName: prize.name,
-                    prizeDetail: detail,
-                    code: code,
-                    type: type,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                confetti({particleCount: 150, spread: 70, origin: { y: 0.6 }});
-                Swal.fire({
-                    title: '🎉 ยินดีด้วย!',
-                    html: `<div class="text-xl text-slate-700">คุณได้รับ: <b>${prize.name}</b></div><div class="mt-2 text-sm text-green-600 font-mono bg-green-50 p-2 rounded">${detail !== '-' ? 'Code: '+detail : ''}</div>`,
-                    icon: 'success'
-                });
             }
         };
 
-        // --- 6. CHAT SYSTEM (Fix Bug) ---
+        const Process = {
+            handle: async (p, c, t) => {
+                let det = '-';
+                if(p.items && p.items.length>0) {
+                    const items = [...p.items];
+                    det = items.shift();
+                    const col = t==='wheel'?'wheel_prizes':'box_prizes';
+                    await db.collection(col).doc(p.id).update({items:items});
+                }
+                await db.collection('history').add({userId:App.user.uid, prizeName:p.name, prizeDetail:det, code:c, type:t, timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+                confetti();
+                Swal.fire({title:'ยินดีด้วย', html:`คุณได้รับ: <b>${p.name}</b><br><small class="text-green-600">${det!=='-'?det:''}</small>`, icon:'success'});
+            }
+        };
+
         const Chat = {
-            activeListener: null,
             init: (uid) => {
-                if(Chat.activeListener) rtdb.ref('chats/'+uid).off(); // Detach old
-                const div = document.getElementById('chat-messages');
-                div.innerHTML = '<div class="text-center text-xs text-gray-400 py-2">Start Chatting</div>';
-                
-                Chat.activeListener = rtdb.ref('chats/'+uid);
-                Chat.activeListener.limitToLast(20).on('child_added', snap => {
-                    const m = snap.val();
-                    const isMe = m.sender === 'user';
-                    div.innerHTML += `
-                        <div class="flex w-full mb-2 ${isMe ? 'justify-end' : 'justify-start'}">
-                            <div class="px-4 py-2 text-sm shadow-sm max-w-[80%] ${isMe ? 'chat-msg-me' : 'chat-msg-admin'}">
-                                ${m.text}
-                            </div>
-                        </div>
-                    `;
+                rtdb.ref('chats/'+uid).limitToLast(20).on('child_added', s => {
+                    const m = s.val();
+                    const me = m.sender==='user';
+                    const div = document.getElementById('chat-messages');
+                    div.innerHTML += `<div class="flex ${me?'justify-end':'justify-start'}"><div class="px-4 py-2 text-sm max-w-[80%] ${me?'chat-msg-me':'chat-msg-admin'}">${m.text}</div></div>`;
                     div.scrollTop = div.scrollHeight;
                 });
             },
@@ -438,27 +333,36 @@
                 e.preventDefault();
                 const inp = document.getElementById('chat-input');
                 if(inp.value && App.user) {
-                    rtdb.ref('chats/'+App.user.uid).push({
-                        text: inp.value, sender: 'user', timestamp: firebase.database.ServerValue.TIMESTAMP
-                    });
+                    rtdb.ref('chats/'+App.user.uid).push({text:inp.value, sender:'user', timestamp:Date.now()});
                     inp.value = '';
                 }
             },
             toggle: () => {
-                const win = document.getElementById('chat-window');
-                win.classList.contains('hidden') ? (win.classList.remove('hidden'), win.classList.add('flex')) : (win.classList.add('hidden'), win.classList.remove('flex'));
+                const w = document.getElementById('chat-window');
+                w.classList.contains('hidden') ? (w.classList.remove('hidden'), w.classList.add('flex')) : (w.classList.add('hidden'), w.classList.remove('flex'));
             }
         };
 
-        // --- 7. UTILS ---
+        const History = {
+            load: () => {
+                db.collection('history').where('userId','==',App.user.uid).orderBy('timestamp','desc').limit(10).onSnapshot(s => {
+                    const d = document.getElementById('history-list');
+                    if(s.empty) { d.innerHTML='<div class="p-6 text-center text-slate-400">ไม่มีประวัติ</div>'; return;}
+                    d.innerHTML = s.docs.map(doc => {
+                        const dd = doc.data();
+                        return `<div class="p-4 flex justify-between items-center text-sm"><div><span class="font-bold text-slate-700">${dd.prizeName}</span> <span class="text-xs text-slate-400">${dd.prizeDetail!=='-'?dd.prizeDetail:''}</span></div></div>`;
+                    }).join('');
+                });
+            }
+        };
+
         const Router = {
-            switch: (page) => {
+            switch: (p) => {
                 document.getElementById('page-wheel').classList.add('hidden');
                 document.getElementById('page-box').classList.add('hidden');
-                document.getElementById(`page-${page}`).classList.remove('hidden');
-                
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById(`tab-${page}`).classList.add('active');
+                document.getElementById('page-'+p).classList.remove('hidden');
+                document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
+                document.getElementById('tab-'+p).classList.add('active');
             }
         };
 
@@ -466,20 +370,14 @@
             openModal: () => document.getElementById('modal-auth').classList.remove('hidden'),
             handle: (e) => {
                 e.preventDefault();
-                const em = document.getElementById('auth-email').value;
-                const pw = document.getElementById('auth-pass').value;
-                auth.signInWithEmailAndPassword(em, pw).then(() => {
-                    document.getElementById('modal-auth').classList.add('hidden');
-                    Swal.fire({icon:'success', title:'ยินดีต้อนรับ', timer:1000, showConfirmButton:false});
-                }).catch(err => Swal.fire('Error', err.message, 'error'));
+                auth.signInWithEmailAndPassword(document.getElementById('auth-email').value, document.getElementById('auth-pass').value)
+                .then(()=>{ document.getElementById('modal-auth').classList.add('hidden'); Swal.fire('Welcome','','success'); })
+                .catch(err=>Swal.fire('Error',err.message,'error'));
             },
             register: () => {
-                const em = document.getElementById('auth-email').value;
-                const pw = document.getElementById('auth-pass').value;
-                auth.createUserWithEmailAndPassword(em, pw).then(() => {
-                    document.getElementById('modal-auth').classList.add('hidden');
-                    Swal.fire({icon:'success', title:'สมัครสำเร็จ', timer:1000, showConfirmButton:false});
-                }).catch(err => Swal.fire('Error', err.message, 'error'));
+                auth.createUserWithEmailAndPassword(document.getElementById('auth-email').value, document.getElementById('auth-pass').value)
+                .then(()=>{ document.getElementById('modal-auth').classList.add('hidden'); Swal.fire('Success','','success'); })
+                .catch(err=>Swal.fire('Error',err.message,'error'));
             },
             logout: () => auth.signOut()
         };
@@ -487,42 +385,8 @@
         const UI = {
             renderAuth: (u) => {
                 const el = document.getElementById('auth-section');
-                if(u) {
-                    el.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="text-right hidden md:block">
-                                <div class="text-xs text-slate-400">Welcome</div>
-                                <div class="font-bold text-slate-800 text-sm">${u.email.split('@')[0]}</div>
-                            </div>
-                            <div class="w-9 h-9 bg-slate-200 rounded-full overflow-hidden"><img src="https://ui-avatars.com/api/?name=${u.email}&background=0f172a&color=fff" class="w-full"></div>
-                            <button onclick="Auth.logout()" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-right-from-bracket"></i></button>
-                        </div>
-                    `;
-                } else {
-                    el.innerHTML = `<button onclick="Auth.openModal()" class="bg-slate-900 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 shadow-lg">เข้าสู่ระบบ</button>`;
-                }
-            }
-        };
-
-        const History = {
-            load: () => {
-                db.collection('history').where('userId', '==', App.user.uid).orderBy('timestamp', 'desc').limit(10).onSnapshot(snap => {
-                    const el = document.getElementById('history-list');
-                    if(snap.empty) { el.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">ยังไม่มีประวัติ</div>'; return; }
-                    el.innerHTML = snap.docs.map(d => {
-                        const data = d.data();
-                        const time = data.timestamp ? new Date(data.timestamp.seconds*1000).toLocaleString('th-TH') : '-';
-                        return `
-                            <div class="p-4 hover:bg-slate-50 transition flex justify-between items-center">
-                                <div>
-                                    <div class="font-bold text-slate-700 text-sm">${data.type==='wheel'?'🎡 วงล้อ':'📦 กล่องสุ่ม'} : <span class="text-blue-600">${data.prizeName}</span></div>
-                                    <div class="text-xs text-slate-400 mt-1">${data.prizeDetail !== '-' ? 'Item: '+data.prizeDetail : 'Used Code: '+data.code}</div>
-                                </div>
-                                <div class="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded">${time}</div>
-                            </div>
-                        `;
-                    }).join('');
-                });
+                if(u) el.innerHTML = `<div class="flex items-center gap-3"><div class="text-right hidden md:block"><div class="text-xs text-slate-400">User</div><div class="font-bold text-slate-800 text-sm">${u.email.split('@')[0]}</div></div><button onclick="Auth.logout()" class="text-red-500"><i class="fa-solid fa-power-off"></i></button></div>`;
+                else el.innerHTML = `<button onclick="Auth.openModal()" class="bg-slate-900 text-white px-5 py-2 rounded-lg text-sm font-bold">เข้าสู่ระบบ</button>`;
             }
         };
 
