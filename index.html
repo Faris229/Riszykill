@@ -17,30 +17,30 @@
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
         .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border-radius: 1rem; transition: 0.2s; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
         .btn-primary:active { transform: scale(0.96); }
-        .status-badge { padding: 6px 16px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; }
-        .st-call { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; animation: pulse 1.5s infinite; }
         
-        /* Marquee Announcement */
+        /* Custom Status Badge Style */
+        .custom-status-box {
+            background: #fff; border-radius: 1rem; padding: 1rem; margin-top: 1rem;
+            border: 2px dashed #cbd5e1; text-align: center; transition: all 0.3s;
+        }
+        .status-text-anim { display: inline-block; }
+
         .marquee-container { background: #1e293b; color: #fff; overflow: hidden; position: fixed; top: 0; left: 0; width: 100%; z-index: 50; height: 40px; display: flex; align-items: center; }
         .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; padding-left: 100%; font-size: 0.9rem; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pt-14 px-6">
 
     <div id="announcement-bar" class="marquee-container hidden">
         <div class="bg-blue-600 h-full px-3 flex items-center font-bold z-10 text-xs shadow-md"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
-        <div id="announcement-text" class="marquee-content py-2">ยินดีต้อนรับสู่ระบบจองคิวออนไลน์</div>
+        <div id="announcement-text" class="marquee-content py-2">...</div>
     </div>
 
     <header class="mb-6 mt-4 flex justify-between items-center max-w-md mx-auto w-full">
         <div>
             <h1 class="font-bold text-2xl text-slate-800" id="shop-name">Loading...</h1>
-            <div id="shop-status-badge" class="flex items-center gap-2 mt-1">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="text-xs text-green-600 font-bold">เปิดรับคิว</span>
-            </div>
+            <div id="shop-status-badge" class="flex items-center gap-2 mt-1"></div>
         </div>
         <div class="text-right">
             <div class="text-xs text-slate-400">คิวปัจจุบัน</div>
@@ -53,7 +53,7 @@
         <div id="form-section" class="glass-card p-6 animate__animated animate__fadeIn">
             <h3 class="font-bold text-lg mb-4 text-slate-700 flex items-center"><i class="fa-solid fa-ticket text-blue-500 mr-2"></i> จองคิวใหม่</h3>
             <form onsubmit="App.book(event)" class="space-y-4">
-                <input id="inp-name" class="w-full p-3 bg-slate-50 border rounded-xl" placeholder="ชื่อของคุณ" required>
+                <input id="inp-name" class="w-full p-3 bg-slate-50 border rounded-xl" placeholder="ชื่อลูกค้า" required>
                 <input id="inp-phone" type="tel" class="w-full p-3 bg-slate-50 border rounded-xl" placeholder="เบอร์โทรศัพท์ (ถ้ามี)">
                 <div class="grid grid-cols-2 gap-3">
                     <select id="inp-pax" class="w-full p-3 bg-slate-50 border rounded-xl"><option value="1">1 ท่าน</option><option value="2">2 ท่าน</option><option value="3+">3+ ท่าน</option></select>
@@ -68,14 +68,17 @@
                 <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center text-white relative">
                     <div class="text-xs opacity-80 uppercase tracking-widest">หมายเลขคิวของคุณ</div>
                     <div id="my-q-num" class="text-7xl font-black mt-2 drop-shadow-md">---</div>
-                    <div id="my-status" class="status-badge bg-white/20 inline-block mt-4 backdrop-blur border border-white/30">WAITING</div>
                 </div>
                 <div class="p-6 bg-white">
-                    <div class="flex justify-between text-sm mb-2 text-slate-500"><span>ชื่อลูกค้า</span><span class="font-bold text-slate-800" id="my-name">...</span></div>
-                    <div class="flex justify-between text-sm mb-4 text-slate-500"><span>เวลาที่ระบุ</span><span class="font-bold text-blue-600" id="my-arrival">...</span></div>
+                    <div class="flex justify-between text-sm mb-2 text-slate-500"><span>ชื่อ</span><span class="font-bold text-slate-800" id="my-name">...</span></div>
                     
-                    <button onclick="App.testSound()" class="w-full mb-3 bg-slate-100 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-200 transition border border-slate-200">
-                        <i class="fa-solid fa-volume-high mr-2 text-blue-500"></i> กดทดสอบเสียง (เปิดแจ้งเตือน)
+                    <div id="custom-status-container" class="custom-status-box hidden">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-1">สถานะปัจจุบัน (Status)</div>
+                        <div id="custom-status-text" class="text-2xl font-bold text-blue-600 status-text-anim">กำลังรอ...</div>
+                    </div>
+
+                    <button onclick="App.testSound()" class="w-full mt-4 mb-3 bg-slate-100 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-200 transition border border-slate-200">
+                        <i class="fa-solid fa-volume-high mr-2 text-blue-500"></i> กดทดสอบเสียง
                     </button>
                     
                     <button onclick="App.cancel()" class="w-full text-red-400 text-sm underline hover:text-red-500">ยกเลิกคิว</button>
@@ -85,21 +88,16 @@
 
         <div id="message-section" class="hidden text-center animate__animated animate__fadeInUp">
             <div class="glass-card p-8">
-                <div id="msg-icon" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-green-100">
-                    <i class="fa-solid fa-check text-5xl text-green-500"></i>
-                </div>
-                <h2 id="msg-title" class="text-2xl font-bold text-slate-800 mb-2">...</h2>
-                <p id="msg-desc" class="text-slate-500 mb-6">...</p>
+                <div id="msg-icon" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-green-100"></div>
+                <h2 id="msg-title" class="text-2xl font-bold text-slate-800 mb-2"></h2>
+                <p id="msg-desc" class="text-slate-500 mb-6"></p>
                 <button onclick="App.logout()" class="btn-primary w-full py-3 shadow-lg">กลับหน้าแรก</button>
             </div>
         </div>
 
         <div id="shop-closed-screen" class="hidden absolute top-0 left-0 w-full h-full bg-slate-100 z-50 flex flex-col items-center justify-center text-center p-6 rounded-3xl animate__animated animate__fadeIn">
-            <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-6">
-                <i class="fa-solid fa-store-slash text-4xl text-gray-500"></i>
-            </div>
+            <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-6"><i class="fa-solid fa-store-slash text-4xl text-gray-500"></i></div>
             <h2 class="text-2xl font-bold text-slate-700">ร้านปิดชั่วคราว</h2>
-            <p class="text-gray-500 mt-2">ขณะนี้ระบบปิดรับจองคิว<br>กรุณาติดต่อใหม่ในเวลาทำการ</p>
         </div>
 
     </main>
@@ -118,13 +116,14 @@
 
         class CustomerApp {
             constructor() {
-                this.myId = localStorage.getItem('q_id_pro_v3');
+                this.myId = localStorage.getItem('q_id_pro_v4');
                 this.lastCallTime = 0;
+                this.currentStatusText = "";
                 this.init();
             }
 
             init() {
-                this.listenConfig(); // ฟังสถานะร้าน/ประกาศ
+                this.listenConfig();
                 if(this.myId) this.listenTicket();
                 else {
                     const now = new Date();
@@ -139,18 +138,15 @@
                         document.getElementById('shop-name').innerText = d.shopName || 'Queue System';
                         document.getElementById('current-q').innerText = d.current || '---';
 
-                        // 1. เช็คสถานะร้านปิด/เปิด
-                        const isShopOpen = d.isShopOpen !== false; // default true
-                        this.toggleShopStatus(isShopOpen);
+                        // Check Shop Status
+                        this.toggleShopStatus(d.isShopOpen !== false);
 
-                        // 2. เช็คประกาศ
+                        // Check Announce
                         const annBar = document.getElementById('announcement-bar');
                         if(d.announceText && d.announceText.trim() !== "") {
                             annBar.classList.remove('hidden');
                             document.getElementById('announcement-text').innerText = d.announceText;
-                        } else {
-                            annBar.classList.add('hidden');
-                        }
+                        } else annBar.classList.add('hidden');
                     }
                 });
             }
@@ -158,17 +154,12 @@
             toggleShopStatus(isOpen) {
                 const closedScreen = document.getElementById('shop-closed-screen');
                 const badge = document.getElementById('shop-status-badge');
-                
                 if(!isOpen) {
-                    // ร้านปิด
-                    if(!this.myId) { // ถ้ายังไม่มีคิว ให้บังหน้าจอเลย
-                        closedScreen.classList.remove('hidden');
-                    }
-                    badge.innerHTML = `<div class="w-2 h-2 bg-red-500 rounded-full"></div><span class="text-xs text-red-500 font-bold">ร้านปิดรับคิว</span>`;
+                    if(!this.myId) closedScreen.classList.remove('hidden');
+                    badge.innerHTML = `<div class="w-2 h-2 bg-red-500 rounded-full"></div><span class="text-xs text-red-500 font-bold">Closed</span>`;
                 } else {
-                    // ร้านเปิด
                     closedScreen.classList.add('hidden');
-                    badge.innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-xs text-green-600 font-bold">เปิดรับคิว</span>`;
+                    badge.innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-xs text-green-600 font-bold">Open</span>`;
                 }
             }
 
@@ -183,6 +174,10 @@
                     this.showScreen('ticket-section');
                     this.renderTicket(d);
 
+                    // --- Logic Custom Status Change (Effect) ---
+                    this.updateCustomStatus(d.customStatus);
+
+                    // --- Logic Voice Call ---
                     if(d.status === 'called') {
                         if (d.lastCallTime && d.lastCallTime > this.lastCallTime) {
                             this.lastCallTime = d.lastCallTime;
@@ -195,15 +190,30 @@
             renderTicket(d) {
                 document.getElementById('my-q-num').innerText = d.number;
                 document.getElementById('my-name').innerText = d.name;
-                document.getElementById('my-arrival').innerText = d.arrivalTime;
+            }
+
+            updateCustomStatus(statusText) {
+                const box = document.getElementById('custom-status-container');
+                const txt = document.getElementById('custom-status-text');
                 
-                const b = document.getElementById('my-status');
-                if(d.status === 'called') {
-                    b.innerText = 'CALLED (กำลังเรียก)';
-                    b.className = 'status-badge st-call inline-block mt-4 backdrop-blur border border-green-400';
+                if(statusText && statusText !== "") {
+                    box.classList.remove('hidden');
+                    
+                    // ถ้าข้อความเปลี่ยน ให้เล่น effect
+                    if(this.currentStatusText !== statusText) {
+                        this.currentStatusText = statusText;
+                        txt.innerText = statusText;
+                        
+                        // Animation: Bounce In
+                        txt.classList.remove('animate__bounceIn');
+                        void txt.offsetWidth; // trigger reflow
+                        txt.classList.add('animate__animated', 'animate__bounceIn');
+                        
+                        // Sound Effect เบาๆ (ถ้าไม่ใช่ครั้งแรก)
+                        if(this.lastCallTime > 0 && navigator.vibrate) navigator.vibrate(50); 
+                    }
                 } else {
-                    b.innerText = 'WAITING (รอเรียก)';
-                    b.className = 'status-badge bg-white/20 inline-block mt-4 backdrop-blur border border-white/30';
+                    box.classList.add('hidden');
                 }
             }
 
@@ -211,14 +221,11 @@
                 e.preventDefault();
                 this.speak(' '); 
                 const btn = document.getElementById('btn-book');
-                btn.disabled = true; btn.innerText = 'กำลังประมวลผล...';
+                btn.disabled = true; btn.innerText = 'Processing...';
 
                 try {
-                    // เช็คก่อนว่าร้านเปิดไหม
                     const config = await db.collection('q_system').doc('config').get();
-                    if(config.exists && config.data().isShopOpen === false) {
-                        throw new Error("ร้านปิดรับจองคิวแล้ว");
-                    }
+                    if(config.exists && config.data().isShopOpen === false) throw new Error("ร้านปิดรับจอง");
 
                     await db.runTransaction(async (t) => {
                         const ref = db.collection('q_system').doc('config');
@@ -228,6 +235,9 @@
                         const prefix = d.queuePrefix || 'A-';
                         const num = `${prefix}${String(next).padStart(3,'0')}`;
                         
+                        // ใช้ Default status จาก config ถ้ามี
+                        const defaultStat = (d.statusList && d.statusList.length > 0) ? d.statusList[0] : "";
+
                         const qRef = ref.collection('queues').doc();
                         t.set(qRef, {
                             number: num, raw: next, prefix: prefix,
@@ -236,11 +246,12 @@
                             pax: document.getElementById('inp-pax').value,
                             arrivalTime: document.getElementById('inp-time').value,
                             status: 'waiting',
+                            customStatus: defaultStat, // เริ่มต้นด้วยสถานะแรก
                             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                             lastCallTime: 0
                         });
                         t.update(ref, { last: next });
-                        localStorage.setItem('q_id_pro_v3', qRef.id);
+                        localStorage.setItem('q_id_pro_v4', qRef.id);
                         this.myId = qRef.id;
                     });
                     this.listenTicket();
@@ -256,19 +267,18 @@
                 const title = document.getElementById('msg-title');
                 const desc = document.getElementById('msg-desc');
                 const icon = document.getElementById('msg-icon');
-                const iTag = icon.querySelector('i');
-
+                
                 if(type === 'success') {
                     title.innerText = "ขอบคุณที่ใช้บริการ";
-                    desc.innerText = "การให้บริการเสร็จสิ้นแล้ว";
+                    desc.innerText = "เสร็จสิ้นเรียบร้อยแล้ว";
+                    icon.innerHTML = '<i class="fa-solid fa-check text-5xl text-green-500"></i>';
                     icon.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-green-100";
-                    iTag.className = "fa-solid fa-check text-5xl text-green-500";
                     if(navigator.vibrate) navigator.vibrate(200);
                 } else {
                     title.innerText = "คิวถูกยกเลิก";
-                    desc.innerText = "กรุณาติดต่อเจ้าหน้าที่หากมีข้อสงสัย";
+                    desc.innerText = "ติดต่อเจ้าหน้าที่หากมีข้อสงสัย";
+                    icon.innerHTML = '<i class="fa-solid fa-xmark text-5xl text-red-500"></i>';
                     icon.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-red-100";
-                    iTag.className = "fa-solid fa-xmark text-5xl text-red-500";
                     if(navigator.vibrate) navigator.vibrate([100,50,100]);
                 }
             }
@@ -279,7 +289,7 @@
             }
 
             testSound() {
-                this.speak('ระบบเสียงพร้อมใช้งาน');
+                this.speak('พร้อมใช้งาน');
                 if(navigator.vibrate) navigator.vibrate(200);
                 Swal.fire({toast:true, position:'top', icon:'success', title:'เปิดเสียงแล้ว', timer:1500, showConfirmButton:false});
             }
@@ -300,12 +310,12 @@
             }
 
             cancel() {
-                Swal.fire({title:'ยกเลิกคิว?', icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'ใช่, ยกเลิก'}).then(r => {
+                Swal.fire({title:'ยกเลิกคิว?', icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444'}).then(r => {
                     if(r.isConfirmed) db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'});
                 });
             }
 
-            logout() { localStorage.removeItem('q_id_pro_v3'); location.reload(); }
+            logout() { localStorage.removeItem('q_id_pro_v4'); location.reload(); }
         }
         const App = new CustomerApp();
     </script>
