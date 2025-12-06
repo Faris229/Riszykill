@@ -3,161 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MathMate - ผู้ช่วยคณิตศาสตร์อัจฉริยะ</title>
+    <title>Q-Space | จองคิวออนไลน์</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Kanit:wght@300;400;600&display=swap');
-        
-        body { font-family: 'Kanit', sans-serif; background-color: #0f172a; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        
-        /* Display Screen */
-        .calc-screen {
-            font-family: 'JetBrains Mono', monospace;
-            background: #1e293b;
-            border-bottom: 2px solid #3b82f6;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        :root {
+            --primary: #111827;
+            --accent: #2563eb;
+            --bg: #ffffff;
+            --surface: #f9fafb;
+            --border: #e5e7eb;
         }
-        
-        /* Buttons */
-        .key-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            padding: 10px;
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            -webkit-font-smoothing: antialiased;
         }
-        
-        .btn-key {
-            height: 50px;
-            border-radius: 8px;
-            font-size: 1.1rem;
+
+        /* --- Components --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            transition: color 0.3s;
+        }
+
+        .input-field:focus + .input-icon { color: var(--primary); }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 1rem;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.1s;
-            cursor: pointer;
-            user-select: none;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        
-        .btn-num { background: #334155; color: white; box-shadow: 0 4px 0 #1e293b; }
-        .btn-num:active { transform: translateY(4px); box-shadow: none; }
-        
-        .btn-op { background: #0f172a; color: #60a5fa; box-shadow: 0 4px 0 #020617; }
-        .btn-op:active { transform: translateY(4px); box-shadow: none; }
-        
-        .btn-fn { background: #475569; color: #fbbf24; font-size: 0.9rem; box-shadow: 0 4px 0 #1e293b; }
-        .btn-fn:active { transform: translateY(4px); box-shadow: none; }
-        
-        .btn-eq { background: #2563eb; color: white; box-shadow: 0 4px 0 #1d4ed8; }
-        .btn-eq:active { transform: translateY(4px); box-shadow: none; }
 
-        .btn-del { background: #ef4444; color: white; box-shadow: 0 4px 0 #b91c1c; }
-        .btn-del:active { transform: translateY(4px); box-shadow: none; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
-        /* Tabs */
-        .tab-btn { padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; transition: all 0.2s; }
-        .tab-btn.active { background: #3b82f6; color: white; }
-        .tab-btn:not(.active) { background: #1e293b; color: #94a3b8; }
+        /* --- Ticket Styles --- */
+        .ticket-card {
+            background: white;
+            border-radius: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            position: relative;
+        }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .ticket-header {
+            background: radial-gradient(circle at top left, #f3f4f6, transparent);
+            padding: 1.5rem;
+            border-bottom: 2px dashed var(--border);
+            position: relative;
+        }
+
+        .ticket-header::after, .ticket-header::before {
+            content: ''; position: absolute; bottom: -10px; width: 20px; height: 20px;
+            background: white; border-radius: 50%; border: 1px solid var(--border);
+        }
+        .ticket-header::after { left: -10px; }
+        .ticket-header::before { right: -10px; }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-waiting { background: #eff6ff; color: #2563eb; }
+        .status-called { background: #ecfdf5; color: #059669; }
+        .status-cancelled { background: #fef2f2; color: #dc2626; }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 0.5rem;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen relative">
 
-    <header class="h-14 bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4 z-20">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">M</div>
-            <span class="font-bold text-lg text-blue-400">Math<span class="text-white">Mate</span></span>
+    <div class="fixed inset-0 z-[-1] opacity-40" style="background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+    <header class="p-6 flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">Q</div>
+            <div>
+                <h1 class="font-bold text-lg leading-none">Q-Space</h1>
+                <p class="text-xs text-gray-400">ระบบจองคิวอัจฉริยะ</p>
+            </div>
         </div>
-        <div id="auth-ui">
-            <button onclick="Auth.modal()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">เข้าสู่ระบบ</button>
-        </div>
+        <div id="connection-status" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
     </header>
 
-    <div class="flex-1 flex overflow-hidden">
+    <main class="flex-1 max-w-md mx-auto w-full p-6 flex flex-col justify-center">
         
-        <div class="flex-1 flex flex-col max-w-md border-r border-slate-800 bg-slate-900 relative z-10">
+        <div id="shop-status-card" class="mb-8 text-center animate__animated animate__fadeInDown">
+            <div class="inline-block px-4 py-1 rounded-full bg-green-50 border border-green-100 text-green-600 text-xs font-bold mb-4">
+                <i class="fa-solid fa-store mr-1"></i> ร้านเปิดให้บริการ
+            </div>
+            <h2 class="text-4xl font-bold text-slate-800 mb-1" id="display-current">A-000</h2>
+            <p class="text-slate-400 text-sm">กำลังให้บริการ (Current Queue)</p>
             
-            <div class="calc-screen h-40 p-4 flex flex-col justify-end text-right">
-                <div id="history-preview" class="text-slate-500 text-sm mb-1 h-5 overflow-hidden"></div>
-                <input id="input-math" type="text" class="bg-transparent border-none outline-none text-3xl w-full text-right text-white placeholder-slate-600" placeholder="0" readonly>
-                <div id="result-preview" class="text-green-400 text-xl font-bold h-8 mt-1">= </div>
-            </div>
-
-            <div class="p-3 flex gap-2 overflow-x-auto bg-slate-900 border-b border-slate-800">
-                <button class="tab-btn active" onclick="Keypad.switch('basic')">พื้นฐาน</button>
-                <button class="tab-btn" onclick="Keypad.switch('trig')">ตรีโกณฯ</button>
-                <button class="tab-btn" onclick="Keypad.switch('adv')">ขั้นสูง</button>
-                <button class="tab-btn" onclick="Keypad.switch('graph')">กราฟ</button>
-            </div>
-
-            <div id="keypad-container" class="flex-1 bg-slate-900 p-2 overflow-y-auto">
+            <div class="mt-6 flex justify-center gap-8">
+                <div>
+                    <div class="text-2xl font-bold text-blue-600" id="display-wait">0</div>
+                    <div class="text-xs text-slate-400 uppercase font-bold">คิวรอ</div>
                 </div>
+                <div>
+                    <div class="text-2xl font-bold text-slate-800" id="display-time">5</div>
+                    <div class="text-xs text-slate-400 uppercase font-bold">นาที/คิว</div>
+                </div>
+            </div>
         </div>
 
-        <div class="hidden md:flex flex-1 flex-col bg-slate-950 relative">
+        <div id="booking-section" class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden transition-all duration-500">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
             
-            <div class="flex border-b border-slate-800">
-                <button onclick="SidePanel.show('history')" class="flex-1 p-3 text-sm font-bold text-slate-400 hover:bg-slate-900 hover:text-white border-r border-slate-800">📜 ประวัติการคำนวณ</button>
-                <button onclick="SidePanel.show('chat')" class="flex-1 p-3 text-sm font-bold text-slate-400 hover:bg-slate-900 hover:text-white">💬 ถามครู (Chat)</button>
-            </div>
-
-            <div id="panel-history" class="flex-1 overflow-y-auto p-4 space-y-2">
-                <div class="text-center text-slate-500 mt-10">กรุณาเข้าสู่ระบบเพื่อดูประวัติ</div>
-            </div>
-
-            <div id="panel-chat" class="hidden flex-1 flex flex-col h-full">
-                <div id="chat-msgs" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-                <form onsubmit="Chat.send(event)" class="p-3 bg-slate-900 border-t border-slate-800 flex gap-2">
-                    <input id="chat-in" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="ถามโจทย์ยากๆ...">
-                    <button class="bg-blue-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-500"><i class="fa-solid fa-paper-plane"></i></button>
-                </form>
-            </div>
-
-            <div id="graph-panel" class="absolute inset-0 bg-slate-900 z-50 hidden flex-col">
-                <div class="p-2 border-b border-slate-700 flex justify-between items-center bg-slate-800">
-                    <span class="font-bold ml-2">📊 Graph Plotter</span>
-                    <button onclick="document.getElementById('graph-panel').classList.add('hidden')" class="text-red-400 px-3"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-xl font-bold mb-6 text-slate-800">จองคิวใหม่</h3>
+            
+            <form onsubmit="App.bookQueue(event)">
+                <div class="input-group">
+                    <input type="text" id="inp-name" class="input-field" placeholder="ชื่อของคุณ" required>
+                    <i class="fa-regular fa-user input-icon"></i>
                 </div>
-                <div id="plot-area" class="flex-1 w-full h-full"></div>
-            </div>
-
+                <div class="input-group">
+                    <input type="tel" id="inp-phone" class="input-field" placeholder="เบอร์โทรศัพท์ (ถ้ามี)">
+                    <i class="fa-solid fa-phone input-icon"></i>
+                </div>
+                <div class="input-group">
+                    <select id="inp-pax" class="input-field appearance-none">
+                        <option value="1">1 ท่าน</option>
+                        <option value="2">2 ท่าน</option>
+                        <option value="3">3-4 ท่าน</option>
+                        <option value="5">5+ ท่าน</option>
+                    </select>
+                    <i class="fa-solid fa-users input-icon"></i>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                </div>
+                
+                <button type="submit" id="btn-book" class="btn-primary">
+                    <i class="fa-solid fa-ticket mr-2"></i> กดรับบัตรคิว
+                </button>
+            </form>
         </div>
-    </div>
 
-    <button onclick="document.querySelector('.md\\:flex').classList.toggle('hidden'); this.classList.toggle('bg-blue-600');" class="md:hidden fixed bottom-4 right-4 w-14 h-14 bg-slate-700 rounded-full shadow-xl flex items-center justify-center text-white z-50 border border-slate-600">
-        <i class="fa-solid fa-layer-group"></i>
-    </button>
-
-    <div id="modal-auth" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center backdrop-blur-sm px-4">
-        <div class="bg-slate-800 p-6 rounded-2xl w-full max-w-sm border border-slate-700 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-center">เข้าสู่ระบบ MathMate</h3>
-            <input id="u-email" type="email" placeholder="Email" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 mb-3 text-white">
-            <input id="u-pass" type="password" placeholder="Password" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 mb-6 text-white">
-            <div class="flex gap-3">
-                <button onclick="Auth.login()" class="flex-1 bg-blue-600 py-3 rounded-lg font-bold hover:bg-blue-500">Login</button>
-                <button onclick="Auth.reg()" class="flex-1 bg-slate-700 py-3 rounded-lg font-bold hover:bg-slate-600">Register</button>
+        <div id="ticket-section" class="hidden animate__animated animate__fadeInUp">
+            <div class="ticket-card text-center">
+                <div class="ticket-header">
+                    <div class="text-xs text-slate-400 uppercase tracking-widest mb-2">Your Queue Number</div>
+                    <div id="ticket-number" class="text-6xl font-black text-slate-800 tracking-tighter">A-005</div>
+                    <div id="ticket-status" class="inline-block mt-3 status-badge status-waiting">WAITING</div>
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-slate-400">Name</span>
+                        <span class="font-bold text-slate-700" id="ticket-name">...</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-4">
+                        <span class="text-slate-400">Time</span>
+                        <span class="font-bold text-slate-700" id="ticket-time">...</span>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100 text-left">
+                        <p class="text-xs text-yellow-700 leading-relaxed">
+                            <i class="fa-solid fa-circle-info mr-1"></i> 
+                            กรุณาแคปหน้าจอนี้ไว้ และแสดงต่อพนักงานเมื่อถึงคิวของท่าน
+                        </p>
+                    </div>
+                    <button onclick="App.cancelQueue()" class="mt-6 text-xs text-red-400 hover:text-red-600 font-bold underline">
+                        ยกเลิกคิวนี้
+                    </button>
+                </div>
             </div>
-            <button onclick="document.getElementById('modal-auth').classList.add('hidden')" class="w-full mt-4 text-xs text-slate-500">Close</button>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-500">อีก <span id="queue-ahead" class="font-bold text-blue-600">0</span> คิวจะถึงตาคุณ</p>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2 overflow-hidden">
+                    <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-1000" id="progress-bar" style="width: 10%"></div>
+                </div>
+            </div>
         </div>
-    </div>
+
+    </main>
+
+    <footer class="p-6 text-center text-xs text-gray-300">
+        Powered by HubFu Queue System
+    </footer>
 
     <script>
-        // CONFIG
+        // --- 1. CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -166,248 +252,192 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const rtdb = firebase.database();
-
-        // STATE
-        const App = {
-            user: null,
-            expression: '',
-            mode: 'basic'
-        };
-
-        // --- 1. CALCULATOR LOGIC ---
-        const Keypad = {
-            layouts: {
-                basic: [
-                    ['C', 'DEL', '%', '/'],
-                    ['7', '8', '9', '*'],
-                    ['4', '5', '6', '-'],
-                    ['1', '2', '3', '+'],
-                    ['0', '.', '(', ')'],
-                    ['ANS', 'EQ'] // EQ spans 2 cols
-                ],
-                trig: [
-                    ['sin', 'cos', 'tan', 'deg'],
-                    ['asin', 'acos', 'atan', 'rad'],
-                    ['sinh', 'cosh', 'tanh', 'π'],
-                    ['7', '8', '9', '/'],
-                    ['4', '5', '6', '*'],
-                    ['1', '2', '3', '-'],
-                    ['0', '.', 'EQ', '+']
-                ],
-                adv: [
-                    ['log', 'ln', 'e', '^'],
-                    ['sqrt', 'cbrt', 'abs', '!'],
-                    ['7', '8', '9', '('],
-                    ['4', '5', '6', ')'],
-                    ['1', '2', '3', ','],
-                    ['0', '.', 'EQ', 'mod']
-                ]
-            },
-            
-            switch: (mode) => {
-                if(mode === 'graph') { Graph.plot(); return; }
-                
-                App.mode = mode;
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                event.target.classList.add('active'); // Dirty fix for highlighting
-                Keypad.render();
-            },
-
-            render: () => {
-                const container = document.getElementById('keypad-container');
-                container.innerHTML = '';
-                
-                // Flatten layout for grid
-                const keys = Keypad.layouts[App.mode].flat();
-                
-                // Create Grid
-                const grid = document.createElement('div');
-                grid.className = 'key-grid';
-                // Adjust columns based on mode
-                grid.style.gridTemplateColumns = App.mode === 'basic' ? 'repeat(4, 1fr)' : 'repeat(4, 1fr)';
-
-                keys.forEach(key => {
-                    const btn = document.createElement('div');
-                    btn.innerText = key;
-                    btn.className = 'btn-key';
-                    
-                    // Style by type
-                    if(['C','DEL'].includes(key)) btn.classList.add('btn-del');
-                    else if(['EQ'].includes(key)) { btn.classList.add('btn-eq'); btn.style.gridColumn = 'span 2'; } // Make EQ wider in basic
-                    else if(['+','-','*','/','^'].includes(key)) btn.classList.add('btn-op');
-                    else if(!isNaN(key) || key === '.') btn.classList.add('btn-num');
-                    else btn.classList.add('btn-fn');
-
-                    btn.onclick = () => Calc.press(key);
-                    grid.appendChild(btn);
-                });
-                container.appendChild(grid);
+        
+        // --- 2. CORE CLASS ---
+        class QueueApp {
+            constructor() {
+                firebase.initializeApp(firebaseConfig);
+                this.db = firebase.firestore();
+                this.myQueueId = localStorage.getItem('my_queue_id');
+                this.currentServing = 'A-000';
+                this.init();
             }
-        };
 
-        const Calc = {
-            press: (key) => {
-                const inp = document.getElementById('input-math');
-                const prev = document.getElementById('result-preview');
+            init() {
+                this.listenSystem();
+                if (this.myQueueId) this.listenMyQueue();
+            }
 
-                if(key === 'C') { App.expression = ''; inp.value = ''; prev.innerText = '= '; return; }
-                if(key === 'DEL') { App.expression = App.expression.slice(0, -1); }
-                else if(key === 'EQ') { Calc.solve(); return; }
-                else if(key === 'ANS') { App.expression += 'ans'; }
-                else {
-                    // Smart append
-                    if(['sin','cos','tan','log','ln','sqrt'].includes(key)) App.expression += key + '(';
-                    else App.expression += key;
-                }
-
-                inp.value = App.expression;
-                // Live preview (Try solve silently)
-                try {
-                    const res = math.evaluate(App.expression);
-                    prev.innerText = `= ${res}`;
-                } catch(e) { prev.innerText = '= ...'; }
-            },
-
-            solve: () => {
-                try {
-                    const result = math.evaluate(App.expression);
-                    document.getElementById('input-math').value = result;
-                    document.getElementById('history-preview').innerText = App.expression + ' =';
-                    
-                    // Save to DB
-                    if(App.user) {
-                        db.collection('math_history').add({
-                            uid: App.user.uid,
-                            expr: App.expression,
-                            res: result.toString(),
-                            ts: firebase.firestore.FieldValue.serverTimestamp()
-                        });
+            // Listen Global Status
+            listenSystem() {
+                this.db.collection('q_system').doc('config').onSnapshot(doc => {
+                    if (doc.exists) {
+                        this.currentServing = doc.data().current || 'A-000';
+                        document.getElementById('display-current').innerText = this.currentServing;
+                        if(this.myQueueId) this.updateProgress();
+                    } else {
+                        // Init System if first time
+                        this.db.collection('q_system').doc('config').set({current:'A-000', last:0});
                     }
-                    
-                    App.expression = result.toString(); // Chain calculation
-                } catch(e) {
-                    Swal.fire({toast:true, icon:'error', title:'รูปแบบสมการไม่ถูกต้อง', position:'top'});
-                }
-            }
-        };
+                });
 
-        // --- 2. GRAPH SYSTEM ---
-        const Graph = {
-            plot: () => {
-                const expr = document.getElementById('input-math').value;
-                if(!expr || !expr.includes('x')) return Swal.fire('Info', 'กรุณาใส่สมการที่มีตัวแปร x (เช่น sin(x), x^2)', 'info');
-                
-                document.getElementById('graph-panel').classList.remove('hidden');
-                document.getElementById('graph-panel').classList.add('flex');
+                // Count Waiting
+                this.db.collection('q_system').doc('config').collection('queues')
+                    .where('status', '==', 'waiting').onSnapshot(snap => {
+                        document.getElementById('display-wait').innerText = snap.size;
+                        if(this.myQueueId) this.updateQueueAhead(snap.docs);
+                    });
+            }
+
+            // Listen My Ticket
+            listenMyQueue() {
+                this.db.collection('q_system').doc('config').collection('queues').doc(this.myQueueId)
+                    .onSnapshot(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            if (data.status === 'cancelled' || data.status === 'served') {
+                                this.clearLocal(); // End Session
+                                return;
+                            }
+                            this.renderTicket(data);
+                        } else {
+                            this.clearLocal();
+                        }
+                    });
+            }
+
+            // Logic: Book Queue
+            async bookQueue(e) {
+                e.preventDefault();
+                const btn = document.getElementById('btn-book');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังจอง...';
+
+                const name = document.getElementById('inp-name').value;
+                const phone = document.getElementById('inp-phone').value;
+                const pax = document.getElementById('inp-pax').value;
 
                 try {
-                    const compiled = math.compile(expr);
-                    const xValues = math.range(-10, 10, 0.1).toArray();
-                    const yValues = xValues.map(x => compiled.evaluate({x: x}));
+                    // Transaction for Atomicity (Prevent Duplicate Numbers)
+                    await this.db.runTransaction(async (t) => {
+                        const configRef = this.db.collection('q_system').doc('config');
+                        const configDoc = await t.get(configRef);
+                        
+                        let newNum = (configDoc.data().last || 0) + 1;
+                        let qString = 'A-' + newNum.toString().padStart(3, '0');
 
-                    const trace = { x: xValues, y: yValues, type: 'scatter', line: {color: '#3b82f6'} };
-                    const layout = {
-                        title: `y = ${expr}`,
-                        paper_bgcolor: '#0f172a',
-                        plot_bgcolor: '#1e293b',
-                        font: { color: '#cbd5e1' },
-                        xaxis: { gridcolor: '#334155' },
-                        yaxis: { gridcolor: '#334155' }
-                    };
-                    
-                    Plotly.newPlot('plot-area', [trace], layout, {responsive: true});
-                } catch(e) {
-                    Swal.fire('Graph Error', 'สมการไม่ถูกต้องสำหรับกราฟ', 'error');
+                        // Create Ticket
+                        const newRef = configRef.collection('queues').doc();
+                        t.set(newRef, {
+                            number: qString,
+                            rawNum: newNum,
+                            name: name,
+                            phone: phone,
+                            pax: pax,
+                            status: 'waiting',
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        // Update Counter
+                        t.update(configRef, { last: newNum });
+                        
+                        // Local Save
+                        localStorage.setItem('my_queue_id', newRef.id);
+                        this.myQueueId = newRef.id;
+                    });
+
+                    // UI Transition
+                    this.listenMyQueue();
+                    Swal.fire({
+                        icon: 'success', 
+                        title: 'จองคิวสำเร็จ!', 
+                        text: 'กรุณารอเรียกหมายเลข',
+                        confirmButtonColor: '#111827'
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    Swal.fire('Error', 'เกิดข้อผิดพลาด โปรดลองใหม่', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = 'กดรับบัตรคิว';
                 }
             }
-        };
 
-        // --- 3. SIDE PANEL (History & Chat) ---
-        const SidePanel = {
-            show: (tab) => {
-                document.getElementById('panel-history').classList.add('hidden');
-                document.getElementById('panel-chat').classList.add('hidden');
-                document.getElementById(`panel-${tab}`).classList.remove('hidden');
-                document.getElementById(`panel-${tab}`).classList.add('flex');
-            }
-        };
-
-        // --- 4. AUTH & DB ---
-        auth.onAuthStateChanged(u => {
-            App.user = u;
-            const ui = document.getElementById('auth-ui');
-            if(u) {
-                ui.innerHTML = `<div class="flex items-center gap-2"><span class="text-xs text-blue-300">${u.email.split('@')[0]}</span><button onclick="auth.signOut()" class="text-red-400"><i class="fa-solid fa-power-off"></i></button></div>`;
-                document.getElementById('modal-auth').classList.add('hidden');
-                LoadData.history();
-                Chat.init(u.uid);
-            } else {
-                ui.innerHTML = `<button onclick="Auth.modal()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-xs font-bold transition">Login</button>`;
-                document.getElementById('panel-history').innerHTML = '<div class="text-center text-slate-500 mt-10">เข้าสู่ระบบเพื่อดูประวัติ</div>';
-            }
-        });
-
-        const Auth = {
-            modal: () => document.getElementById('modal-auth').classList.remove('hidden'),
-            login: () => {
-                const e = document.getElementById('u-email').value;
-                const p = document.getElementById('u-pass').value;
-                auth.signInWithEmailAndPassword(e, p).catch(err => Swal.fire('Error', err.message, 'error'));
-            },
-            reg: () => {
-                const e = document.getElementById('u-email').value;
-                const p = document.getElementById('u-pass').value;
-                auth.createUserWithEmailAndPassword(e, p).catch(err => Swal.fire('Error', err.message, 'error'));
-            }
-        };
-
-        const LoadData = {
-            history: () => {
-                db.collection('math_history').where('uid','==',App.user.uid).orderBy('ts','desc').limit(20).onSnapshot(snap => {
-                    const div = document.getElementById('panel-history');
-                    if(snap.empty) { div.innerHTML = '<div class="text-center text-slate-500 mt-4">ยังไม่มีประวัติ</div>'; return; }
-                    div.innerHTML = snap.docs.map(d => `
-                        <div class="bg-slate-900 p-3 rounded border border-slate-800 flex justify-between items-center hover:border-blue-500 cursor-pointer" onclick="document.getElementById('input-math').value='${d.data().expr}'; App.expression='${d.data().expr}';">
-                            <div class="font-mono text-sm text-slate-300">${d.data().expr}</div>
-                            <div class="font-bold text-green-400">= ${d.data().res}</div>
-                        </div>
-                    `).join('');
+            cancelQueue() {
+                Swal.fire({
+                    title: 'ยกเลิกคิว?',
+                    text: "คุณจะไม่สามารถกู้คืนคิวเดิมได้",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'ยืนยันยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.db.collection('q_system').doc('config').collection('queues').doc(this.myQueueId)
+                            .update({ status: 'cancelled' });
+                        this.clearLocal();
+                    }
                 });
             }
-        };
 
-        const Chat = {
-            init: (uid) => {
-                rtdb.ref('chats/'+uid).limitToLast(20).on('child_added', s => {
-                    const m = s.val();
-                    const me = m.sender === 'user';
-                    const box = document.getElementById('chat-msgs');
-                    box.innerHTML += `
-                        <div class="flex ${me?'justify-end':'justify-start'}">
-                            <div class="px-3 py-2 rounded-lg text-sm max-w-[80%] ${me?'bg-blue-600 text-white':'bg-slate-800 border border-slate-700'}">${m.text}</div>
-                        </div>
-                    `;
-                    box.scrollTop = box.scrollHeight;
-                });
-            },
-            send: (e) => {
-                e.preventDefault();
-                const inp = document.getElementById('chat-in');
-                if(inp.value && App.user) {
-                    rtdb.ref('chats/'+App.user.uid).push({text:inp.value, sender:'user', ts:Date.now()});
-                    inp.value = '';
+            // UI Helpers
+            renderTicket(data) {
+                document.getElementById('booking-section').classList.add('hidden');
+                document.getElementById('ticket-section').classList.remove('hidden');
+                
+                document.getElementById('ticket-number').innerText = data.number;
+                document.getElementById('ticket-name').innerText = data.name;
+                document.getElementById('ticket-time').innerText = data.timestamp ? moment(data.timestamp.toDate()).format('HH:mm') : '-';
+                
+                // Status Logic
+                const badge = document.getElementById('ticket-status');
+                badge.className = 'inline-block mt-3 status-badge';
+                if(data.status === 'called') {
+                    badge.classList.add('status-called');
+                    badge.innerText = "ถึงคิวคุณแล้ว!";
+                    this.notifyUser(data.number);
+                } else {
+                    badge.classList.add('status-waiting');
+                    badge.innerText = "WAITING";
+                }
+                
+                this.myData = data; // Store for calc
+            }
+
+            updateQueueAhead(docs) {
+                if(!this.myData) return;
+                const myNum = this.myData.rawNum;
+                // Filter docs with number < myNum
+                const ahead = docs.filter(d => d.data().rawNum < myNum).length;
+                document.getElementById('queue-ahead').innerText = ahead;
+                
+                // Progress Bar Simulation (Rough)
+                const total = ahead + 1; // Assuming
+                const percent = Math.max(5, 100 - (ahead * 10)); 
+                document.getElementById('progress-bar').style.width = `${percent}%`;
+            }
+
+            notifyUser(num) {
+                if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                // SweetAlert Override if not already open
+                if(!Swal.isVisible()) {
+                    Swal.fire({
+                        title: 'ถึงคิวคุณแล้ว!',
+                        text: `หมายเลข ${num} เชิญที่ช่องบริการ`,
+                        icon: 'success',
+                        backdrop: `rgba(0,0,123,0.4)`
+                    });
                 }
             }
-        };
 
-        // Init
-        Keypad.render();
-        // Load intro plot
-        // setTimeout(() => { document.getElementById('input-math').value = 'sin(x)'; Graph.plot(); }, 1000); // Demo
+            clearLocal() {
+                localStorage.removeItem('my_queue_id');
+                location.reload();
+            }
+        }
+
+        // Start App
+        const App = new QueueApp();
     </script>
 </body>
 </html>
