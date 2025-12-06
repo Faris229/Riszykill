@@ -2,112 +2,113 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FF Arena - Live Display</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&family=Russo+One&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&family=Teko:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; color: #1e293b; overflow: hidden; }
-        .font-head { font-family: 'Russo One', sans-serif; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; overflow: hidden; touch-action: none; }
+        .font-condensed { font-family: 'Teko', sans-serif; }
         
-        /* Floating Animation */
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        .card-float { animation: float 5s ease-in-out infinite; }
-        
-        /* Announcement Scroll */
-        .marquee-container { overflow: hidden; white-space: nowrap; }
-        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
-        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
         }
+
+        /* Responsive Layout Tweaks */
+        @media (max-width: 768px) {
+            .vs-icon { font-size: 3rem !important; margin: 10px 0 !important; }
+            .card-title { font-size: 0.7rem !important; padding: 4px 12px !important; top: -12px !important; }
+            .player-name { font-size: 2rem !important; }
+        }
+
+        /* Animations */
+        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        .floating { animation: float 5s ease-in-out infinite; }
         
-        ::-webkit-scrollbar { display: none; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        
+        /* Ticker */
+        .ticker-wrap { position: fixed; top: 0; width: 100%; height: 2.5rem; background: #2563eb; color: white; z-index: 50; display: flex; }
+        .ticker { display: inline-block; white-space: nowrap; animation: ticker 20s linear infinite; padding-left: 100%; align-self: center; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
     </style>
 </head>
-<body class="h-screen flex flex-col relative">
+<body class="h-screen flex flex-col relative text-slate-800">
 
-    <div id="announcement-bar" class="bg-blue-600 text-white h-10 flex items-center overflow-hidden hidden relative z-50 shadow-md">
-        <div class="bg-blue-800 h-full px-4 flex items-center font-bold z-10 text-sm uppercase">
-            <i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ
-        </div>
-        <div class="marquee-container w-full">
-            <div id="ann-text" class="marquee-text font-bold text-lg">ยินดีต้อนรับสู่การแข่งขัน...</div>
-        </div>
+    <div id="ticker-area" class="ticker-wrap hidden">
+        <div class="bg-blue-800 px-4 flex items-center font-bold text-xs uppercase z-10"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
+        <div id="ticker-text" class="ticker text-sm font-medium">...</div>
     </div>
 
-    <header class="pt-6 pb-2 text-center">
-        <h1 class="text-4xl md:text-5xl font-head text-slate-800 tracking-wider drop-shadow-sm">1 VS 1 BATTLE</h1>
-        <p class="text-slate-400 text-sm mt-1">จัดคิวตามยอดโดเนท • ล้มแชมป์รับเงินรางวัล</p>
-    </header>
-
-    <div class="flex-1 flex items-center justify-center gap-6 md:gap-12 px-10 pb-4">
+    <main class="flex-1 flex flex-col md:flex-row items-center justify-center p-4 md:p-10 gap-4 md:gap-12 w-full max-w-7xl mx-auto pt-12 md:pt-0">
         
-        <div class="flex-1 max-w-md card-float">
-            <div class="glass-panel rounded-3xl p-6 text-center border-t-4 border-yellow-500 relative">
-                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg tracking-widest">
-                    KING 👑
+        <div class="w-full md:flex-1 max-w-md relative floating" style="animation-delay: 0s;">
+            <div class="glass-card rounded-3xl p-6 md:p-8 text-center border-t-8 border-yellow-400 relative">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 card-title bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-1 rounded-full shadow-lg text-xs md:text-sm font-bold tracking-widest uppercase">
+                    <span id="label-king">KING</span>
                 </div>
                 
-                <div class="mt-4 mb-2">
-                    <div id="king-name" class="text-4xl md:text-5xl font-head text-slate-800 truncate">ว่าง</div>
+                <div class="mt-4 mb-2 flex items-center justify-center h-16 md:h-24">
+                    <h2 id="king-name" class="player-name text-4xl md:text-5xl font-bold truncate">Loading...</h2>
                 </div>
-                
-                <div class="flex justify-center items-center gap-2 bg-yellow-50 rounded-xl py-2 mt-4">
-                    <span class="text-yellow-700 font-bold text-sm">ชนะต่อเนื่อง:</span>
-                    <span id="king-wins" class="text-3xl font-head text-yellow-600">0</span>
+
+                <div class="bg-yellow-50 rounded-xl p-2 md:p-3 flex justify-center items-center gap-3 border border-yellow-100">
+                    <i class="fa-solid fa-trophy text-yellow-600 text-xl"></i>
+                    <div class="text-left leading-none">
+                        <div class="text-[10px] font-bold text-yellow-600 uppercase">Win Streak</div>
+                        <div id="king-wins" class="text-2xl font-condensed font-bold">0</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="z-10 animate__animated animate__pulse animate__infinite">
-            <span class="font-head text-6xl text-slate-300 italic drop-shadow-lg">VS</span>
+        <div class="text-center z-10">
+            <span class="vs-icon text-6xl md:text-8xl font-black italic text-slate-300 drop-shadow-sm animate__animated animate__pulse animate__infinite">VS</span>
         </div>
 
-        <div class="flex-1 max-w-md card-float" style="animation-delay: 2s;">
-            <div class="glass-panel rounded-3xl p-6 text-center border-t-4 border-blue-500 relative">
-                <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg tracking-widest">
-                    ผู้ท้าชิง ⚔️
+        <div class="w-full md:flex-1 max-w-md relative floating" style="animation-delay: 2s;">
+            <div class="glass-card rounded-3xl p-6 md:p-8 text-center border-t-8 border-blue-500 relative">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 card-title bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-1 rounded-full shadow-lg text-xs md:text-sm font-bold tracking-widest uppercase">
+                    <span id="label-chal">CHALLENGER</span>
                 </div>
                 
-                <div class="mt-4 mb-2">
-                    <div id="chal-name" class="text-4xl md:text-5xl font-head text-slate-800 truncate">ว่าง</div>
+                <div class="mt-4 mb-2 flex items-center justify-center h-16 md:h-24">
+                    <h2 id="chal-name" class="player-name text-4xl md:text-5xl font-bold truncate">Loading...</h2>
                 </div>
-                
-                <div class="flex justify-center items-center gap-2 bg-blue-50 rounded-xl py-2 mt-4">
-                    <span class="text-blue-700 font-bold text-sm">ยอดโดเนท:</span>
-                    <span id="chal-donate" class="text-3xl font-head text-blue-600">0</span>
+
+                <div class="bg-blue-50 rounded-xl p-2 md:p-3 flex justify-center items-center gap-3 border border-blue-100">
+                    <i class="fa-solid fa-sack-dollar text-blue-600 text-xl"></i>
+                    <div class="text-left leading-none">
+                        <div class="text-[10px] font-bold text-blue-600 uppercase">Donation</div>
+                        <div id="chal-donate" class="text-2xl font-condensed font-bold">0</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-    </div>
+    </main>
 
-    <div class="bg-white border-t border-slate-200 p-4 shadow-inner">
-        <div class="flex items-center justify-between mb-3 px-2">
-            <div class="flex items-center gap-2">
-                <div class="w-1.5 h-6 bg-slate-800 rounded-full"></div>
-                <h2 class="text-lg font-bold text-slate-700">คิวรอเล่น (เรียงตามโดเนท)</h2>
-            </div>
-            <div class="bg-slate-100 px-3 py-1 rounded-lg text-xs font-bold text-slate-500">
-                รวมทั้งหมด: <span id="q-total" class="text-slate-800 text-sm">0</span> คิว
-            </div>
+    <div class="bg-white/90 backdrop-blur border-t border-slate-200 h-24 md:h-32 fixed bottom-0 left-0 w-full z-20 flex flex-col shadow-lg">
+        <div class="flex justify-between items-center px-4 py-1.5 border-b border-slate-100 bg-slate-50/50">
+            <span class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-list-ol mr-1"></i> Waiting Queue</span>
+            <span class="text-[10px] md:text-xs font-bold text-slate-400">Total: <span id="q-total" class="text-slate-800">0</span></span>
         </div>
-
-        <div id="queue-list" class="flex gap-3 overflow-x-auto pb-2 h-24 items-center">
+        <div id="queue-container" class="flex-1 flex items-center gap-3 px-4 overflow-x-auto hide-scroll">
             </div>
     </div>
 
     <script>
+        // Config
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -116,61 +117,69 @@
             messagingSenderId: "864674622740",
             appId: "1:864674622740:web:3131798892e0e63e12a601"
         };
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 1. King
-        db.collection('arena_queue').where('status', '==', 'king').onSnapshot(s => {
-            const n = document.getElementById('king-name');
-            if(!s.empty) {
-                const d = s.docs[0].data();
-                n.innerText = d.name;
-                document.getElementById('king-wins').innerText = d.wins || 0;
-                n.classList.add('animate__animated','animate__fadeInDown');
-                setTimeout(()=>n.classList.remove('animate__animated','animate__fadeInDown'), 1000);
-            } else { n.innerText = "รอแชมป์"; document.getElementById('king-wins').innerText = 0; }
-        });
-
-        // 2. Challenger
-        db.collection('arena_queue').where('status', '==', 'challenger').onSnapshot(s => {
-            const n = document.getElementById('chal-name');
-            if(!s.empty) {
-                const d = s.docs[0].data();
-                n.innerText = d.name;
-                document.getElementById('chal-donate').innerText = d.donate;
-                n.classList.add('animate__animated','animate__fadeInUp');
-                setTimeout(()=>n.classList.remove('animate__animated','animate__fadeInUp'), 1000);
-            } else { n.innerText = "รอคิว"; document.getElementById('chal-donate').innerText = "-"; }
-        });
-
-        // 3. Waiting List
-        db.collection('arena_queue').where('status', '==', 'waiting').orderBy('donate', 'desc').orderBy('timestamp', 'asc').onSnapshot(s => {
-            const l = document.getElementById('queue-list');
-            document.getElementById('q-total').innerText = s.size;
-            l.innerHTML = '';
-            s.docs.forEach((doc, i) => {
+        // 1. Listen Main State
+        db.collection('arena_system').doc('main_state').onSnapshot((doc) => {
+            if (doc.exists) {
                 const d = doc.data();
-                const style = i===0 ? 'bg-yellow-50 border-yellow-300 ring-2 ring-yellow-100' : 'bg-white border-slate-200';
-                l.innerHTML += `
-                    <div class="min-w-[160px] h-20 ${style} border rounded-xl p-3 flex flex-col justify-between shadow-sm animate__animated animate__fadeInRight" style="animation-delay:${i*0.1}s">
-                        <div class="flex justify-between"><span class="text-xs font-bold text-slate-400">#${i+1}</span> <span class="font-bold text-green-500 text-sm">฿${d.donate}</span></div>
-                        <div class="font-bold text-slate-700 truncate">${d.name}</div>
-                    </div>
-                `;
-            });
-            if(s.empty) l.innerHTML = '<span class="text-slate-400 w-full text-center">ยังไม่มีคิว...</span>';
-        });
+                updateText('king-name', d.kingName || "ว่าง");
+                updateText('king-wins', d.kingWins || 0);
+                document.getElementById('label-king').innerText = d.kingTitle || "KING";
 
-        // 4. Announcements
-        db.collection('announcements').doc('config').onSnapshot(doc => {
-            const bar = document.getElementById('announcement-bar');
-            if(doc.exists && doc.data().active) {
-                bar.classList.remove('hidden');
-                document.getElementById('ann-text').innerText = doc.data().text;
-            } else {
-                bar.classList.add('hidden');
+                updateText('chal-name', d.chalName || "ว่าง");
+                updateText('chal-donate', `฿${d.chalDonate || 0}`);
+                document.getElementById('label-chal').innerText = d.chalTitle || "CHALLENGER";
+
+                const ticker = document.getElementById('ticker-area');
+                if (d.announcementActive) {
+                    ticker.classList.remove('hidden');
+                    document.getElementById('ticker-text').innerText = d.announcementText || "";
+                } else {
+                    ticker.classList.add('hidden');
+                }
             }
         });
+
+        // 2. Listen Queue
+        db.collection('arena_system').doc('main_state').collection('queue')
+            .orderBy('donate', 'desc').orderBy('timestamp', 'asc').onSnapshot((snap) => {
+                const con = document.getElementById('queue-container');
+                document.getElementById('q-total').innerText = snap.size;
+                con.innerHTML = '';
+                
+                if (snap.empty) {
+                    con.innerHTML = '<span class="text-slate-300 w-full text-center text-xs">Waiting for players...</span>';
+                    return;
+                }
+
+                snap.forEach((doc, i) => {
+                    const d = doc.data();
+                    const isTop = i === 0;
+                    const cardClass = isTop ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-slate-200 opacity-70';
+                    const html = `
+                        <div class="min-w-[140px] md:min-w-[160px] h-14 md:h-16 ${cardClass} border rounded-xl px-3 flex flex-col justify-center animate__animated animate__fadeInRight" style="animation-delay: ${i*0.1}s">
+                            <div class="flex justify-between items-center mb-0.5">
+                                <span class="text-[10px] font-bold text-slate-400">#${i+1}</span>
+                                <span class="text-[10px] font-bold text-green-500">฿${d.donate}</span>
+                            </div>
+                            <div class="font-bold text-slate-700 truncate text-sm">${d.name}</div>
+                        </div>
+                    `;
+                    con.insertAdjacentHTML('beforeend', html);
+                });
+            });
+
+        function updateText(id, val) {
+            const el = document.getElementById(id);
+            if (el.innerText != val) {
+                el.classList.remove('animate__fadeIn');
+                void el.offsetWidth;
+                el.innerText = val;
+                el.classList.add('animate__animated', 'animate__fadeIn');
+            }
+        }
     </script>
 </body>
 </html>
