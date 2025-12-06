@@ -9,28 +9,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; color: #334155; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; color: #334155; padding-bottom: 40px; }
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
         .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border-radius: 1rem; transition: 0.2s; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
         .btn-primary:active { transform: scale(0.96); }
         .status-badge { padding: 6px 16px; border-radius: 99px; font-weight: 700; font-size: 0.9rem; }
         .st-call { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; animation: pulse 1.5s infinite; }
+        
+        /* Marquee Announcement */
+        .marquee-container { background: #1e293b; color: #fff; overflow: hidden; position: fixed; top: 0; left: 0; width: 100%; z-index: 50; height: 40px; display: flex; align-items: center; }
+        .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; padding-left: 100%; font-size: 0.9rem; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-6">
+<body class="min-h-screen flex flex-col pt-14 px-6">
 
-    <header class="mb-6 flex justify-between items-center max-w-md mx-auto w-full">
+    <div id="announcement-bar" class="marquee-container hidden">
+        <div class="bg-blue-600 h-full px-3 flex items-center font-bold z-10 text-xs shadow-md"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
+        <div id="announcement-text" class="marquee-content py-2">ยินดีต้อนรับสู่ระบบจองคิวออนไลน์</div>
+    </div>
+
+    <header class="mb-6 mt-4 flex justify-between items-center max-w-md mx-auto w-full">
         <div>
             <h1 class="font-bold text-2xl text-slate-800" id="shop-name">Loading...</h1>
-            <div class="flex items-center gap-2 mt-1">
+            <div id="shop-status-badge" class="flex items-center gap-2 mt-1">
                 <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="text-xs text-slate-500">ระบบออนไลน์</span>
+                <span class="text-xs text-green-600 font-bold">เปิดรับคิว</span>
             </div>
         </div>
         <div class="text-right">
@@ -39,7 +48,7 @@
         </div>
     </header>
 
-    <main class="flex-1 max-w-md mx-auto w-full flex flex-col justify-center">
+    <main class="flex-1 max-w-md mx-auto w-full flex flex-col justify-center relative">
         
         <div id="form-section" class="glass-card p-6 animate__animated animate__fadeIn">
             <h3 class="font-bold text-lg mb-4 text-slate-700 flex items-center"><i class="fa-solid fa-ticket text-blue-500 mr-2"></i> จองคิวใหม่</h3>
@@ -56,7 +65,7 @@
 
         <div id="ticket-section" class="hidden animate__animated animate__zoomIn">
             <div class="glass-card overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center text-white relative overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center text-white relative">
                     <div class="text-xs opacity-80 uppercase tracking-widest">หมายเลขคิวของคุณ</div>
                     <div id="my-q-num" class="text-7xl font-black mt-2 drop-shadow-md">---</div>
                     <div id="my-status" class="status-badge bg-white/20 inline-block mt-4 backdrop-blur border border-white/30">WAITING</div>
@@ -69,41 +78,33 @@
                         <i class="fa-solid fa-volume-high mr-2 text-blue-500"></i> กดทดสอบเสียง (เปิดแจ้งเตือน)
                     </button>
                     
-                    <div class="bg-yellow-50 text-yellow-700 text-xs p-3 rounded-lg mb-4 text-center">
-                        <i class="fa-solid fa-bell"></i> ระบบจะส่งเสียงเรียกเมื่อถึงคิว
-                    </div>
-
                     <button onclick="App.cancel()" class="w-full text-red-400 text-sm underline hover:text-red-500">ยกเลิกคิว</button>
                 </div>
             </div>
         </div>
 
-        <div id="success-section" class="hidden text-center animate__animated animate__fadeInUp">
+        <div id="message-section" class="hidden text-center animate__animated animate__fadeInUp">
             <div class="glass-card p-8">
-                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <div id="msg-icon" class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-green-100">
                     <i class="fa-solid fa-check text-5xl text-green-500"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800 mb-2">ขอบคุณที่ใช้บริการ</h2>
-                <p class="text-slate-500 mb-6">การให้บริการเสร็จสิ้นเรียบร้อยแล้ว</p>
+                <h2 id="msg-title" class="text-2xl font-bold text-slate-800 mb-2">...</h2>
+                <p id="msg-desc" class="text-slate-500 mb-6">...</p>
                 <button onclick="App.logout()" class="btn-primary w-full py-3 shadow-lg">กลับหน้าแรก</button>
             </div>
         </div>
 
-        <div id="cancelled-section" class="hidden text-center animate__animated animate__fadeInUp">
-            <div class="glass-card p-8">
-                <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-                    <i class="fa-solid fa-xmark text-5xl text-red-500"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800 mb-2">คิวถูกยกเลิก</h2>
-                <p class="text-slate-500 mb-6">หากมีข้อสงสัยกรุณาติดต่อเจ้าหน้าที่</p>
-                <button onclick="App.logout()" class="w-full py-3 rounded-xl bg-slate-200 text-slate-600 font-bold hover:bg-slate-300">กลับหน้าแรก</button>
+        <div id="shop-closed-screen" class="hidden absolute top-0 left-0 w-full h-full bg-slate-100 z-50 flex flex-col items-center justify-center text-center p-6 rounded-3xl animate__animated animate__fadeIn">
+            <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-6">
+                <i class="fa-solid fa-store-slash text-4xl text-gray-500"></i>
             </div>
+            <h2 class="text-2xl font-bold text-slate-700">ร้านปิดชั่วคราว</h2>
+            <p class="text-gray-500 mt-2">ขณะนี้ระบบปิดรับจองคิว<br>กรุณาติดต่อใหม่ในเวลาทำการ</p>
         </div>
 
     </main>
 
     <script>
-        // Config เดิมของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -117,18 +118,15 @@
 
         class CustomerApp {
             constructor() {
-                this.myId = localStorage.getItem('q_id_final');
+                this.myId = localStorage.getItem('q_id_pro_v3');
                 this.lastCallTime = 0;
                 this.init();
             }
 
             init() {
-                this.listenConfig();
-                // ถ้ามี ID ค้างอยู่ ให้ฟังสถานะตั๋ว
-                if(this.myId) {
-                    this.listenTicket();
-                } else {
-                    // ถ้าจองใหม่ ให้ตั้งเวลาปัจจุบันในฟอร์ม
+                this.listenConfig(); // ฟังสถานะร้าน/ประกาศ
+                if(this.myId) this.listenTicket();
+                else {
                     const now = new Date();
                     document.getElementById('inp-time').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
                 }
@@ -137,42 +135,58 @@
             listenConfig() {
                 db.collection('q_system').doc('config').onSnapshot(doc => {
                     if(doc.exists) {
-                        document.getElementById('shop-name').innerText = doc.data().shopName || 'Queue System';
-                        document.getElementById('current-q').innerText = doc.data().current || '---';
+                        const d = doc.data();
+                        document.getElementById('shop-name').innerText = d.shopName || 'Queue System';
+                        document.getElementById('current-q').innerText = d.current || '---';
+
+                        // 1. เช็คสถานะร้านปิด/เปิด
+                        const isShopOpen = d.isShopOpen !== false; // default true
+                        this.toggleShopStatus(isShopOpen);
+
+                        // 2. เช็คประกาศ
+                        const annBar = document.getElementById('announcement-bar');
+                        if(d.announceText && d.announceText.trim() !== "") {
+                            annBar.classList.remove('hidden');
+                            document.getElementById('announcement-text').innerText = d.announceText;
+                        } else {
+                            annBar.classList.add('hidden');
+                        }
                     }
                 });
             }
 
+            toggleShopStatus(isOpen) {
+                const closedScreen = document.getElementById('shop-closed-screen');
+                const badge = document.getElementById('shop-status-badge');
+                
+                if(!isOpen) {
+                    // ร้านปิด
+                    if(!this.myId) { // ถ้ายังไม่มีคิว ให้บังหน้าจอเลย
+                        closedScreen.classList.remove('hidden');
+                    }
+                    badge.innerHTML = `<div class="w-2 h-2 bg-red-500 rounded-full"></div><span class="text-xs text-red-500 font-bold">ร้านปิดรับคิว</span>`;
+                } else {
+                    // ร้านเปิด
+                    closedScreen.classList.add('hidden');
+                    badge.innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-xs text-green-600 font-bold">เปิดรับคิว</span>`;
+                }
+            }
+
             listenTicket() {
                 db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(doc => {
-                    // ถ้าหาเอกสารไม่เจอ (โดนลบ) ให้ logout
                     if(!doc.exists) return this.logout();
-                    
                     const d = doc.data();
-                    
-                    // --- 1. เช็คสถานะเพื่อเปลี่ยนหน้าจอ ---
-                    if(d.status === 'served') {
-                        this.showScreen('success-section');
-                        if(navigator.vibrate) navigator.vibrate(200); // สั่นเตือนจบงาน
-                        return;
-                    }
-                    if(d.status === 'cancelled') {
-                        this.showScreen('cancelled-section');
-                        if(navigator.vibrate) navigator.vibrate([100,50,100]); // สั่นเตือนยกเลิก
-                        return;
-                    }
 
-                    // --- 2. แสดงข้อมูลบัตรคิว (Waiting / Called) ---
+                    if(d.status === 'served') return this.showMessage('success');
+                    if(d.status === 'cancelled') return this.showMessage('cancelled');
+
                     this.showScreen('ticket-section');
                     this.renderTicket(d);
 
-                    // --- 3. เช็คว่าถูกเรียกหรือไม่ (เสียง) ---
                     if(d.status === 'called') {
-                        // ใช้ lastCallTime เพื่อป้องกันเสียงซ้ำ ถ้าแอดมินไม่ได้กดเรียกใหม่
                         if (d.lastCallTime && d.lastCallTime > this.lastCallTime) {
                             this.lastCallTime = d.lastCallTime;
-                            const msg = d.voiceMessage || `ขอเชิญคิวที่ ${d.number} ค่ะ`;
-                            this.announce(msg);
+                            this.announce(d.voiceMessage);
                         }
                     }
                 });
@@ -195,12 +209,17 @@
 
             async book(e) {
                 e.preventDefault();
-                this.speak(' '); // Unlock audio context
-
+                this.speak(' '); 
                 const btn = document.getElementById('btn-book');
                 btn.disabled = true; btn.innerText = 'กำลังประมวลผล...';
 
                 try {
+                    // เช็คก่อนว่าร้านเปิดไหม
+                    const config = await db.collection('q_system').doc('config').get();
+                    if(config.exists && config.data().isShopOpen === false) {
+                        throw new Error("ร้านปิดรับจองคิวแล้ว");
+                    }
+
                     await db.runTransaction(async (t) => {
                         const ref = db.collection('q_system').doc('config');
                         const doc = await t.get(ref);
@@ -221,7 +240,7 @@
                             lastCallTime: 0
                         });
                         t.update(ref, { last: next });
-                        localStorage.setItem('q_id_final', qRef.id);
+                        localStorage.setItem('q_id_pro_v3', qRef.id);
                         this.myId = qRef.id;
                     });
                     this.listenTicket();
@@ -232,59 +251,61 @@
                 }
             }
 
+            showMessage(type) {
+                this.showScreen('message-section');
+                const title = document.getElementById('msg-title');
+                const desc = document.getElementById('msg-desc');
+                const icon = document.getElementById('msg-icon');
+                const iTag = icon.querySelector('i');
+
+                if(type === 'success') {
+                    title.innerText = "ขอบคุณที่ใช้บริการ";
+                    desc.innerText = "การให้บริการเสร็จสิ้นแล้ว";
+                    icon.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-green-100";
+                    iTag.className = "fa-solid fa-check text-5xl text-green-500";
+                    if(navigator.vibrate) navigator.vibrate(200);
+                } else {
+                    title.innerText = "คิวถูกยกเลิก";
+                    desc.innerText = "กรุณาติดต่อเจ้าหน้าที่หากมีข้อสงสัย";
+                    icon.className = "w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm bg-red-100";
+                    iTag.className = "fa-solid fa-xmark text-5xl text-red-500";
+                    if(navigator.vibrate) navigator.vibrate([100,50,100]);
+                }
+            }
+
             showScreen(id) {
-                ['form-section','ticket-section','success-section','cancelled-section'].forEach(s => {
-                    document.getElementById(s).classList.add('hidden');
-                });
+                ['form-section','ticket-section','message-section'].forEach(s => document.getElementById(s).classList.add('hidden'));
                 document.getElementById(id).classList.remove('hidden');
             }
 
             testSound() {
-                // ฟังก์ชันสำคัญเพื่อให้ Browser อนุญาตให้เล่นเสียง
-                this.speak('ทดสอบระบบเสียง พร้อมใช้งาน');
+                this.speak('ระบบเสียงพร้อมใช้งาน');
                 if(navigator.vibrate) navigator.vibrate(200);
-                Swal.fire({
-                    toast: true, position: 'top', icon: 'success', 
-                    title: 'เปิดระบบเสียงแล้ว', showConfirmButton: false, timer: 1500
-                });
+                Swal.fire({toast:true, position:'top', icon:'success', title:'เปิดเสียงแล้ว', timer:1500, showConfirmButton:false});
             }
 
             announce(msg) {
-                // สั่น + พูด + Popup
                 if(navigator.vibrate) navigator.vibrate([500,300,500]);
-                this.speak(msg);
-                Swal.fire({
-                    title: 'ถึงคิวคุณแล้ว!', 
-                    text: 'กรุณาติดต่อเคาน์เตอร์บริการ', 
-                    icon: 'success', 
-                    confirmButtonText: 'รับทราบ',
-                    confirmButtonColor: '#2563eb'
-                });
+                this.speak(msg || 'ถึงคิวของคุณแล้ว');
+                Swal.fire({title: 'ถึงคิวคุณแล้ว!', text: 'กรุณาติดต่อเคาน์เตอร์', icon: 'success', confirmButtonText: 'รับทราบ'});
             }
 
             speak(txt) {
                 if(!('speechSynthesis' in window)) return;
-                window.speechSynthesis.cancel(); // ตัดเสียงเก่าทิ้งก่อน
-                if(txt.trim() === '') return;
-                
+                window.speechSynthesis.cancel();
+                if(!txt || txt.trim() === '') return;
                 const u = new SpeechSynthesisUtterance(txt);
                 u.lang = 'th-TH'; u.rate = 1.0;
                 window.speechSynthesis.speak(u);
             }
 
             cancel() {
-                Swal.fire({title:'ต้องการยกเลิกคิว?', icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'ใช่, ยกเลิก'}).then(r => {
-                    if(r.isConfirmed) {
-                        db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'});
-                        // ไม่ต้อง logout ทันที รอ listenTicket จับ status เปลี่ยนแล้วค่อยเปลี่ยนหน้าจอ
-                    }
+                Swal.fire({title:'ยกเลิกคิว?', icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'ใช่, ยกเลิก'}).then(r => {
+                    if(r.isConfirmed) db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'});
                 });
             }
 
-            logout() {
-                localStorage.removeItem('q_id_final');
-                location.reload();
-            }
+            logout() { localStorage.removeItem('q_id_pro_v3'); location.reload(); }
         }
         const App = new CustomerApp();
     </script>
