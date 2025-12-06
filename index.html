@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>จองคิวออนไลน์</title>
+    <title>จองคิวออนไลน์ - สำหรับลูกค้า</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -14,70 +14,170 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .card { background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
-        .btn-primary { background: #2563eb; color: white; border-radius: 1rem; transition: transform 0.1s; }
-        .btn-primary:active { transform: scale(0.97); }
-        .status-badge { padding: 4px 12px; border-radius: 99px; font-weight: bold; font-size: 0.8rem; }
-        .st-wait { background: #eff6ff; color: #2563eb; }
-        .st-call { background: #ecfdf5; color: #059669; animation: flash 1s infinite; }
-        .marquee-wrap { position: fixed; top: 0; width: 100%; height: 36px; background: #2563eb; color: white; z-index: 50; display: flex; align-items: center; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; color: #334155; }
+        
+        /* Custom UI Components */
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+            color: white; 
+            border-radius: 1rem; 
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        .status-badge { padding: 6px 16px; border-radius: 99px; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .st-wait { background: #eff6ff; color: #3b82f6; border: 1px solid #dbeafe; }
+        .st-call { 
+            background: #ecfdf5; color: #059669; border: 1px solid #d1fae5;
+            animation: pulse-green 2s infinite;
+        }
+
+        /* Animations */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .marquee-wrap { position: fixed; top: 0; width: 100%; height: 40px; background: #1e293b; color: white; z-index: 50; display: flex; align-items: center; }
         .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 20s linear infinite; padding-left: 100%; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        /* Input Styling */
+        .input-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-box:focus { border-color: #3b82f6; background: white; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col pt-12">
+<body class="min-h-screen flex flex-col pt-14 pb-6">
 
     <div id="ann-bar" class="marquee-wrap hidden">
-        <div class="bg-blue-800 h-full px-4 flex items-center font-bold z-10 text-xs"><i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ</div>
-        <div id="ann-text" class="marquee-content text-sm font-medium">...</div>
+        <div class="bg-blue-600 h-full px-4 flex items-center font-bold z-10 text-xs shadow-md">
+            <i class="fa-solid fa-bullhorn mr-2"></i> ประกาศ
+        </div>
+        <div id="ann-text" class="marquee-content text-sm font-medium py-2">...</div>
     </div>
 
-    <header class="p-6 bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-gray-100">
+    <header class="px-6 mb-6 sticky top-14 z-40">
         <div class="flex justify-between items-center max-w-md mx-auto">
-            <div><h1 class="font-bold text-xl text-slate-800" id="shop-name">Loading...</h1><p class="text-xs text-gray-400">ระบบจองคิว</p></div>
-            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div>
+                <h1 class="font-bold text-2xl text-slate-800 tracking-tight" id="shop-name">Loading...</h1>
+                <p class="text-xs text-slate-400 font-medium">บริการจองคิวออนไลน์</p>
+            </div>
+            <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-xs font-bold text-slate-600">Online</span>
+            </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-md mx-auto w-full p-6 flex flex-col justify-center">
-        <div class="text-center mb-8">
-            <h2 class="text-5xl font-bold text-slate-800" id="current-q">A-000</h2>
-            <p class="text-sm text-gray-400 mt-1">คิวปัจจุบัน</p>
-            <div class="mt-4"><span class="text-xl font-bold text-blue-600" id="wait-count">0</span> <span class="text-xs text-gray-400">คิวรอ</span></div>
+    <main class="flex-1 max-w-md mx-auto w-full px-6 flex flex-col justify-start gap-6">
+        
+        <div class="text-center py-4">
+            <div class="inline-block relative">
+                <h2 class="text-6xl font-black text-slate-800 tracking-tighter" id="current-q">---</h2>
+                <span class="absolute -top-2 -right-4 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-bounce hidden" id="calling-badge">NOW</span>
+            </div>
+            <p class="text-sm text-slate-400 font-medium mt-1">คิวที่กำลังเรียก</p>
+            <div class="mt-4 bg-white inline-flex items-center px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+                <i class="fa-solid fa-user-group text-blue-500 mr-2"></i>
+                <span class="text-lg font-bold text-blue-600 mr-1" id="wait-count">0</span> 
+                <span class="text-xs text-slate-400">คิวรอ</span>
+            </div>
         </div>
 
-        <div id="form-section" class="card p-6">
-            <h3 class="font-bold text-lg mb-4">จองคิวใหม่</h3>
-            <form onsubmit="App.book(event)" class="space-y-3">
-                <input id="inp-name" class="w-full bg-slate-50 border rounded-xl p-3" placeholder="ชื่อลูกค้า" required>
-                <input id="inp-phone" type="tel" class="w-full bg-slate-50 border rounded-xl p-3" placeholder="เบอร์โทร">
-                <div class="grid grid-cols-2 gap-3">
-                    <select id="inp-pax" class="w-full bg-slate-50 border rounded-xl p-3"><option value="1">1 ท่าน</option><option value="2">2 ท่าน</option><option value="3+">3+ ท่าน</option></select>
-                    <input id="inp-time" type="time" class="w-full bg-slate-50 border rounded-xl p-3 text-blue-600 font-bold" required>
+        <div id="form-section" class="glass-card p-6 animate__animated animate__fadeIn">
+            <h3 class="font-bold text-lg mb-4 text-slate-700 flex items-center">
+                <i class="fa-solid fa-ticket text-blue-500 mr-2"></i> จองคิวใหม่
+            </h3>
+            <form onsubmit="App.book(event)" class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 ml-1 mb-1 block">ชื่อผู้จอง</label>
+                    <input id="inp-name" class="input-box" placeholder="ระบุชื่อของคุณ" required>
                 </div>
-                <button id="btn-book" class="btn-primary w-full py-3.5 font-bold shadow-lg mt-2">กดรับบัตรคิว</button>
+                <div>
+                    <label class="text-xs text-slate-400 ml-1 mb-1 block">เบอร์โทรศัพท์ (ถ้ามี)</label>
+                    <input id="inp-phone" type="tel" class="input-box" placeholder="0xx-xxx-xxxx">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-400 ml-1 mb-1 block">จำนวนคน</label>
+                        <select id="inp-pax" class="input-box">
+                            <option value="1">1 ท่าน</option>
+                            <option value="2">2 ท่าน</option>
+                            <option value="3">3 ท่าน</option>
+                            <option value="4+">4+ ท่าน</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 ml-1 mb-1 block">เวลาถึงร้าน</label>
+                        <input id="inp-time" type="time" class="input-box text-center font-bold text-blue-600" required>
+                    </div>
+                </div>
+                <button id="btn-book" class="btn-primary w-full py-4 font-bold text-lg shadow-lg mt-2 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-check-circle"></i> กดรับบัตรคิว
+                </button>
+                <p class="text-[10px] text-center text-slate-400 mt-2">*กรุณาเปิดเสียงโทรศัพท์เพื่อรอเรียก</p>
             </form>
         </div>
 
-        <div id="ticket-section" class="hidden card overflow-hidden animate__animated animate__fadeInUp">
-            <div class="bg-slate-50 p-6 border-b border-dashed text-center">
-                <div class="text-xs text-gray-400 uppercase">Your Queue</div>
-                <div id="my-q-num" class="text-5xl font-black text-slate-800 mt-2">A-001</div>
-                <div id="my-status" class="status-badge st-wait inline-block mt-3">WAITING</div>
-            </div>
-            <div class="p-6">
-                <div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Name</span><span class="font-bold" id="my-name">...</span></div>
-                <div class="flex justify-between text-sm mb-4"><span class="text-gray-400">Arrival</span><span class="font-bold text-blue-600" id="my-arrival">...</span></div>
-                <div class="bg-yellow-50 p-3 rounded text-xs text-yellow-700 mb-4 border border-yellow-100">
-                    <i class="fa-solid fa-volume-high mr-1"></i> กรุณาเปิดเสียงเพื่อรอเรียกคิว
+        <div id="ticket-section" class="hidden animate__animated animate__zoomIn">
+            <div class="glass-card overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center text-white relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                    <div class="text-xs uppercase tracking-widest opacity-80 mb-1">Your Queue Number</div>
+                    <div id="my-q-num" class="text-6xl font-black drop-shadow-md">---</div>
+                    <div id="my-status" class="status-badge bg-white/20 text-white mt-3 backdrop-blur inline-block border border-white/30">WAITING</div>
                 </div>
-                <button onclick="App.cancel()" class="w-full text-center text-xs text-red-400 mt-2 underline">ยกเลิกคิว</button>
+                
+                <div class="p-6 bg-white">
+                    <div class="space-y-3 border-b border-dashed border-slate-200 pb-4 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">ชื่อลูกค้า</span>
+                            <span class="font-bold text-slate-700" id="my-name">...</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">เวลาที่ระบุ</span>
+                            <span class="font-bold text-blue-600" id="my-arrival">...</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">จำนวน</span>
+                            <span class="font-bold text-slate-700" id="my-pax">...</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 p-3 rounded-xl text-xs text-yellow-700 mb-4 border border-yellow-100 flex gap-2 items-start">
+                        <i class="fa-solid fa-volume-high mt-0.5 text-yellow-600"></i>
+                        <span>ระบบจะส่งเสียงเรียกและสั่นเมื่อถึงคิวของคุณ กรุณาอย่าปิดหน้าจอนี้</span>
+                    </div>
+
+                    <button onclick="App.cancel()" class="w-full py-3 text-sm text-red-500 hover:bg-red-50 rounded-xl transition font-medium">
+                        <i class="fa-solid fa-times-circle mr-1"></i> ยกเลิกคิว
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
+        // --- Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -92,145 +192,237 @@
         class CustomerApp {
             constructor() {
                 this.myId = localStorage.getItem('q_id_pro');
-                this.lastCallTime = null;
+                this.lastCallTimestamp = 0; // เก็บเวลาการเรียกล่าสุด เพื่อกันเรียกซ้ำเอง
                 this.init();
             }
 
             init() {
                 this.listenConfig();
-                if(this.myId) this.listenTicket();
+                if(this.myId) {
+                    this.listenTicket();
+                } else {
+                    // ถ้าไม่มีคิว ให้ตั้งเวลา Input เป็นเวลาปัจจุบัน
+                    const now = new Date();
+                    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+                    document.getElementById('inp-time').value = timeStr;
+                }
             }
 
+            // ฟังการตั้งค่าร้านค้า + คิวปัจจุบัน
             listenConfig() {
                 db.collection('q_system').doc('config').onSnapshot(doc => {
                     if(doc.exists) {
                         const d = doc.data();
-                        document.getElementById('shop-name').innerText = d.shopName || 'Queue System';
-                        document.getElementById('current-q').innerText = d.current || 'A-000';
+                        document.getElementById('shop-name').innerText = d.shopName || 'Smart Queue';
+                        document.getElementById('current-q').innerText = d.current || '---';
                         
+                        // Badge คำว่า NOW
+                        const badge = document.getElementById('calling-badge');
+                        if(d.isCalling) badge.classList.remove('hidden'); else badge.classList.add('hidden');
+
+                        // Announcement Bar
                         const bar = document.getElementById('ann-bar');
-                        if(d.showAnnounce) {
+                        if(d.showAnnounce && d.announceText) {
                             bar.classList.remove('hidden');
                             document.getElementById('ann-text').innerText = d.announceText;
-                        } else bar.classList.add('hidden');
-                        
-                        db.collection('q_system').doc('config').collection('queues').where('status','==','waiting')
-                          .onSnapshot(s => document.getElementById('wait-count').innerText = s.size);
+                        } else {
+                            bar.classList.add('hidden');
+                        }
+
+                        // นับจำนวนคนรอ
+                        db.collection('q_system').doc('config').collection('queues')
+                          .where('status','==','waiting')
+                          .onSnapshot(snapshot => {
+                              document.getElementById('wait-count').innerText = snapshot.size;
+                          });
                     }
                 });
             }
 
-            // ฟังการเปลี่ยนแปลงของตั๋วตัวเอง
+            // ฟังตั๋วของตัวเอง
             listenTicket() {
-                db.collection('q_system').doc('config').collection('queues').doc(this.myId).onSnapshot(doc => {
+                db.collection('q_system').doc('config').collection('queues').doc(this.myId)
+                .onSnapshot(doc => {
                     if(doc.exists) {
                         const d = doc.data();
-                        if(d.status==='cancelled'||d.status==='served') { this.logout(); return; }
+                        
+                        // ถ้าสถานะเป็น จบงาน หรือ ยกเลิก
+                        if(d.status === 'completed' || d.status === 'cancelled') {
+                            if(d.status === 'completed') Swal.fire('ขอบคุณที่ใช้บริการ', 'คิวของคุณเสร็จสิ้นแล้ว', 'success').then(() => this.logout());
+                            else this.logout();
+                            return;
+                        }
+
                         this.renderTicket(d);
 
-                        // --- จุดสำคัญ: ตรวจสอบว่าถูกเรียกหรือยัง ---
-                        // ใช้ lastCall timestamp เพื่อเช็คว่าเป็นการเรียกครั้งใหม่หรือไม่ (กันเสียงซ้ำ)
-                        const callKey = JSON.stringify(d.lastCall);
-                        
-                        if(d.status === 'called' && this.lastCallTime !== callKey) {
-                            this.lastCallTime = callKey;
-                            
-                            // ถ้ามีข้อความจากแอดมิน (voiceMessage) ให้ใช้ข้อความนั้น
-                            // ถ้าไม่มี ให้ใช้ข้อความมาตรฐาน
-                            const msg = d.voiceMessage || `ขอเชิญหมายเลข ${d.number} ค่ะ`;
-                            
-                            this.announceDouble(msg);
+                        // --- LOGIC เสียงเรียก ---
+                        if(d.status === 'called') {
+                            // ตรวจสอบว่าเป็นคำสั่งเรียกใหม่หรือไม่ (ดูจาก timestamp ที่แอดมินส่งมา)
+                            // ถ้าแอดมินกด "เรียกซ้ำ" timestamp จะเปลี่ยน เราก็จะพูดใหม่
+                            if (d.lastCallTime && d.lastCallTime > this.lastCallTimestamp) {
+                                this.lastCallTimestamp = d.lastCallTime;
+                                const msg = `ขอเชิญคิวที่, ${d.number}, ค่ะ`;
+                                this.announce(msg, d.number);
+                            }
                         }
-                    } else this.logout();
+                    } else {
+                        // หาไม่เจอ (อาจจะโดนลบ)
+                        this.logout();
+                    }
+                }, error => {
+                    console.error("Error listening ticket:", error);
                 });
             }
 
-            announceDouble(msg) {
-                if(navigator.vibrate) navigator.vibrate([500,200,500]); // สั่นแจ้งเตือน
-                
-                // พูดรอบที่ 1
-                this.speak(msg);
-                
-                // พูดรอบที่ 2 (เว้น 4 วิ)
-                setTimeout(() => { this.speak(msg); }, 4000);
-
-                // เด้ง Popup
-                Swal.fire({
-                    title: 'ถึงคิวคุณแล้ว!', 
-                    text: msg, 
-                    icon: 'success',
-                    confirmButtonText: 'รับทราบ',
-                    confirmButtonColor: '#2563eb'
-                });
-            }
-
+            // ฟังก์ชันจองคิว
             async book(e) {
                 e.preventDefault();
-                // เทคนิคปลดล็อกเสียง (iOS ต้องมี user interaction ก่อนถึงจะเล่นเสียงได้)
-                this.speak(''); 
+                
+                // *** เทคนิค Unlock Audio Context ของ Browser มือถือ ***
+                // เล่นเสียงเงียบๆ 1 ครั้งทันทีที่ user กดปุ่ม เพื่อเปิดสิทธิ์การเล่นเสียงในอนาคต
+                this.speak(' '); 
 
                 const btn = document.getElementById('btn-book');
-                btn.disabled = true; btn.innerText = 'Processing...';
+                btn.disabled = true; 
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังจอง...';
 
                 try {
                     await db.runTransaction(async (t) => {
-                        const ref = db.collection('q_system').doc('config');
-                        const doc = await t.get(ref);
-                        let next = (doc.data().last||0)+1;
-                        let num = 'A-'+String(next).padStart(3,'0');
-                        const qRef = ref.collection('queues').doc();
+                        const configRef = db.collection('q_system').doc('config');
+                        const configDoc = await t.get(configRef);
                         
-                        t.set(qRef, {
-                            number: num, raw: next,
+                        if(!configDoc.exists) throw "Config not found";
+
+                        const data = configDoc.data();
+                        
+                        // 1. ดึง Prefix จาก Config (ถ้าไม่มีใช้ A-)
+                        const prefix = data.queuePrefix || 'A-';
+                        
+                        // 2. คำนวณเลขถัดไป
+                        const nextRaw = (data.last || 0) + 1;
+                        const qNumber = `${prefix}${String(nextRaw).padStart(3,'0')}`;
+
+                        // 3. สร้างตั๋วใหม่
+                        const newQRef = configRef.collection('queues').doc();
+                        
+                        t.set(newQRef, {
+                            number: qNumber,
+                            raw: nextRaw,
+                            prefix: prefix, // เก็บ prefix ไว้ในตั๋วด้วย เผื่ออนาคตเปลี่ยน
                             name: document.getElementById('inp-name').value,
                             phone: document.getElementById('inp-phone').value,
-                            pax: document.getElementById('inp-pax').value,
-                            arrivalTime: document.getElementById('inp-time').value, // เก็บเวลามาถึง
+                            pax: document.getElementById('inp-pax').value + ' ท่าน',
+                            arrivalTime: document.getElementById('inp-time').value,
                             status: 'waiting',
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastCallTime: 0 // เริ่มต้นยังไม่เคยถูกเรียก
                         });
-                        t.update(ref, {last: next});
-                        localStorage.setItem('q_id_pro', qRef.id);
-                        this.myId = qRef.id;
+
+                        // 4. อัปเดตเลข running
+                        t.update(configRef, { last: nextRaw });
+
+                        // จำ ID ไว้ในเครื่อง
+                        localStorage.setItem('q_id_pro', newQRef.id);
+                        this.myId = newQRef.id;
                     });
+
+                    // สำเร็จ
                     this.listenTicket();
-                    Swal.fire({icon:'success', title:'จองสำเร็จ', timer:1500, showConfirmButton:false});
-                } catch(e) {
-                    btn.disabled = false; btn.innerText = 'กดรับบัตรคิว';
-                    Swal.fire('Error', e.message, 'error');
+                    Swal.fire({
+                        icon: 'success', 
+                        title: 'จองคิวสำเร็จ', 
+                        text: 'กรุณารอเรียกคิว',
+                        timer: 1500, 
+                        showConfirmButton: false
+                    });
+
+                } catch(err) {
+                    console.error(err);
+                    btn.disabled = false; 
+                    btn.innerHTML = 'กดรับบัตรคิว';
+                    Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
                 }
             }
 
+            // ฟังก์ชันเรนเดอร์หน้าบัตรคิว
             renderTicket(d) {
                 document.getElementById('form-section').classList.add('hidden');
                 document.getElementById('ticket-section').classList.remove('hidden');
+                
                 document.getElementById('my-q-num').innerText = d.number;
                 document.getElementById('my-name').innerText = d.name;
                 document.getElementById('my-arrival').innerText = d.arrivalTime || '-';
-                
-                const b = document.getElementById('my-status');
-                if(d.status==='called') { b.className='status-badge st-call inline-block mt-3'; b.innerText='CALLED'; }
-                else { b.className='status-badge st-wait inline-block mt-3'; b.innerText='WAITING'; }
-            }
+                document.getElementById('my-pax').innerText = d.pax || '-';
 
-            cancel() {
-                if(confirm('Cancel Queue?')) {
-                    db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({status:'cancelled'});
-                    this.logout();
+                const statusBadge = document.getElementById('my-status');
+                if(d.status === 'called') {
+                    statusBadge.className = 'status-badge st-call inline-block mt-3 border border-green-200';
+                    statusBadge.innerText = 'กำลังเรียกคุณ (CALLED)';
+                } else {
+                    statusBadge.className = 'status-badge st-wait inline-block mt-3';
+                    statusBadge.innerText = 'รอเรียก (WAITING)';
                 }
             }
 
-            logout() { localStorage.removeItem('q_id_pro'); location.reload(); }
+            // ฟังก์ชันแจ้งเตือน (สั่น + พูด + Popup)
+            announce(msg, number) {
+                // 1. สั่น (ถ้าเครื่องรองรับ)
+                if(navigator.vibrate) navigator.vibrate([500, 300, 500]);
 
+                // 2. พูด
+                this.speak(msg);
+
+                // 3. แสดง Popup
+                Swal.fire({
+                    title: `ถึงคิวคุณแล้ว! ${number}`,
+                    text: 'กรุณาติดต่อเคาน์เตอร์บริการ',
+                    icon: 'success',
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#2563eb',
+                    backdrop: `rgba(0,0,123,0.4)`
+                });
+            }
+
+            // ฟังก์ชันพูด (Speech Synthesis) แก้บั๊กเสียงตีกัน
             speak(txt) {
                 if('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); // หยุดเสียงเก่าก่อน
+                    // *** สำคัญ: ยกเลิกเสียงเก่าก่อนพูดใหม่เสมอ ***
+                    window.speechSynthesis.cancel();
+
+                    if(txt.trim() === '') return; // ถ้าส่งมาแค่ unlock ไม่ต้องพูด
+
                     const u = new SpeechSynthesisUtterance(txt);
-                    u.lang = 'th-TH'; u.rate = 0.9;
+                    u.lang = 'th-TH'; 
+                    u.rate = 0.9; // พูดช้าลงนิดนึงให้ชัด
+                    u.volume = 1.0;
                     window.speechSynthesis.speak(u);
                 }
             }
+
+            cancel() {
+                Swal.fire({
+                    title: 'ต้องการยกเลิกคิว?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'ใช, ยกเลิก',
+                    cancelButtonText: 'ไม่',
+                    confirmButtonColor: '#ef4444'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        db.collection('q_system').doc('config').collection('queues').doc(this.myId).update({
+                            status: 'cancelled'
+                        }).then(() => this.logout());
+                    }
+                });
+            }
+
+            logout() {
+                localStorage.removeItem('q_id_pro');
+                location.reload();
+            }
         }
+
+        // Start App
         const App = new CustomerApp();
     </script>
 </body>
