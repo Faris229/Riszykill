@@ -243,7 +243,8 @@
     </footer>
 
     <script>
-        // --- 1. CONFIGURATION ---
+<script>
+        // --- 1. CONFIGURATION (ใส่ค่าเดิมของคุณ) ---
         const firebaseConfig = {
             apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
             authDomain: "hubfu-c4296.firebaseapp.com",
@@ -256,27 +257,76 @@
         // --- 2. CORE CLASS ---
         class QueueApp {
             constructor() {
-                firebase.initializeApp(firebaseConfig);
+                // Init Firebase
+                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 this.db = firebase.firestore();
+                
                 this.myQueueId = localStorage.getItem('my_queue_id');
                 this.currentServing = 'A-000';
+                this.lastAnnounced = null; // กันเสียงพูดซ้ำตอนโหลดหน้าเว็บ
+                
                 this.init();
             }
 
             init() {
                 this.listenSystem();
                 if (this.myQueueId) this.listenMyQueue();
+                
+                // ขอ Permission เสียง (iOS/Android บางรุ่นต้องการ)
+                document.body.addEventListener('click', () => {
+                    this.enableAudioContext();
+                }, { once: true });
             }
 
-            // Listen Global Status
+            // --- FUNCTION พูดเสียงภาษาไทย ---
+            speak(text) {
+                if ('speechSynthesis' in window) {
+                    // หยุดเสียงเก่าก่อนพูดใหม่
+                    window.speechSynthesis.cancel();
+
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'th-TH'; // ภาษาไทย
+                    utterance.rate = 0.9;     // ความเร็วปกติ
+                    utterance.volume = 1;     // เสียงดังสุด
+                    
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+
+            // Trick เพื่อเปิดใช้งานเสียงในมือถือ (ต้องมี user interaction ก่อน)
+            enableAudioContext() {
+                const empty = new SpeechSynthesisUtterance('');
+                window.speechSynthesis.speak(empty);
+            }
+
+            // Listen Global Status (ฟังเสียงเรียกคิวรวม)
             listenSystem() {
                 this.db.collection('q_system').doc('config').onSnapshot(doc => {
                     if (doc.exists) {
-                        this.currentServing = doc.data().current || 'A-000';
+                        const data = doc.data();
+                        this.currentServing = data.current || 'A-000';
                         document.getElementById('display-current').innerText = this.currentServing;
+                        
+                        // Logic การพูด: ต้องไม่ใช่ค่าว่าง และ ไม่ใช่ตัวเดิมที่เคยพูดไปแล้ว
+                        if (this.currentServing !== 'A-000' && this.currentServing !== this.lastAnnounced) {
+                            // เช็คว่าเป็นครั้งแรกที่โหลดหน้าเว็บไหม (ถ้าใช่ ไม่ต้องพูด)
+                            if (this.lastAnnounced !== null) {
+                                this.speak(`ขอเชิญหมายเลข ${this.currentServing} ค่ะ`);
+                                
+                                // Animation ตัวเลขเด้ง
+                                const el = document.getElementById('display-current');
+                                el.classList.remove('animate__flash');
+                                void el.offsetWidth; // Trigger Reflow
+                                el.classList.add('animate__animated', 'animate__flash');
+                            }
+                            this.lastAnnounced = this.currentServing;
+                        } else if (this.lastAnnounced === null) {
+                            // ครั้งแรกที่เปิดเว็บ ให้จำค่าปัจจุบันไว้เฉยๆ ไม่ต้องพูด
+                            this.lastAnnounced = this.currentServing;
+                        }
+
                         if(this.myQueueId) this.updateProgress();
                     } else {
-                        // Init System if first time
                         this.db.collection('q_system').doc('config').set({current:'A-000', last:0});
                     }
                 });
@@ -289,14 +339,16 @@
                     });
             }
 
-            // Listen My Ticket
+            // Listen My Ticket (ฟังเสียงเตือนเฉพาะเรา)
             listenMyQueue() {
                 this.db.collection('q_system').doc('config').collection('queues').doc(this.myQueueId)
                     .onSnapshot(doc => {
                         if (doc.exists) {
                             const data = doc.data();
+                            // ถ้าถูกยกเลิก หรือ เสร็จแล้ว
                             if (data.status === 'cancelled' || data.status === 'served') {
-                                this.clearLocal(); // End Session
+                                if (data.status === 'cancelled') Swal.fire('แจ้งเตือน', 'คิวของคุณถูกยกเลิก', 'error').then(() => this.clearLocal());
+                                else this.clearLocal();
                                 return;
                             }
                             this.renderTicket(data);
@@ -306,19 +358,20 @@
                     });
             }
 
-            // Logic: Book Queue
             async bookQueue(e) {
                 e.preventDefault();
                 const btn = document.getElementById('btn-book');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังจอง...';
 
+                // Trigger เปิดเสียงทันทีที่กดปุ่ม (สำคัญมากสำหรับ iOS)
+                this.enableAudioContext();
+
                 const name = document.getElementById('inp-name').value;
                 const phone = document.getElementById('inp-phone').value;
                 const pax = document.getElementById('inp-pax').value;
 
                 try {
-                    // Transaction for Atomicity (Prevent Duplicate Numbers)
                     await this.db.runTransaction(async (t) => {
                         const configRef = this.db.collection('q_system').doc('config');
                         const configDoc = await t.get(configRef);
@@ -326,7 +379,6 @@
                         let newNum = (configDoc.data().last || 0) + 1;
                         let qString = 'A-' + newNum.toString().padStart(3, '0');
 
-                        // Create Ticket
                         const newRef = configRef.collection('queues').doc();
                         t.set(newRef, {
                             number: qString,
@@ -338,15 +390,12 @@
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
 
-                        // Update Counter
                         t.update(configRef, { last: newNum });
                         
-                        // Local Save
                         localStorage.setItem('my_queue_id', newRef.id);
                         this.myQueueId = newRef.id;
                     });
 
-                    // UI Transition
                     this.listenMyQueue();
                     Swal.fire({
                         icon: 'success', 
@@ -357,7 +406,7 @@
 
                 } catch (err) {
                     console.error(err);
-                    Swal.fire('Error', 'เกิดข้อผิดพลาด โปรดลองใหม่', 'error');
+                    Swal.fire('Error', 'เกิดข้อผิดพลาด: ' + err.message, 'error');
                     btn.disabled = false;
                     btn.innerHTML = 'กดรับบัตรคิว';
                 }
@@ -366,11 +415,10 @@
             cancelQueue() {
                 Swal.fire({
                     title: 'ยกเลิกคิว?',
-                    text: "คุณจะไม่สามารถกู้คืนคิวเดิมได้",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'ยืนยันยกเลิก'
+                    confirmButtonText: 'ยืนยัน'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.db.collection('q_system').doc('config').collection('queues').doc(this.myQueueId)
@@ -380,7 +428,6 @@
                 });
             }
 
-            // UI Helpers
             renderTicket(data) {
                 document.getElementById('booking-section').classList.add('hidden');
                 document.getElementById('ticket-section').classList.remove('hidden');
@@ -389,9 +436,9 @@
                 document.getElementById('ticket-name').innerText = data.name;
                 document.getElementById('ticket-time').innerText = data.timestamp ? moment(data.timestamp.toDate()).format('HH:mm') : '-';
                 
-                // Status Logic
                 const badge = document.getElementById('ticket-status');
                 badge.className = 'inline-block mt-3 status-badge';
+                
                 if(data.status === 'called') {
                     badge.classList.add('status-called');
                     badge.innerText = "ถึงคิวคุณแล้ว!";
@@ -401,25 +448,26 @@
                     badge.innerText = "WAITING";
                 }
                 
-                this.myData = data; // Store for calc
+                this.myData = data;
             }
 
             updateQueueAhead(docs) {
                 if(!this.myData) return;
                 const myNum = this.myData.rawNum;
-                // Filter docs with number < myNum
                 const ahead = docs.filter(d => d.data().rawNum < myNum).length;
                 document.getElementById('queue-ahead').innerText = ahead;
                 
-                // Progress Bar Simulation (Rough)
-                const total = ahead + 1; // Assuming
                 const percent = Math.max(5, 100 - (ahead * 10)); 
                 document.getElementById('progress-bar').style.width = `${percent}%`;
             }
 
             notifyUser(num) {
-                if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                // SweetAlert Override if not already open
+                // สั่น (Android Only)
+                if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+                
+                // พูดเตือนเฉพาะเจ้าของคิว
+                this.speak(`ถึงคิวของคุณแล้วค่ะ หมายเลข ${num} เชิญที่ช่องบริการค่ะ`);
+
                 if(!Swal.isVisible()) {
                     Swal.fire({
                         title: 'ถึงคิวคุณแล้ว!',
