@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameRent Pro - เช่าไอดีเกมครบวงจร</title>
+    <title>HubFu Rental - Minimal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -11,478 +11,463 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
-        body { font-family: 'Kanit', sans-serif; background-color: #0f172a; color: #e2e8f0; }
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
+        
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background-color: #f8fafc; /* พื้นหลังสีเทาอ่อนมาก */
+            color: #334155; /* สีตัวอักษรเทาเข้ม */
         }
-        .admin-badge {
-            background: linear-gradient(45deg, #ef4444, #f59e0b);
+
+        /* Minimal Card Style */
+        .card-minimal {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
+        .card-minimal:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Minimal Input */
+        .input-minimal {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .input-minimal:focus {
+            background: #ffffff;
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <nav class="glass sticky top-0 z-50 px-6 py-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-gamepad text-3xl text-blue-500"></i>
-                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">GameRent Pro</h1>
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('home')">
+                <div class="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center text-xl font-bold">
+                    HF
+                </div>
+                <h1 class="text-xl font-bold text-slate-800 tracking-tight">HubFu<span class="text-blue-600">Rental</span></h1>
             </div>
             
-            <div id="nav-menu" class="hidden md:flex gap-6 items-center">
-                <button onclick="showPage('home')" class="hover:text-blue-400 transition">หน้าแรก</button>
-                <button onclick="showPage('auction')" class="hover:text-blue-400 transition">ประมูลไอดี</button>
-                <button onclick="showPage('topup')" class="hover:text-blue-400 transition">เติมเงิน</button>
-                <button onclick="toggleChat()" class="relative hover:text-blue-400 transition">
-                    <i class="fa-solid fa-comment-dots text-xl"></i>
-                    <span class="absolute -top-2 -right-2 bg-red-500 text-xs rounded-full w-4 h-4 flex items-center justify-center">1</span>
+            <div id="nav-menu" class="hidden md:flex gap-8 items-center font-medium text-slate-600">
+                <button onclick="showPage('home')" class="hover:text-black transition relative group">
+                    หน้าหลัก <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-black transition-all group-hover:w-full"></span>
                 </button>
+                <button onclick="showPage('auction')" class="hover:text-black transition">ประมูล</button>
+                <button onclick="showPage('topup')" class="hover:text-black transition">เติมเงิน</button>
                 
-                <div id="user-info" class="flex items-center gap-3 ml-4 bg-slate-800 py-1 px-3 rounded-full border border-slate-700">
-                    <span id="user-balance" class="text-green-400 font-bold">฿0.00</span>
-                    <span id="user-email" class="text-sm text-gray-300">Guest</span>
-                    <button onclick="logout()" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-right-from-bracket"></i></button>
+                <div class="flex items-center gap-3 ml-4 pl-6 border-l border-gray-200">
+                    <div class="text-right">
+                        <p id="user-email" class="text-xs text-gray-400">Loading...</p>
+                        <p id="user-balance" class="text-sm font-bold text-green-600">฿0.00</p>
+                    </div>
+                    <div class="relative group">
+                         <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 cursor-pointer">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 hidden group-hover:block p-2">
+                            <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg">
+                                <i class="fa-solid fa-sign-out-alt mr-2"></i> ออกจากระบบ
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div id="auth-buttons">
-                <button onclick="showPage('login')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition shadow-lg shadow-blue-500/30">เข้าสู่ระบบ</button>
+                <button onclick="showPage('login')" class="bg-black hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl font-medium transition shadow-lg shadow-slate-200">
+                    เข้าสู่ระบบ
+                </button>
             </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-6 flex-grow relative">
+    <main class="container mx-auto p-6 flex-grow max-w-6xl">
 
-        <div id="page-login" class="max-w-md mx-auto mt-10 glass p-8 rounded-2xl shadow-2xl hidden">
-            <h2 class="text-3xl font-bold text-center mb-6">ยินดีต้อนรับ</h2>
-            <div class="flex gap-4 mb-6">
-                <button onclick="toggleAuthMode('login')" class="flex-1 py-2 rounded-lg bg-blue-600 text-white" id="btn-mode-login">เข้าสู่ระบบ</button>
-                <button onclick="toggleAuthMode('register')" class="flex-1 py-2 rounded-lg bg-slate-700 text-gray-400 hover:bg-slate-600" id="btn-mode-register">สมัครสมาชิก</button>
-            </div>
-            
-            <form id="auth-form" onsubmit="handleAuth(event)">
-                <div class="mb-4">
-                    <label class="block text-gray-400 mb-2">อีเมล</label>
-                    <input type="email" id="email" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition" required>
+        <div id="page-login" class="hidden min-h-[60vh] flex items-center justify-center">
+            <div class="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">ยินดีต้อนรับ</h2>
+                <p class="text-slate-400 mb-8">กรุณาเข้าสู่ระบบเพื่อใช้งาน</p>
+                
+                <div class="flex bg-slate-100 p-1 rounded-xl mb-6">
+                    <button onclick="toggleAuthMode('login')" id="btn-mode-login" class="flex-1 py-2 rounded-lg text-sm font-medium bg-white shadow-sm text-slate-800 transition-all">เข้าสู่ระบบ</button>
+                    <button onclick="toggleAuthMode('register')" id="btn-mode-register" class="flex-1 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-700 transition-all">สมัครใหม่</button>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-400 mb-2">รหัสผ่าน</label>
-                    <input type="password" id="password" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition" required>
-                </div>
-                <div id="forgot-pass-link" class="text-right mb-6">
-                    <a href="#" onclick="forgotPassword()" class="text-sm text-blue-400 hover:underline">ลืมรหัสผ่าน?</a>
-                </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 rounded-lg shadow-lg transform transition hover:scale-105">ยืนยัน</button>
-            </form>
-        </div>
-
-        <div id="page-home" class="hidden">
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h2 class="text-4xl font-bold text-white mb-2">บริการเช่าไอดีเกม <span class="text-blue-500">Premium</span></h2>
-                    <p class="text-gray-400">เลือกเกมที่คุณต้องการเล่นได้ทันที</p>
-                </div>
-                <input type="text" placeholder="ค้นหาเกม..." class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 w-64 focus:outline-none focus:border-blue-500">
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="rental-grid">
-                </div>
-        </div>
-
-        <div id="page-auction" class="hidden">
-            <h2 class="text-3xl font-bold mb-6 text-yellow-500"><i class="fa-solid fa-gavel"></i> ประมูลไอดีเทพ</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="auction-grid">
-                <div class="glass p-6 rounded-xl relative overflow-hidden group hover:border-yellow-500/50 transition duration-300">
-                    <div class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg animate-pulse">Live</div>
-                    <img src="https://via.placeholder.com/400x200/000000/FFFFFF?text=Valorant+Skin+Rare" class="w-full h-40 object-cover rounded-lg mb-4 opacity-80 group-hover:opacity-100 transition">
-                    <h3 class="text-xl font-bold mb-2">Valorant ID: Full Skin (Vandal RGX)</h3>
-                    <div class="flex justify-between items-center bg-slate-800 p-3 rounded-lg mb-4">
-                        <span class="text-gray-400 text-sm">ราคาสูงสุดปัจจุบัน</span>
-                        <span class="text-2xl font-bold text-green-400">฿1,250</span>
-                    </div>
-                    <div class="flex gap-2">
-                         <input type="number" placeholder="ใส่ราคาประมูล" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">
-                         <button onclick="placeBid()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold">บิดเลย!</button>
-                    </div>
-                    <p class="text-xs text-center mt-3 text-gray-500">สิ้นสุดใน: 02:15:30</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="page-topup" class="hidden max-w-2xl mx-auto">
-            <h2 class="text-3xl font-bold mb-6 text-center">เติมเงินเข้าสู่ระบบ</h2>
-            <div class="glass p-8 rounded-2xl">
-                <div class="flex justify-center mb-6">
-                     <img src="https://via.placeholder.com/200?text=QR+Code+PromptPay" alt="QR Code" class="rounded-lg border-4 border-white">
-                </div>
-                <div class="text-center mb-6">
-                    <p class="text-lg">ธนาคาร: <span class="font-bold text-blue-400">กสิกรไทย (K-Bank)</span></p>
-                    <p class="text-lg">เลขบัญชี: <span class="font-bold text-xl copy-text cursor-pointer" onclick="copyText('123-4-56789-0')">123-4-56789-0 <i class="fa-regular fa-copy text-sm ml-2"></i></span></p>
-                    <p class="text-sm text-gray-400 mt-2">ชื่อบัญชี: บจก. เกมเรนท์ โปร จำกัด</p>
-                </div>
-                <hr class="border-gray-700 my-6">
-                <form onsubmit="submitTopup(event)">
+                
+                <form onsubmit="handleAuth(event)">
                     <div class="mb-4">
-                        <label class="block text-gray-400 mb-2">จำนวนเงินที่โอน (บาท)</label>
-                        <input type="number" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3" placeholder="เช่น 100.00" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-400 mb-2">แนบสลิปการโอนเงิน</label>
-                        <input type="file" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" accept="image/*" required>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">อีเมล</label>
+                        <input type="email" id="email" class="w-full input-minimal rounded-xl p-3" placeholder="name@example.com" required>
                     </div>
                     <div class="mb-6">
-                        <label class="block text-gray-400 mb-2">เวลาที่โอน (ตามสลิป)</label>
-                        <input type="datetime-local" class="w-full bg-slate-800 border border-slate-600 rounded-lg p-3" required>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">รหัสผ่าน</label>
+                        <input type="password" id="password" class="w-full input-minimal rounded-xl p-3" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg shadow-lg">แจ้งเติมเงิน</button>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-3.5 rounded-xl transition shadow-lg">
+                        ดำเนินการต่อ <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
                 </form>
             </div>
         </div>
 
+        <div id="page-home" class="hidden animate-fade-in">
+            <div class="bg-white rounded-3xl p-8 mb-10 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2">
+                    <span class="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold mb-3">New Arrival</span>
+                    <h2 class="text-4xl font-bold text-slate-800 mb-4 leading-tight">เช่าไอดีเกมระดับเทพ <br>เริ่มใช้งานได้ทันที</h2>
+                    <p class="text-slate-500 mb-6">บริการเช่ารหัสเกมอัตโนมัติ 24 ชม. ราคาถูก ปลอดภัย 100%</p>
+                    <button class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                        ดูสินค้าทั้งหมด
+                    </button>
+                </div>
+                <div class="md:w-1/2 mt-6 md:mt-0 flex justify-center">
+                    <i class="fa-solid fa-gamepad text-9xl text-slate-100"></i>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-end mb-6">
+                <h3 class="text-2xl font-bold text-slate-800">รายการสินค้าแนะนำ</h3>
+                <div class="text-sm text-slate-400 cursor-pointer hover:text-blue-500">ดูทั้งหมด <i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="rental-grid">
+                <div class="col-span-full text-center py-20 text-gray-400">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i><br>กำลังโหลดข้อมูล...
+                </div>
+            </div>
+        </div>
+
         <div id="page-admin" class="hidden">
-            <div class="flex justify-between items-center mb-6 bg-red-900/30 p-4 rounded-xl border border-red-500/50">
-                <h2 class="text-3xl font-bold text-red-400"><i class="fa-solid fa-user-shield"></i> Admin Dashboard</h2>
-                <div class="text-sm text-gray-300">Logged in as: <span class="font-bold text-white">farisxuma1@gmail.com</span></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-blue-500">
-                    <p class="text-gray-400 text-sm">ผู้ใช้งานทั้งหมด</p>
-                    <p class="text-2xl font-bold">1,204</p>
+            <div class="bg-slate-900 text-white p-6 rounded-2xl mb-8 flex justify-between items-center shadow-xl">
+                <div>
+                    <h2 class="text-2xl font-bold">Admin Control</h2>
+                    <p class="text-slate-400 text-sm">จัดการระบบหลังบ้าน</p>
                 </div>
-                <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-green-500">
-                    <p class="text-gray-400 text-sm">ยอดเติมเงินรออนุมัติ</p>
-                    <p class="text-2xl font-bold">5</p>
-                </div>
-                <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-yellow-500">
-                    <p class="text-gray-400 text-sm">ไอดีว่างให้เช่า</p>
-                    <p class="text-2xl font-bold">42</p>
-                </div>
-                <div class="bg-slate-800 p-4 rounded-lg border-l-4 border-purple-500">
-                    <p class="text-gray-400 text-sm">รายได้วันนี้</p>
-                    <p class="text-2xl font-bold">฿8,540</p>
+                <div class="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-circle text-green-500 text-xs mr-2"></i> Online
                 </div>
             </div>
 
-            <div class="mb-6 border-b border-gray-700">
-                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="admin-tabs">
-                    <li class="mr-2">
-                        <button class="inline-block p-4 text-blue-500 border-b-2 border-blue-500 rounded-t-lg active" onclick="switchAdminTab('products')">จัดการสินค้า</button>
-                    </li>
-                    <li class="mr-2">
-                        <button class="inline-block p-4 hover:text-gray-300 hover:border-gray-300 rounded-t-lg" onclick="switchAdminTab('users')">จัดการผู้ใช้</button>
-                    </li>
-                    <li class="mr-2">
-                        <button class="inline-block p-4 hover:text-gray-300 hover:border-gray-300 rounded-t-lg relative" onclick="switchAdminTab('topups')">
-                            อนุมัติเติมเงิน <span class="bg-red-500 text-white text-xs px-2 rounded-full ml-1">5</span>
-                        </button>
-                    </li>
-                </ul>
+            <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-4">เพิ่มสินค้าใหม่</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm text-slate-500 mb-1">ชื่อสินค้า/เกม</label>
+                        <input type="text" id="prod-name" class="w-full input-minimal rounded-lg p-3">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-500 mb-1">ราคา (บาท/ชม.)</label>
+                        <input type="number" id="prod-price" class="w-full input-minimal rounded-lg p-3">
+                    </div>
+                    <div class="md:col-span-2">
+                         <label class="block text-sm text-slate-500 mb-1">รูปภาพ (URL)</label>
+                         <input type="text" id="prod-img" class="w-full input-minimal rounded-lg p-3" placeholder="https://...">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-slate-500 mb-1">รายละเอียด</label>
+                        <textarea id="prod-desc" class="w-full input-minimal rounded-lg p-3 h-24"></textarea>
+                    </div>
+                </div>
+                <button onclick="addProductToDB()" class="bg-slate-800 text-white px-8 py-3 rounded-xl hover:bg-black transition font-medium">
+                    <i class="fa-solid fa-plus mr-2"></i> บันทึกข้อมูล
+                </button>
             </div>
+        </div>
 
-            <div id="admin-products" class="glass p-6 rounded-xl">
-                <h3 class="text-xl font-bold mb-4">ลงสินค้า/ไอดีเช่าใหม่</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <input type="text" placeholder="ชื่อเกม / ชื่อแพ็คเกจ" class="bg-slate-900 border border-slate-700 rounded p-2">
-                    <input type="number" placeholder="ราคาต่อชั่วโมง (บาท)" class="bg-slate-900 border border-slate-700 rounded p-2">
-                    <input type="text" placeholder="Username (ไอดีเกม)" class="bg-slate-900 border border-slate-700 rounded p-2">
-                    <input type="text" placeholder="Password (รหัสเกม)" class="bg-slate-900 border border-slate-700 rounded p-2">
-                </div>
-                <textarea placeholder="รายละเอียดไอดี (เช่น สกิน, แรงค์)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 mb-4 h-24"></textarea>
-                <div class="flex justify-end">
-                    <button class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-bold" onclick="Swal.fire('สำเร็จ', 'ลงประกาศเช่าเรียบร้อย', 'success')">ลงสินค้า</button>
-                </div>
-            </div>
-            <div id="admin-users" class="glass p-6 rounded-xl hidden">
-                <h3 class="text-xl font-bold mb-4">รายชื่อผู้ใช้</h3>
-                <table class="w-full text-left text-sm text-gray-400">
-                    <thead class="bg-slate-900 text-gray-200 uppercase">
-                        <tr>
-                            <th class="p-3">Email</th>
-                            <th class="p-3">Balance</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b border-slate-700">
-                            <td class="p-3">user01@test.com</td>
-                            <td class="p-3">฿50.00</td>
-                            <td class="p-3"><span class="bg-green-900 text-green-300 py-1 px-2 rounded text-xs">Active</span></td>
-                            <td class="p-3"><button class="text-blue-400 hover:underline">Edit</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div id="page-topup" class="hidden text-center py-20">
+            <i class="fa-solid fa-wallet text-6xl text-slate-200 mb-4"></i>
+            <h2 class="text-2xl font-bold text-slate-700">ระบบเติมเงิน</h2>
+            <p class="text-slate-400">อยู่ระหว่างการตกแต่งให้สวยงาม...</p>
+        </div>
+        <div id="page-auction" class="hidden text-center py-20">
+            <i class="fa-solid fa-gavel text-6xl text-slate-200 mb-4"></i>
+            <h2 class="text-2xl font-bold text-slate-700">ระบบประมูล</h2>
+            <p class="text-slate-400">อยู่ระหว่างการตกแต่งให้สวยงาม...</p>
         </div>
 
     </main>
 
-    <div id="chat-widget" class="fixed bottom-4 right-4 w-80 h-96 bg-slate-800 rounded-t-xl shadow-2xl flex flex-col hidden border border-slate-600 z-50">
-        <div class="bg-blue-700 p-3 rounded-t-xl flex justify-between items-center cursor-pointer" onclick="toggleChat()">
-            <span class="font-bold text-white"><i class="fa-solid fa-headset mr-2"></i> Support Chat</span>
-            <i class="fa-solid fa-chevron-down text-white"></i>
-        </div>
-        <div class="flex-grow p-4 overflow-y-auto bg-slate-900" id="chat-messages">
-            <div class="flex justify-start mb-2">
-                <div class="bg-slate-700 text-white p-2 rounded-lg max-w-[80%] text-sm">
-                    สวัสดีครับ มีอะไรให้แอดมินช่วยไหมครับ?
-                </div>
+    <div class="fixed bottom-6 right-6 z-50">
+        <button onclick="toggleChat()" class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition flex items-center justify-center text-xl">
+            <i class="fa-solid fa-comment-dots"></i>
+        </button>
+        
+        <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-96">
+            <div class="bg-slate-50 p-4 border-b border-gray-100 flex justify-between items-center">
+                <span class="font-bold text-slate-700">Live Support</span>
+                <span class="text-xs text-green-500 flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span> Online</span>
             </div>
-        </div>
-        <div class="p-3 bg-slate-800 border-t border-slate-700 flex">
-            <input type="text" id="chat-input" class="flex-grow bg-slate-900 border border-slate-700 rounded-l-lg px-3 py-2 text-sm focus:outline-none" placeholder="พิมพ์ข้อความ...">
-            <button onclick="sendMessage()" class="bg-blue-600 text-white px-3 rounded-r-lg hover:bg-blue-500"><i class="fa-solid fa-paper-plane"></i></button>
+            <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-white space-y-3">
+                </div>
+            <div class="p-3 bg-slate-50 border-t border-gray-100 flex gap-2">
+                <input type="text" id="chat-input" class="flex-grow input-minimal rounded-lg px-3 py-2 text-sm" placeholder="พิมพ์ข้อความ...">
+                <button onclick="sendMessage()" class="bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-700"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- Configuration ---
+        // --- 1. CONFIGURATION (ใส่ Key ของคุณแล้ว) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBt4Hsmdf6BITdtYvysSMnkmfwFX_4Pm8s",
+            authDomain: "hubfu-c4296.firebaseapp.com",
+            projectId: "hubfu-c4296",
+            storageBucket: "hubfu-c4296.firebasestorage.app",
+            messagingSenderId: "864674622740",
+            appId: "1:864674622740:web:3131798892e0e63e12a601",
+            measurementId: "G-PDB6KGDJYB"
+        };
+
+        // Init Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const realtimeDb = firebase.database();
+
         const ADMIN_EMAIL = 'farisxuma1@gmail.com';
-        let currentUser = null; // null = guest
+        let currentUserData = null;
 
-        // --- Mock Data ---
-        const products = [
-            { id: 1, name: 'Valorant Rank Diamond', price: 15, image: 'https://via.placeholder.com/300x150?text=Valorant' },
-            { id: 2, name: 'GTA V FiveM Ready', price: 10, image: 'https://via.placeholder.com/300x150?text=GTA+V' },
-            { id: 3, name: 'Netflix Premium 4K', price: 5, image: 'https://via.placeholder.com/300x150?text=Netflix' },
-        ];
+        // --- 2. LOGIC ---
+        
+        // Auto Login Check
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("Logged in:", user.email);
+                setupRealtimeUser(user.uid);
+                
+                // UI Update
+                document.getElementById('auth-buttons').classList.add('hidden');
+                document.getElementById('nav-menu').classList.remove('hidden');
+                document.getElementById('nav-menu').classList.add('flex');
+                document.getElementById('user-email').textContent = user.email;
 
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
-            showPage('home'); // Default page
+                // Redirect logic
+                const loginPage = document.getElementById('page-login');
+                if (!loginPage.classList.contains('hidden')) {
+                    if(user.email === ADMIN_EMAIL) showPage('admin');
+                    else showPage('home');
+                }
+            } else {
+                currentUserData = null;
+                document.getElementById('auth-buttons').classList.remove('hidden');
+                document.getElementById('nav-menu').classList.add('hidden');
+                document.getElementById('nav-menu').classList.remove('flex');
+                showPage('home'); // Default page for guest
+            }
         });
 
-        // --- Navigation Logic ---
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
-            
-            // Show requested page
-            const target = document.getElementById(`page-${pageId}`);
-            if (target) {
-                target.classList.remove('hidden');
-            } else {
-                console.error('Page not found:', pageId);
-            }
-
-            // Auth Logic Visualization
-            const authBtns = document.getElementById('auth-buttons');
-            const navMenu = document.getElementById('nav-menu');
-            
-            if (currentUser) {
-                authBtns.classList.add('hidden');
-                navMenu.classList.remove('hidden');
-                navMenu.classList.add('flex');
-                document.getElementById('user-email').textContent = currentUser.email;
-                
-                // Show Admin Menu if admin
-                if (currentUser.email === ADMIN_EMAIL && pageId !== 'admin') {
-                   // Add admin button dynamically if needed or just redirect logic
-                }
-            } else {
-                authBtns.classList.remove('hidden');
-                navMenu.classList.add('hidden');
-                navMenu.classList.remove('flex');
-                if (pageId !== 'login' && pageId !== 'home') {
-                    // Redirect to login if accessing protected pages
-                     Swal.fire({
-                        icon: 'warning',
-                        title: 'กรุณาเข้าสู่ระบบ',
-                        text: 'คุณต้องเข้าสู่ระบบก่อนใช้งานหน้านี้',
-                        showConfirmButton: false,
-                        timer: 1500
+        // Realtime Balance Listener
+        function setupRealtimeUser(uid) {
+            db.collection('users').doc(uid).onSnapshot((doc) => {
+                if (doc.exists) {
+                    currentUserData = doc.data();
+                    document.getElementById('user-balance').innerText = `฿${(currentUserData.balance || 0).toLocaleString()}`;
+                } else {
+                    // Create default if not exist
+                    db.collection('users').doc(uid).set({
+                        email: auth.currentUser.email,
+                        balance: 0,
+                        role: 'user',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    showPage('login');
                 }
-            }
+            });
         }
 
-        // --- Authentication ---
-        function toggleAuthMode(mode) {
-            const btnLogin = document.getElementById('btn-mode-login');
-            const btnReg = document.getElementById('btn-mode-register');
+        // Realtime Products Listener
+        db.collection('products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+            const container = document.getElementById('rental-grid');
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400">ยังไม่มีสินค้าในขณะนี้</div>';
+                return;
+            }
+
+            let html = '';
+            snapshot.forEach((doc) => {
+                const p = doc.data();
+                html += `
+                    <div class="card-minimal rounded-2xl overflow-hidden group">
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                             <img src="${p.image || 'https://via.placeholder.com/400x300?text=No+Image'}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                             <div class="absolute top-3 right-3 bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded-md text-slate-700 shadow-sm">
+                                ว่าง
+                             </div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="font-bold text-lg text-slate-800 mb-1">${p.name}</h3>
+                            <p class="text-xs text-slate-400 line-clamp-2 mb-4 h-8">${p.desc || 'ไม่มีรายละเอียด'}</p>
+                            
+                            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                                <div class="text-blue-600 font-bold text-xl">฿${p.price}<span class="text-xs text-slate-400 font-normal">/ชม.</span></div>
+                                <button onclick="rentItem('${doc.id}', '${p.name}', ${p.price})" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-black transition">
+                                    เช่าทันที
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        });
+
+        // --- 3. FUNCTIONS ---
+
+        function showPage(pageId) {
+            document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
             
-            if (mode === 'login') {
-                btnLogin.classList.replace('bg-slate-700', 'bg-blue-600');
-                btnLogin.classList.replace('text-gray-400', 'text-white');
-                btnReg.classList.replace('bg-blue-600', 'bg-slate-700');
-                btnReg.classList.replace('text-white', 'text-gray-400');
-            } else {
-                btnReg.classList.replace('bg-slate-700', 'bg-blue-600');
-                btnReg.classList.replace('text-gray-400', 'text-white');
-                btnLogin.classList.replace('bg-blue-600', 'bg-slate-700');
-                btnLogin.classList.replace('text-white', 'text-gray-400');
+            // Admin Guard
+            if(pageId === 'admin') {
+                if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Access Denied',
+                        text: 'สำหรับผู้ดูแลระบบเท่านั้น',
+                        confirmButtonColor: '#0f172a'
+                    });
+                    showPage('home');
+                }
             }
         }
 
         function handleAuth(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
-            // Mock Login
-            currentUser = { email: email, balance: 0 };
+            const password = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btn-mode-login');
+            const isLogin = !btnLogin.classList.contains('text-slate-500'); // Check active tab
+
+            if (isLogin) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        Toast.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ' });
+                    })
+                    .catch(err => Swal.fire('Error', err.message, 'error'));
+            } else {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => {
+                        Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อย', 'success');
+                    })
+                    .catch(err => Swal.fire('Error', err.message, 'error'));
+            }
+        }
+
+        function toggleAuthMode(mode) {
+            const btnLogin = document.getElementById('btn-mode-login');
+            const btnReg = document.getElementById('btn-mode-register');
+            
+            if (mode === 'login') {
+                btnLogin.className = "flex-1 py-2 rounded-lg text-sm font-medium bg-white shadow-sm text-slate-800 transition-all";
+                btnReg.className = "flex-1 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-700 transition-all";
+            } else {
+                btnReg.className = "flex-1 py-2 rounded-lg text-sm font-medium bg-white shadow-sm text-slate-800 transition-all";
+                btnLogin.className = "flex-1 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-700 transition-all";
+            }
+        }
+
+        function addProductToDB() {
+            if(!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return;
+            
+            const name = document.getElementById('prod-name').value;
+            const price = Number(document.getElementById('prod-price').value);
+            const image = document.getElementById('prod-img').value;
+            const desc = document.getElementById('prod-desc').value;
+
+            if(!name || !price) {
+                Swal.fire('แจ้งเตือน', 'กรุณากรอกชื่อและราคา', 'warning');
+                return;
+            }
+
+            db.collection('products').add({
+                name, price, image, desc,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                Swal.fire('เรียบร้อย', 'ลงสินค้าใหม่แล้ว', 'success');
+                document.getElementById('prod-name').value = '';
+                document.getElementById('prod-price').value = '';
+            });
+        }
+
+        function rentItem(id, name, price) {
+            if (!auth.currentUser) {
+                showPage('login');
+                return;
+            }
             
             Swal.fire({
-                icon: 'success',
-                title: 'เข้าสู่ระบบสำเร็จ',
-                timer: 1000,
-                showConfirmButton: false
-            }).then(() => {
-                if (email === ADMIN_EMAIL) {
-                    showPage('admin');
-                } else {
-                    showPage('home');
+                title: `<span class="text-slate-800">เช่า ${name}</span>`,
+                html: `
+                    <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <p class="text-sm text-slate-500 mb-2">ราคา: <span class="text-blue-600 font-bold">${price}</span> บาท/ชม.</p>
+                        <input type="range" min="1" max="12" value="1" class="w-full accent-blue-600" id="rent-range" oninput="document.getElementById('rent-label').innerText = this.value + ' ชม.'">
+                        <div class="flex justify-between mt-2 font-bold text-slate-700">
+                            <span id="rent-label">1 ชม.</span>
+                            <span class="text-green-600">รวม: ฿${price}</span>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#0f172a',
+                confirmButtonText: 'ยืนยันจ่ายเงิน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                     Swal.fire('Processing', 'ระบบกำลังจำลองการตัดเงิน...', 'info');
+                     // ตรงนี้ต้องเชื่อม Cloud Function ตัดเงินจริง
                 }
             });
         }
 
         function logout() {
-            currentUser = null;
-            showPage('home');
-            Swal.fire('ออกจากระบบ', 'ไว้เจอกันใหม่นะ!', 'success');
+            auth.signOut();
         }
 
-        function forgotPassword() {
-            Swal.fire({
-                title: 'ลืมรหัสผ่าน',
-                input: 'email',
-                inputLabel: 'กรุณากรอกอีเมลของคุณ',
-                inputPlaceholder: 'user@example.com',
-                showCancelButton: true,
-                confirmButtonText: 'ส่งลิงก์รีเซ็ต',
-                confirmButtonColor: '#3b82f6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('ส่งแล้ว!', 'ตรวจสอบอีเมลของคุณเพื่อตั้งรหัสผ่านใหม่', 'success');
-                }
-            });
-        }
-
-        // --- Rental System ---
-        function renderProducts() {
-            const container = document.getElementById('rental-grid');
-            container.innerHTML = products.map(p => `
-                <div class="glass p-4 rounded-xl hover:shadow-2xl hover:shadow-blue-500/20 transition duration-300 group">
-                    <div class="overflow-hidden rounded-lg mb-4">
-                        <img src="${p.image}" class="w-full h-40 object-cover transform group-hover:scale-110 transition duration-500">
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-1">${p.name}</h3>
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-blue-400">ว่างพร้อมเช่า</span>
-                        <span class="text-2xl font-bold text-yellow-400">฿${p.price}<span class="text-sm text-gray-400">/ชม.</span></span>
-                    </div>
-                    <button onclick="rentItem(${p.id}, '${p.name}', ${p.price})" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition">
-                        เช่าเลย
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function rentItem(id, name, price) {
-            if (!currentUser) { showPage('login'); return; }
-
-            Swal.fire({
-                title: `เช่า ${name}`,
-                html: `
-                    <div class="mb-4 text-left">
-                        <label>เลือกจำนวนชั่วโมง:</label>
-                        <input type="range" id="rent-hours" min="1" max="24" value="1" class="w-full mt-2" oninput="updatePrice(this.value, ${price})">
-                        <div class="flex justify-between mt-2 font-bold">
-                            <span id="hours-display">1 ชม.</span>
-                            <span id="price-display" class="text-yellow-400">฿${price}</span>
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'ยืนยันการเช่า',
-                confirmButtonColor: '#10b981',
-                preConfirm: () => {
-                    return document.getElementById('rent-hours').value;
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const hours = result.value;
-                    const total = hours * price;
-                    Swal.fire('สำเร็จ!', `คุณได้เช่า ${name} เป็นเวลา ${hours} ชม. <br>ระบบส่ง ID/Pass เข้าทางแชทแล้ว`, 'success');
-                }
-            });
-        }
-
-        window.updatePrice = function(hours, price) {
-            document.getElementById('hours-display').innerText = `${hours} ชม.`;
-            document.getElementById('price-display').innerText = `฿${hours * price}`;
-        }
-
-        // --- Topup System ---
-        function submitTopup(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'กำลังตรวจสอบ...',
-                text: 'กรุณารอสักครู่ แอดมินกำลังตรวจสอบสลิป',
-                icon: 'info',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                Swal.fire('แจ้งเติมเงินสำเร็จ', 'กรุณารอแอดมินอนุมัติภายใน 5 นาที', 'success');
-                showPage('home');
-            });
-        }
-
-        // --- Chat System ---
+        // Chat Widget
         function toggleChat() {
-            const chat = document.getElementById('chat-widget');
+            const chat = document.getElementById('chat-window');
             chat.classList.toggle('hidden');
         }
 
         function sendMessage() {
             const input = document.getElementById('chat-input');
             const msg = input.value;
-            if(!msg) return;
+            if(!msg || !auth.currentUser) return;
 
-            const chatBox = document.getElementById('chat-messages');
-            chatBox.innerHTML += `
-                <div class="flex justify-end mb-2">
-                    <div class="bg-blue-600 text-white p-2 rounded-lg max-w-[80%] text-sm">
-                        ${msg}
-                    </div>
-                </div>
-            `;
+            const chatRoom = 'chats/' + auth.currentUser.uid;
+            realtimeDb.ref(chatRoom).push({
+                text: msg,
+                sender: auth.currentUser.email,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
             input.value = '';
+            
+            // UI Fake Append (Real logic waits for listener)
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `<div class="text-right"><span class="inline-block bg-blue-600 text-white text-sm px-3 py-2 rounded-t-xl rounded-bl-xl max-w-[80%]">${msg}</span></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        // --- Admin Logic ---
-        function switchAdminTab(tab) {
-            // Hide all tab content
-            document.getElementById('admin-products').classList.add('hidden');
-            document.getElementById('admin-users').classList.add('hidden');
-            // Show selected
-            document.getElementById(`admin-${tab}`).classList.remove('hidden');
-        }
-
-        function copyText(text) {
-            navigator.clipboard.writeText(text);
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
-            });
-            Toast.fire({
-                icon: 'success',
-                title: 'คัดลอกแล้ว'
-            });
         }
     </script>
 </body>
